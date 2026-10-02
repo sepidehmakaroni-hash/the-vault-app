@@ -562,3 +562,11 @@ select.in option{background:#1b1a18}
 .door-copy .h1{text-wrap:wrap}
 
 .sign{font-family:'Archivo',sans-serif;font-weight:500;margin-inline-end:.08em}
+
+/* Persian body copy one step larger than the English, so both read at the same size */
+[dir=rtl] body,.app[dir=rtl]{font-size:16px}
+[dir=rtl] .p{font-size:15.5px}
+[dir=rtl] .small,[dir=rtl] .err,[dir=rtl] .row i,[dir=rtl] .box i,[dir=rtl] .ends,[dir=rtl] .note,[dir=rtl] .tx i,[dir=rtl] .fliphint,[dir=rtl] .saved,[dir=rtl] .icard .icap i,[dir=rtl] .roomc i,[dir=rtl] .backtext i{font-size:14px}
+[dir=rtl] .row b,[dir=rtl] .tx b,[dir=rtl] .kv,[dir=rtl] .check span,[dir=rtl] .chip{font-size:15.5px}
+[dir=rtl] .btn{font-size:16.5px}
+.check input{width:24px;height:24px}

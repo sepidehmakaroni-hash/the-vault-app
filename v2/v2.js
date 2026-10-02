@@ -313,7 +313,7 @@ function doorFrame(t) {   // t in ms, opening direction
   var swing = seg(t, 700, 3000, E.sine), cam = seg(t, 2600, 4300, E.io);
   return {
     '--bolt': seg(t, 0, 600), '--hrot': (-80 * seg(t, 50, 800, E.back)) + 'deg', '--pop': (10 * seg(t, 500, 850, E.out)) + 'px',
-    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 900, 2800, E.sine),
+    '--swing': (-4 * seg(t, 250, 700, E.out) - 108 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 900, 2800, E.sine),
     '--logo': seg(t, 1100, 2600, E.sine) * (1 - seg(t, 3500, 4100, E.sine)), '--halo': 1 - seg(t, 700, 1500),
     '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 3300, 4100), '--fade': 1 - seg(t, 3800, 4500, E.sine)
   };
