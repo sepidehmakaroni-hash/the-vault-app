@@ -585,7 +585,7 @@ select.in option{background:#1b1a18}
 .pass-g{margin:0;font-size:15px;color:var(--ivory)}
 .pass-clock{margin:0;font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;font-size:30px;font-weight:500;letter-spacing:.06em;color:var(--gold-l)}
 .pass-hint{margin:0;font-size:13px;color:var(--mute)}
-.pass-put{margin:6px 0 0;font-size:13px;color:var(--faint);letter-spacing:.06em}
+.pass-x{margin-top:6px;min-height:44px;padding:0 18px;border:1px solid var(--line2);border-radius:22px;background:none;font:inherit;font-size:13.5px;color:var(--gold-l);letter-spacing:.04em;cursor:pointer}.pass-x:focus-visible{outline:2px solid var(--gold-l);outline-offset:3px}.pass-clock b{display:inline-block;width:.64em;text-align:center;font-weight:500}.pass-clock i{font-style:normal;font-family:'Archivo',sans-serif;padding:0 .04em}[dir=rtl] .pass-clock{font-family:'Noto Naskh Arabic','Archivo',sans-serif}
 @media (prefers-reduced-motion:reduce){.pass-sheen{animation:none;opacity:.4}}
 /* ---------- dock: active tab in foil with a brass dot ---------- */
 .dock button{position:relative}

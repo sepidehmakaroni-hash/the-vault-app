@@ -771,22 +771,24 @@ function guestsTonight() { var r = S.res.filter(function (x) { return x.day === 
 function openPass() {
   if (passEl) return; var l = L(), g = guestsTonight();
   passEl = document.createElement('div'); passEl.className = 'pass'; passEl.setAttribute('role', 'dialog'); passEl.setAttribute('aria-modal', 'true'); passEl.setAttribute('aria-label', l.passT); passEl.tabIndex = -1;
-  passEl.innerHTML = '<div class="pass-in"><p class="eyb">' + l.passT + '</p><div class="pass-plate"><div class="pass-qr">' + qr() + '</div><span class="pass-sheen"></span></div>' +
+  passEl.innerHTML = '<div class="pass-in"><p class="eyb">' + l.passT + '</p><div class="pass-plate"><div class="pass-qr" role="img" aria-label="' + (fa() ? 'کد ورود' : 'Entry code') + '">' + qr() + '</div><span class="pass-sheen"></span></div>' +
     '<div class="pass-who"><b dir="ltr">ARASH FARAHANI</b><span dir="ltr">Nº 001</span></div>' +
     '<p class="pass-g">' + (g > 1 ? fill(l.passGuests, digits(g)) : (g === 1 ? l.passGuest1 : l.passAlone)) + '</p>' +
-    '<p class="pass-clock" dir="ltr" aria-live="off"></p><p class="pass-hint">☀ ' + l.passBright + '</p><p class="pass-put">' + l.passPut + '</p></div>';
-  app.appendChild(passEl); [view, bar, dock].forEach(function (x) { x.inert = true; });
-  var tick = function () { var d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; }; var c = passEl && passEl.querySelector('.pass-clock'); if (c) c.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); };
+    '<p class="pass-clock" dir="ltr" aria-live="off"></p><p class="pass-hint">☀ ' + l.passBright + '</p><button type="button" class="pass-x" aria-label="' + l.close + '">' + l.passPut + '</button></div>';
+  app.appendChild(passEl); [].forEach.call(app.children, function (x) { if (x !== passEl) x.inert = true; });
+  var tick = function () { var d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; }; var c = passEl && passEl.querySelector('.pass-clock'); if (c) c.innerHTML = digits(p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds())).split('').map(function (ch) { return ch === ':' ? '<i>:</i>' : '<b>' + ch + '</b>'; }).join(''); };
   tick(); passT = setInterval(tick, 1000);
   history.pushState({ i: ++depth, pass: 1 }, '', '#/' + route.path);
-  requestAnimationFrame(function () { passEl.classList.add('on'); passEl.focus({ preventScroll: true }); }); buzz(20); SFX.set();
+  requestAnimationFrame(function () { if (!passEl) return; passEl.classList.add('on'); passEl.querySelector('.pass-x').focus({ preventScroll: true }); }); buzz(20); SFX.set();
+  passEl.querySelector('.pass-x').addEventListener('click', function () { closePass(); });
+  passEl.addEventListener('keydown', function (e) { if (e.key === 'Tab') { e.preventDefault(); passEl.querySelector('.pass-x').focus(); } });
   var y0 = null;
   passEl.addEventListener('pointerdown', function (e) { y0 = e.clientY; });
   passEl.addEventListener('pointerup', function (e) { if (y0 != null && (e.clientY - y0 > 60 || Math.abs(e.clientY - y0) < 10)) closePass(); y0 = null; });
 }
 function closePass(fromPop) {
   if (!passEl) return; var el = passEl; passEl = null; clearInterval(passT);
-  el.classList.remove('on'); [view, bar, dock].forEach(function (x) { x.inert = false; });
+  el.classList.remove('on'); [].forEach.call(app.children, function (x) { if (x !== el) x.inert = false; });
   setTimeout(function () { el.remove(); }, calm ? 0 : 450);
   if (fromPop !== true) { ignorePop = true; history.back(); }
   var c = $('#card'); if (c) c.focus({ preventScroll: true });
