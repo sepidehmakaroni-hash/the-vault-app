@@ -34,7 +34,7 @@ memberNo: 'Member Nº 001', morning: 'Good morning.', afternoon: 'Good afternoon
 cardHint: 'Tap the card to show it at the door', cardBackT: 'Show at the door', cardBackD: 'The doorman scans this. It changes every visit.',
 avail: 'Available to spend', owed: 'Owed', ofLimit: 'of %1 credit',
 nextVisit: 'Your next visit', nothing: 'Nothing reserved yet', chooseRoom: 'choose a room and a time',
-boxes: [['Reserve', 'A table, a room'], ['Calendar', 'What is on'], ['Concierge', 'Anything, tonight'], ['Wallet', 'Charge and credit']],
+boxes: [['Guest list', 'Name tonight’s guests'], ['Car at the door', 'Ready when you are'], ['Humidor locker', 'Nº 14 · nine cigars'], ['House rules', 'Six short rules']], carT: 'Your car', carB: 'The valet brings it to the door. Tell us when.', carNow: 'Now', carIn: 'In 15 minutes', carLater: 'In 30 minutes', carSend: 'Bring my car', carDone: 'Your car is on its way to the door.', lockerT: 'Humidor locker Nº 14', lockerB: 'Kept at 70% humidity, 18°C. The humidor keeper holds the key.', cigars: [['Cohiba Behike 54', '3'], ['Montecristo Nº 2', '4'], ['Padrón 1964 Anniversary', '2']], ask: 'Ask the keeper', asked: 'The keeper will bring your selection.',
 tonight: 'Tonight and this week', chefT: 'The chef’s table', chefD: 'Tonight · eight seats · a menu of the season', terrT: 'The terrace is open', terrD: 'Dinner under the sky · until midnight', today: 'Today', swipe: 'Swipe',
 dock: ['Home', 'Reserve', 'Events', 'Concierge', 'Wallet'],
 reserveEy: 'Reserve', reserveTitle: 'Where would you like to sit?', yourRes: 'Your reservations', cancel: 'Cancel', cancelQ: 'Cancel this reservation?', cancelYes: 'Yes, cancel it', keep: 'Keep it', cancelled: 'The reservation is cancelled.',
@@ -87,7 +87,7 @@ memberNo: 'عضو شمارهٔ ۰۰۱', morning: 'صبح بخیر.', afternoon: 
 cardHint: 'برای نشان دادن در ورودی، روی کارت بزنید', cardBackT: 'نمایش در ورودی', cardBackD: 'دربان این را اسکن می‌کند. هر بار عوض می‌شود.',
 avail: 'قابل خرج', owed: 'بدهی', ofLimit: 'از %1 اعتبار',
 nextVisit: 'حضور بعدی شما', nothing: 'هنوز رزروی نیست', chooseRoom: 'یک فضا و یک ساعت انتخاب کنید',
-boxes: [['رزرو', 'یک میز، یک فضا'], ['تقویم', 'برنامهٔ خانه'], ['کانسیرژ', 'هر چه بخواهید'], ['کیف پول', 'شارژ و اعتبار']],
+boxes: [['فهرست مهمان', 'مهمان‌های امشب'], ['ماشین دم در', 'هر وقت آماده‌اید'], ['قفسهٔ هیومیدور', 'شمارهٔ ۱۴ · نه سیگار'], ['قوانین خانه', 'شش قانون کوتاه']], carT: 'ماشین شما', carB: 'متصدی پارکینگ آن را دم در می‌آورد. بگویید کی.', carNow: 'همین حالا', carIn: '۱۵ دقیقهٔ دیگر', carLater: '۳۰ دقیقهٔ دیگر', carSend: 'ماشینم را بیاورید', carDone: 'ماشین شما در راه در ورودی است.', lockerT: 'قفسهٔ هیومیدور شمارهٔ ۱۴', lockerB: 'در رطوبت ۷۰٪ و دمای ۱۸ درجه نگه داشته می‌شود. کلید نزد مسئول هیومیدور است.', cigars: [['کوهیبا بهیکه ۵۴', '۳'], ['مونته‌کریستو شمارهٔ ۲', '۴'], ['پادرون ۱۹۶۴ آنیورسری', '۲']], ask: 'درخواست از مسئول', asked: 'مسئول هیومیدور انتخاب شما را می‌آورد.',
 tonight: 'امشب و این هفته', chefT: 'میز سرآشپز', chefD: 'امشب · هشت صندلی · منوی فصل', terrT: 'تراس باز است', terrD: 'شام زیر آسمان · تا نیمه‌شب', today: 'امروز', swipe: 'ورق بزنید',
 dock: ['خانه', 'رزرو', 'رویدادها', 'کانسیرژ', 'کیف پول'],
 reserveEy: 'رزرو', reserveTitle: 'کجا می‌خواهید بنشینید؟', yourRes: 'رزروهای شما', cancel: 'لغو', cancelQ: 'این رزرو لغو شود؟', cancelYes: 'بله، لغو شود', keep: 'نگه دار', cancelled: 'رزرو لغو شد.',
@@ -220,7 +220,7 @@ function wallet() {
   return { top: top, spent: spent, bal: bal, debt: debt, remain: remain, avail: remain + Math.max(0, W.limit - debt), by: by };
 }
 var EV = [{ off: 3, seats: 12 }, { off: 9, seats: 4 }, { off: 16, seats: 20 }, { off: 27, seats: 9 }];
-var EVPH = ['gallery', 'member-events', 'bar', 'events'];
+var EVPH = ['member-events', 'gallery', 'bar', 'events'];
 
 /* ================= the door ================= */
 (function buildDoor() {
@@ -298,11 +298,12 @@ function seg(t, a, b, ease) { var x = Math.max(0, Math.min(1, (t - a) / (b - a))
 var VARS = ['--bolt', '--hrot', '--pop', '--swing', '--shade', '--glow', '--logo', '--halo', '--cam', '--fade', '--frame'];
 function setVars(v) { for (var k in v) app.style.setProperty(k, v[k]); }
 function clearVars() { VARS.forEach(function (k) { app.style.removeProperty(k); }); }
+var rush = 1;
 function timeline(total, frame, cues, done) {
-  var t0 = performance.now(), fired = {};
+  var t0 = performance.now(), fired = {}, last = t0, tt = 0; rush = 1;
   if (calm) { frame(total); done(); return; }
   (function tick(now) {
-    var t = now - t0;
+    tt += (now - last) * rush; last = now; var t = tt;
     cues.forEach(function (c, i) { if (!fired[i] && t >= c[0]) { fired[i] = 1; c[1](); } });
     frame(Math.min(t, total));
     if (t < total) requestAnimationFrame(tick); else done();
@@ -318,13 +319,18 @@ function doorFrame(t) {   // t in ms, opening direction
   };
 }
 var OPEN_T = 8400;
+// the short way in: the same moves, compressed (short ms -> long-timeline ms)
+var SHORT = [[0, 0], [550, 1100], [800, 2100], [1850, 6000], [2700, 8400]];
+function warp(t, k) { for (var i = 1; i < k.length; i++) if (t <= k[i][0]) { var a = k[i - 1], b = k[i]; return a[1] + (b[1] - a[1]) * (t - a[0]) / (b[0] - a[0]); } return k[k.length - 1][1]; }
 function unlock() {
   busy = true; S.authed = true; S.typing = false; save();
   app.classList.add('scene-combo', 'animating'); app.classList.remove('scene-login');
   view.style.transition = 'opacity .6s'; view.style.opacity = '0';
   var entered = false;
-  timeline(OPEN_T, function (t) { setVars(doorFrame(t)); if (!entered && t >= 7300) { entered = true; app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
-    [[0, function () { SFX.bolts(); buzz(30); }], [1600, SFX.seal], [2000, SFX.swing]],
+  var today = new Date().toDateString(), full = ls.get('vault.fullOpen') !== today; ls.set('vault.fullOpen', today);
+  var T = full ? OPEN_T : SHORT[SHORT.length - 1][0], at = function (t) { return full ? t : warp(t, SHORT); };
+  timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= 7300) { entered = true; app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
+    full ? [[0, function () { SFX.bolts(); buzz(30); }], [1600, SFX.seal], [2000, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [650, SFX.swing]],
     function () {
       if (!entered) { app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
       app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();
@@ -488,7 +494,7 @@ function showErrors() {
 var digitsOnly = function (s) { return String(s || '').replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/\D/g, ''); };
 function icard(attrs, photo, title, sub, tag, pill, cls) { return '<button type="button" class="icard' + (cls ? ' ' + cls : '') + '" ' + attrs + '>' + img(photo, '') + (tag || '') + (pill || '') + '<span class="icap"><b>' + title + '</b>' + (sub ? '<i>' + sub + '</i>' : '') + '</span></button>'; }
 function dateTag(d) { return '<span class="tag num">' + dfmt(d, { day: 'numeric' }) + '<small>' + dfmt(d, { month: 'short' }) + '</small></span>'; }
-function img(name, alt) { return '<img src="../assets/photos/' + name + '.jpg" alt="' + esc(alt || '') + '" loading="lazy" decoding="async">'; }
+function img(name, alt) { return '<img src="img/' + name + '.jpg" alt="' + esc(alt || '') + '" loading="lazy" decoding="async">'; }
 
 /* ================= pages: the door ================= */
 R('', { scene: 'door', cls: 'door-page', html: function () {
@@ -648,7 +654,7 @@ R('m', { scene: 'in', html: function () {
       icard('data-act="event" data-v="2"', EVPH[2], l.events[2][0], l.events[2][1] + ' · ' + l.events[2][2], dateTag(dayOf(EV[2].off)), S.rsvp[2] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
     '</div></div>' +
     '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' +
-    '<div class="boxes">' + l.boxes.map(function (b, i) { return '<button type="button" class="box" data-go="' + ['m/reserve', 'm/events', 'm/concierge', 'm/wallet'][i] + '"><span class="plate">Nº 0' + (i + 1) + '</span>' + KEYHOLE + '<span><b>' + b[0] + '</b><i>' + b[1] + '</i></span></button>'; }).join('') + '</div>' +
+    '<div class="boxes">' + l.boxes.map(function (b, i) { return '<button type="button" class="box" ' + ['data-go="m/account"', 'data-act="car"', 'data-act="locker"', 'data-go="m/rules"'][i] + '><span class="plate">Nº 0' + (i + 1) + '</span>' + KEYHOLE + '<span><b>' + b[0] + '</b><i>' + b[1] + '</i></span></button>'; }).join('') + '</div>' +
     '';
 }, after: function () { cardTilt(); } });
 
@@ -671,7 +677,7 @@ R('m/room', { scene: 'in', back: true, html: function (r) {
     '<div class="f"><span class="lab">' + l.party + '</span><div class="stepper"><button type="button" data-act="party" data-v="-1" aria-label="−">−</button><output class="num">' + digits(f.party) + '</output><button type="button" data-act="party" data-v="1" aria-label="+">+</button></div></div>' +
     (f.party > 1 ? '<div class="f"><label class="lab">' + l.guestNames + '</label><textarea class="in" style="min-height:90px" placeholder="' + l.guestPh + '" data-k="rf.' + r.room + '.guests"></textarea></div>' : '') +
     '<div class="f"><label class="lab">' + l.noteLab + '</label><input class="in" placeholder="' + esc(l.notePh) + '" data-k="rf.' + r.room + '.note"></div></div>' +
-    '<div class="cta-bar"><button type="button" class="btn gold" data-act="hold">' + l.hold + '</button></div></div>';
+    '<div class="cta-bar static"><button type="button" class="btn gold" data-act="hold">' + l.hold + '</button></div></div>';
 } });
 
 R('m/events', { scene: 'in', html: function () {
@@ -781,6 +787,7 @@ function eventSheet(i) {
 
 /* ================= one handler for every tap ================= */
 document.addEventListener('pointerdown', function () { audio(); }, { once: true });
+app.addEventListener('pointerdown', function () { if (app.classList.contains('animating')) rush = 4; }, true);
 app.addEventListener('click', function (e) {
   var cardEl = e.target.closest('#card');
   if (cardEl) { askMotion(); cardEl.classList.toggle('flipped'); buzz(8); return; }
@@ -883,6 +890,10 @@ app.addEventListener('click', function (e) {
         '<button type="button" class="btn ghost" data-act="report">' + l.report + '</button>');
     },
     report: function () { closeSheet(); toast(l.reported); },
+    car: function () { S.carW = S.carW || 0; openSheet(l.carT, '<p class="p">' + l.carB + '</p>' + chips('car', 'carW', [l.carNow, l.carIn, l.carLater], false) + '<button type="button" class="btn gold" data-act="carSend">' + l.carSend + '</button>'); },
+    carSend: function () { closeSheet(); SFX.set(); buzz(12); toast(l.carDone); },
+    locker: function () { openSheet(l.lockerT, '<p class="p">' + l.lockerB + '</p><div>' + l.cigars.map(function (c) { return '<div class="kv"><span>' + c[0] + '</span><span class="num">× ' + c[1] + '</span></div>'; }).join('') + '</div><button type="button" class="btn line" data-act="asked">' + l.ask + '</button>'); },
+    asked: function () { closeSheet(); toast(l.asked); },
     addGuest: function () { var g = String(S.newGuest || '').trim(); if (!g) return; S.guests.push(g); S.newGuest = ''; save(); rerender(); },
     rmGuest: function () { S.guests.splice(Number(v), 1); save(); rerender(); toast(l.removed); },
     notif: function () { S.notif[Number(v)] = !S.notif[Number(v)]; save(); el.setAttribute('aria-checked', String(S.notif[Number(v)])); buzz(5); },

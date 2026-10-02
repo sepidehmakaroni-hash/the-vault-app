@@ -3,10 +3,12 @@
 @font-face{font-family:'Awaken';src:url(../assets/fonts/Awaken.otf) format('opentype');font-display:swap}
 @font-face{font-family:'Bodoni Moda';src:url(../assets/fonts/BodoniModa-VF.ttf);font-weight:400 900;font-display:swap}
 @font-face{font-family:'Archivo';src:url(../assets/fonts/Archivo-VF.ttf);font-weight:100 900;font-display:swap}
+@font-face{font-family:'Reem Kufi';src:url(fonts/reem-kufi-arabic-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Reem Kufi';src:url(fonts/reem-kufi-arabic-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Vazirmatn';src:url(../assets/fonts/Vazirmatn-VF.ttf);font-weight:100 900;font-display:swap}
 
 :root{
-  --ink:#0F0E0D; --ivory:#ECE5D6; --mute:rgba(236,229,214,.62); --faint:rgba(236,229,214,.38);
+  --ink:#0F0E0D; --ivory:#ECE5D6; --mute:rgba(236,229,214,.72); --faint:rgba(236,229,214,.58);
   --gold:#A08A58; --gold-l:#CDB57E; --line:rgba(205,181,126,.22); --line2:rgba(205,181,126,.45);
   --red:#D9826F; --green:#9DBB8A;
   --foil:linear-gradient(180deg,#E2CC95 0%,#C2A86E 45%,#A08A58 70%,#87713F 100%);
@@ -478,3 +480,16 @@ select.in option{background:#1b1a18}
 .hide .money{filter:none;letter-spacing:.12em}
 .hide .meter i{opacity:0}
 .hide .stat b.neg{color:inherit}
+
+/* ---------- type: Persian gets its own display face, and nothing readable is smaller than 13px ---------- */
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Reem Kufi','Vazirmatn',sans-serif;font-weight:400;letter-spacing:0}
+[dir=rtl] .h1{font-size:clamp(30px,8.6vw,38px);line-height:1.35}
+[dir=rtl] .h2{line-height:1.4}[dir=rtl] .h3{font-weight:500}
+[dir=rtl] .icard .icap b{font-size:23px;line-height:1.35}
+.small,.err,.row i,.roomc i,.backtext i,.box i,.ends,.note,.tx i,.fliphint,.saved,.ornament,.icard .icap i{font-size:13px}
+.eyb,.lab,.stat span{font-size:12px;letter-spacing:.18em}
+[dir=rtl] .eyb,[dir=rtl] .lab,[dir=rtl] .stat span{font-size:13px;letter-spacing:0}
+.dock button{font-size:11px}[dir=rtl] .dock button{font-size:12px}
+.icard .tag small{font-size:11px}
+
+.cta-bar.static{position:static;margin:26px 0 0!important;padding:0 0 8px;background:none}
