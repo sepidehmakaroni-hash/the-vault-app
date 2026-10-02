@@ -131,10 +131,10 @@ var P = { lang: ls.get('vault.lang') || 'en', sound: ls.get('vault.sound') !== '
 var fa = function () { return P.lang === 'fa'; };
 var L = function () { return T[P.lang]; };
 var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, function (_, i) { return a[i]; }); };
-var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x); };
+var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x).replace(/\u066C/g, '\u202F'); };
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
-var money = function (x) { return S.hide ? '<span class="money" aria-label="hidden">••••••</span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; };
-var dfmt = function (d, o) { return new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); };
+var money = function (x, sign) { var inner = S.hide ? '<span class="money" aria-label="hidden">••••••</span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; return '<bdi dir="ltr" class="amtw">' + (sign || '') + inner + '</bdi>'; };
+var dfmt = function (d, o) { var s2 = new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); return fa() ? s2.replace(/,/g, '،') : s2; };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 
 /* ================= state that survives Back and reload ================= */
@@ -242,7 +242,7 @@ function valueAt(r) { return ((Math.round(-r / 3.6) % 100) + 100) % 100; }
 function pad(v) { return (v < 10 ? '0' : '') + v; }
 function paintDial() {
   dial.style.setProperty('--rot', rot.toFixed(2) + 'deg');
-  var v = valueAt(rot); dial.setAttribute('aria-valuenow', v);
+  var v = valueAt(rot); dial.setAttribute('aria-valuenow', v); dial.setAttribute('aria-valuetext', String(v));
   if (route.key === 'combo') { var cur = $$('.page:not(.leave) .slot')[slots.length]; if (cur) cur.textContent = pad(v); }
 }
 function angle(e) { var r = dial.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; }
@@ -310,44 +310,45 @@ function timeline(total, frame, cues, done) {
   })(t0);
 }
 function doorFrame(t) {   // t in ms, opening direction
-  var swing = seg(t, 2000, 6200, E.sine), cam = seg(t, 5300, 8300, E.io);
+  var swing = seg(t, 1100, 4200, E.sine), cam = seg(t, 3500, 5600, E.io);
   return {
-    '--bolt': seg(t, 0, 1100), '--hrot': (-80 * seg(t, 200, 1800, E.back)) + 'deg', '--pop': (10 * seg(t, 1600, 2300, E.out)) + 'px',
-    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 2200, 5200, E.sine),
-    '--logo': seg(t, 2800, 5000, E.sine) * (1 - seg(t, 7000, 7900, E.sine)), '--halo': 1 - seg(t, 2000, 3200),
-    '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 6600, 7800), '--fade': 1 - seg(t, 7500, 8400, E.sine)
+    '--bolt': seg(t, 0, 700), '--hrot': (-80 * seg(t, 100, 1000, E.back)) + 'deg', '--pop': (10 * seg(t, 850, 1300, E.out)) + 'px',
+    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 1300, 3600, E.sine),
+    '--logo': seg(t, 1600, 3400, E.sine) * (1 - seg(t, 4500, 5200, E.sine)), '--halo': 1 - seg(t, 1100, 2000),
+    '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 4400, 5300), '--fade': 1 - seg(t, 5000, 5700, E.sine)
   };
 }
-var OPEN_T = 8400;
+var OPEN_T = 5700, ENTER_T = 4900;
 // the short way in: the same moves, compressed (short ms -> long-timeline ms)
-var SHORT = [[0, 0], [550, 1100], [800, 2100], [1850, 6000], [2700, 8400]];
+var SHORT = [[0, 0], [400, 700], [600, 1100], [1700, 4000], [2500, 5700]];
 function warp(t, k) { for (var i = 1; i < k.length; i++) if (t <= k[i][0]) { var a = k[i - 1], b = k[i]; return a[1] + (b[1] - a[1]) * (t - a[0]) / (b[0] - a[0]); } return k[k.length - 1][1]; }
 function unlock() {
   busy = true; S.authed = true; S.typing = false; save();
-  app.classList.add('scene-combo', 'animating'); app.classList.remove('scene-login');
+  app.classList.add('scene-combo', 'animating', 'hidebar'); app.classList.remove('scene-login');
   view.style.transition = 'opacity .6s'; view.style.opacity = '0';
   var entered = false;
   var today = new Date().toDateString(), full = ls.get('vault.fullOpen') !== today; ls.set('vault.fullOpen', today);
   var T = full ? OPEN_T : SHORT[SHORT.length - 1][0], at = function (t) { return full ? t : warp(t, SHORT); };
-  timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= 7300) { entered = true; app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
-    full ? [[0, function () { SFX.bolts(); buzz(30); }], [1600, SFX.seal], [2000, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [650, SFX.swing]],
+  timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= ENTER_T) { entered = true; app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
+    full ? [[0, function () { SFX.bolts(); buzz(30); }], [850, SFX.seal], [1100, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
     function () {
-      if (!entered) { app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
+      if (!entered) { app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
       app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();
       requestAnimationFrame(function () { app.classList.remove('instant'); }); view.style.transition = ''; slots = []; busy = false;
     });
 }
 function lockVault() {
   if (busy) return; closeSheet(); S.authed = false; save();
-  busy = true; app.classList.add('animating');
+  busy = true; app.classList.add('animating', 'hidebar');
   setVars(doorFrame(OPEN_T));
+  view.style.transition = 'none'; view.style.opacity = '0';
   go('', { replace: true, fade: true });
   app.classList.remove('inside');
-  // the same timeline, played backwards and a little quicker
-  var T = 7000, map = function (t) { return OPEN_T - t * (OPEN_T / T); };
+  // the same moves backwards, quicker: step out of the pattern, the door swings shut, the bolts go home
+  var T = 3400, map = function (t) { return OPEN_T - t * (OPEN_T / T); };
   timeline(T, function (t) { setVars(doorFrame(map(t))); },
-    [[2300, SFX.swing], [T - 1500, function () { SFX.shut(); buzz(40); }], [T - 900, SFX.bolts]],
-    function () { app.classList.remove('animating'); clearVars(); busy = false; toast(L().locked); });
+    [[700, SFX.swing], [T - 700, function () { SFX.shut(); buzz(40); view.style.transition = 'opacity .7s'; view.style.opacity = ''; app.classList.remove('hidebar'); }], [T - 300, SFX.bolts]],
+    function () { app.classList.remove('animating'); clearVars(); view.style.transition = ''; busy = false; toast(L().locked); });
 }
 
 /* ================= router ================= */
@@ -366,7 +367,9 @@ window.addEventListener('popstate', function (e) {
   closeSheet();
   var to = curPath();
   // Back out of the member area never shows a public page with the vault still open: it locks instead
-  if (S.authed && route.key.indexOf('m') === 0 && to.indexOf('m') !== 0) { depth = i; history.pushState({ i: ++depth }, '', '#/' + route.path); lockVault(); return; }
+  if (S.authed && route.key.indexOf('m') === 0 && to.indexOf('m') !== 0) { depth = i; history.pushState({ i: ++depth }, '', '#/' + route.path); if (route.key !== 'm') { go('m', { replace: true, back: true }); } return; }
+  // after sending a request, Back goes to the door, not into the finished form
+  if (route.key === 'sent') { depth = i; history.replaceState({ i: depth }, '', '#/'); render('back'); return; }
   var dir = i < depth ? 'back' : 'fwd'; depth = i;
   render(dir);
 });
@@ -397,9 +400,9 @@ function render(dir, o) {
   if (!app.classList.contains('animating')) app.classList.toggle('inside', def.scene === 'in');
   ['door', 'login', 'combo'].forEach(function (s) { app.classList.toggle('scene-' + s, def.scene === s); });
   app.classList.toggle('has-dock', def.scene === 'in');
-  app.setAttribute('dir', fa() ? 'rtl' : 'ltr'); document.documentElement.lang = fa() ? 'fa' : 'en';
+  app.setAttribute('dir', fa() ? 'rtl' : 'ltr'); document.documentElement.lang = fa() ? 'fa' : 'en'; dial.setAttribute('aria-label', fa() ? 'قفل رمز' : 'Combination dial');
   dial.tabIndex = (def.scene === 'door' || def.scene === 'combo') ? 0 : -1;
-  drawBar(def); drawDock();
+  drawBar(def); drawDock(); app.classList.remove('scrolled');
 
   var pg = document.createElement('div');
   pg.className = 'page ' + (def.cls || '') + ' enter' + (o.fade || first ? ' fade' : (dir === 'back' ? ' pback' : ''));
@@ -424,8 +427,8 @@ function drawBar(def) {
   var l = L(), monoTo = def.scene === 'in' ? 'm' : '';
   var mono = '<button type="button" class="mono" data-go="' + monoTo + '" aria-label="The Vault"><span class="mk"></span></button>';
   var left = def.back ? '<button type="button" class="back" data-act="back"><i></i><span>' + l.back + '</span></button>' : mono;
-  var right = def.scene === 'in' ? '<button type="button" class="ibtn lang" data-act="lang">' + l.lang + '</button><button type="button" class="avatar" data-go="m/account" aria-label="' + l.accEy + '">AF</button>'
-    : '<button type="button" class="ibtn" data-act="sound" aria-label="' + l.sound + '" aria-pressed="' + P.sound + '">' + I(P.sound ? 'sound' : 'mute') + '</button><button type="button" class="ibtn" data-act="lang">' + l.lang + '</button>';
+  var right = def.scene === 'in' ? '<button type="button" class="ibtn lang" data-act="lang" lang="' + (fa() ? 'en' : 'fa') + '" aria-label="' + (fa() ? 'English' : 'فارسی') + '">' + l.lang + '</button><button type="button" class="avatar" data-go="m/account" aria-label="' + l.accEy + '">AF</button>'
+    : '<button type="button" class="ibtn" data-act="sound" aria-label="' + l.sound + '" aria-pressed="' + P.sound + '">' + I(P.sound ? 'sound' : 'mute') + '</button><button type="button" class="ibtn lang" data-act="lang" lang="' + (fa() ? 'en' : 'fa') + '" aria-label="' + (fa() ? 'English' : 'فارسی') + '">' + l.lang + '</button>';
   bar.innerHTML = '<div class="bar-l">' + left + '</div>' + (def.back ? '<div>' + mono + '</div>' : '') + '<div class="bar-r">' + right + '</div>';
 }
 var DOCK = [['m', 'home'], ['m/reserve', 'reserve'], ['m/events', 'events'], ['m/concierge', 'conc'], ['m/wallet', 'wallet']];
@@ -451,6 +454,7 @@ function hydrate(root) {
 }
 function countUpdate(el) { var c = $('[data-cnt="' + el.getAttribute('data-k') + '"]'); if (c) c.textContent = digits(el.value.length) + ' / ' + digits(el.getAttribute('maxlength')); }
 function clearErr(key) { if (key && S.errs[key]) { delete S.errs[key]; save(); var f = $('.page:not(.leave) [data-f="' + key + '"]'); if (f) { f.classList.remove('bad'); var e = $('.err', f); if (e) e.remove(); } } }
+view.addEventListener('scroll', function (e) { var t = e.target; if (t.classList && t.classList.contains('page') && !t.classList.contains('leave')) app.classList.toggle('scrolled', t.scrollTop > 8); }, true);
 view.addEventListener('input', function (e) {
   var el = e.target, k = el.getAttribute('data-k');
   if (el.hasAttribute('data-digits')) {
@@ -494,7 +498,7 @@ function showErrors() {
 var digitsOnly = function (s) { return String(s || '').replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/\D/g, ''); };
 function icard(attrs, photo, title, sub, tag, pill, cls) { return '<button type="button" class="icard' + (cls ? ' ' + cls : '') + '" ' + attrs + '>' + img(photo, '') + (tag || '') + (pill || '') + '<span class="icap"><b>' + title + '</b>' + (sub ? '<i>' + sub + '</i>' : '') + '</span></button>'; }
 function dateTag(d) { return '<span class="tag num">' + dfmt(d, { day: 'numeric' }) + '<small>' + dfmt(d, { month: 'short' }) + '</small></span>'; }
-function img(name, alt) { return '<img src="img/' + name + '.jpg" alt="' + esc(alt || '') + '" loading="lazy" decoding="async">'; }
+function img(name, alt) { return '<img src="img/' + name + '.webp" alt="' + esc(alt || '') + '" loading="lazy" decoding="async">'; }
 
 /* ================= pages: the door ================= */
 R('', { scene: 'door', cls: 'door-page', html: function () {
@@ -506,7 +510,7 @@ R('', { scene: 'door', cls: 'door-page', html: function () {
 R('login', { scene: 'login', back: true, cls: 'door-page login', html: function () {
   var l = L(), m = S.login.mode;
   var h = '<div class="head center rise"><h1 class="h2">' + l.loginTitle + '</h1><p class="p">' + l.loginBody + '</p></div>' +
-    '<div class="seg" role="tablist"><button type="button" role="tab" data-act="lmode" data-v="0" aria-pressed="' + (m === 0) + '">' + l.byCode + '</button><button type="button" role="tab" data-act="lmode" data-v="1" aria-pressed="' + (m === 1) + '">' + l.byPass + '</button></div>';
+    '<div class="seg" role="tablist"><button type="button" role="tab" data-act="lmode" data-v="0" aria-selected="' + (m === 0) + '" aria-pressed="' + (m === 0) + '">' + l.byCode + '</button><button type="button" role="tab" data-act="lmode" data-v="1" aria-selected="' + (m === 1) + '" aria-pressed="' + (m === 1) + '">' + l.byPass + '</button></div>';
   if (m === 0) h += '<div class="fields">' + phone('lphone', 'login.cc', 'login.phone', l.mobile, true) + '</div><button type="button" class="btn gold" data-act="sendCombo">' + l.send + '</button>';
   else h += '<div class="fields">' + input('luser', 'login.user', l.user, 'autocomplete="username" autocapitalize="off" spellcheck="false" dir="ltr"', true) +
     fld('lpass', l.pass, { html: '<div class="pw"><input class="in" type="' + (S.login.show ? 'text' : 'password') + '" autocomplete="current-password" dir="ltr" data-k="login.pass"><button type="button" data-act="showpw">' + (S.login.show ? l.hide : l.show) + '</button></div>' }, true) +
@@ -549,12 +553,13 @@ R('house', { scene: 'flat', back: true, html: function () {
     '<div class="sec"><h2 class="h2">' + l.memT + '</h2><ol class="steps4">' + l.memSteps.map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol></div>' +
     '<div class="btns"><button type="button" class="btn gold" data-go="apply/1">' + l.request + '</button><button type="button" class="btn line" data-go="login">' + l.members + '</button><button type="button" class="btn ghost" data-go="rules">' + l.rulesT + '</button></div>';
 } });
-function rulesHTML() { var l = L(); return '<div class="head rise"><p class="eyb">' + l.houseEy + '</p><h1 class="h1">' + l.rulesT + '</h1><p class="p">' + l.rulesBody + '</p></div><div class="list">' + l.rules.map(function (r, i) { return '<div class="row"><span class="k num">' + ['I', 'II', 'III', 'IV', 'V', 'VI'][i] + '</span><span class="grow"><b>' + r[0] + '</b><i>' + r[1] + '</i></span></div>'; }).join('') + '</div>'; }
+function rulesHTML() { var l = L(); return '<div class="head rise"><p class="eyb">' + l.houseEy + '</p><h1 class="h1">' + l.rulesT + '</h1><p class="p">' + l.rulesBody + '</p></div><div class="list">' + l.rules.map(function (r, i) { return '<div class="row"><span class="k num">' + roman(i) + '</span><span class="grow"><b>' + r[0] + '</b><i>' + r[1] + '</i></span></div>'; }).join('') + '</div>'; }
 R('rules', { scene: 'flat', back: true, html: rulesHTML });
 R('m/rules', { scene: 'in', back: true, html: rulesHTML });
 
 /* ================= pages: membership request ================= */
 var ROMAN = ['I', 'II', 'III', 'IV', 'V'];
+function roman(i) { return fa() ? digits(i + 1) : ['I', 'II', 'III', 'IV', 'V', 'VI'][i]; }
 function validate(step) {
   if (FREE) return {};
   var f = S.form, e = {}, req = function (k) { if (!String(f[k] || '').trim()) e[k] = 'req'; };
@@ -580,7 +585,7 @@ R('apply', { scene: 'flat', back: true, html: function (r) {
   var l = L(), s = r.step, st = l.steps[s - 1];
   var tum = '<div class="tumblers">' + ROMAN.map(function (x, i) {
     var k = i + 1, cls = k === s ? 'cur' : (S.done[k] ? (k < 5 && nErr(k) ? 'bad' : 'done') : '');
-    return '<button type="button" class="tum ' + cls + '" data-go="apply/' + k + '" data-replace="1" aria-label="' + l.steps[i][0] + '"' + (k === s ? ' aria-current="step"' : '') + '>' + x + '</button>';
+    return '<button type="button" class="tum ' + cls + '" data-go="apply/' + k + '" data-replace="1" aria-label="' + l.steps[i][0] + '"' + (k === s ? ' aria-current="step"' : '') + '>' + roman(i) + '</button>';
   }).join('') + '</div>';
   var h = '<div class="head rise"><p class="eyb">' + l.reqEy + ' · ' + fill(l.stepOf, digits(s)) + '</p><h1 class="h1">' + st[0] + '</h1><p class="p">' + st[1] + '</p></div>' + tum + '<div class="fields">';
   if (s === 1) h += '<div class="grid2">' + input('first', 'form.first', l.first, 'autocomplete="given-name"', true) + input('last', 'form.last', l.last, 'autocomplete="family-name"', true) + '</div>' +
@@ -603,7 +608,7 @@ function reviewHTML() {
   var pick = function (list, i) { return i == null || i === '' ? '—' : list[i]; };
   var multi = function (list, o) { var a = Object.keys(o || {}).filter(function (k) { return o[k]; }).map(function (k) { return list[k]; }); return a.length ? a.join(sep) : '—'; };
   var sec = function (k, rows) {
-    return '<div class="panel"><div class="sech"><h3 class="h3">' + ROMAN[k - 1] + ' · ' + l.steps[k - 1][0] + '</h3><button type="button" class="more" data-act="editStep" data-v="' + k + '">' + l.edit + '</button></div><div class="review">' +
+    return '<div class="panel"><div class="sech"><h3 class="h3">' + roman(k - 1) + ' · ' + l.steps[k - 1][0] + '</h3><button type="button" class="more" data-act="editStep" data-v="' + k + '">' + l.edit + '</button></div><div class="review">' +
       rows.map(function (r) { return '<div class="rv' + (r[2] ? ' miss' : '') + '"><span>' + r[0] + '</span><span>' + r[1] + '</span></div>'; }).join('') + '</div>' + (nErr(k) ? '<p class="err" style="margin-top:10px">' + l.fixFirst + '</p>' : '') + '</div>';
   };
   var e1 = validate(1), e2 = validate(2), e3 = validate(3);
@@ -626,7 +631,7 @@ R('sent', { scene: 'flat', html: function () {
   var l = L();
   return '<div class="envelope"><div class="addr">THE VAULT</div><div class="wax"><span class="mk"></span></div></div>' +
     '<div class="head center rise"><p class="eyb">' + l.sentEy + '</p><h1 class="h1">' + l.sentTitle + '</h1><p class="p">' + l.sentBody + '</p></div>' +
-    '<div class="panel center"><p class="eyb">' + l.ref + '</p><p class="h2 num" dir="ltr" style="margin-top:6px">' + digits(S.sent.ref) + '</p></div>' +
+    '<div class="panel center"><p class="eyb">' + l.ref + '</p><p class="h2 refno" dir="ltr" style="margin-top:6px">' + S.sent.ref + '</p></div>' +
     '<button type="button" class="btn gold" data-act="toDoor">' + l.toDoor + '</button>';
 } });
 
@@ -704,15 +709,15 @@ R('m/concierge', { scene: 'in', html: function () {
 R('m/wallet', { scene: 'in', html: function () {
   var l = L(), w = wallet(), used = Math.min(100, w.debt / W.limit * 100), atLimit = w.debt >= W.limit;
   var feeD = dayOf(W.feeDay), renew = new Date(feeD.getTime() + 365 * DAY), f = S.filt, rows = '';
-  if (f !== 1) rows += S.pend.map(function (p) { return '<div class="tx"><span class="dot">' + I('in') + '</span><span class="grow"><b>' + l.txTop + '</b><i>' + dfmt(new Date(p.at), { day: 'numeric', month: 'short' }) + ' · ' + l.methods[p.m] + '</i></span><span class="a"><span class="num">+' + money(p.amt) + '</span><small>' + l.pending + '</small></span></div>'; }).join('');
+  if (f !== 1) rows += S.pend.map(function (p) { return '<div class="tx"><span class="dot">' + I('in') + '</span><span class="grow"><b>' + l.txTop + '</b><i>' + dfmt(new Date(p.at), { day: 'numeric', month: 'short' }) + ' · ' + l.methods[p.m] + '</i></span><span class="a"><span class="num">' + money(p.amt, '+') + '</span><small>' + l.pending + '</small></span></div>'; }).join('');
   rows += W.tx.map(function (t, i) { return { t: t, i: i }; }).filter(function (x) { return f === 0 || (f === 1 ? x.t[0] === 'spend' : x.t[0] === 'top'); }).map(function (x) {
     var t = x.t, top = t[0] === 'top';
-    return '<button type="button" class="tx" data-act="tx" data-v="' + x.i + '"><span class="dot">' + I(top ? 'in' : 'out') + '</span><span class="grow"><b>' + (top ? l.txTop : l.places[t[3]]) + '</b><i>' + dfmt(dayOf(t[2]), { weekday: 'short', day: 'numeric', month: 'short' }) + (top ? '' : ' · ' + party(t[4] + 1)) + '</i></span><span class="a num' + (top ? ' plus' : '') + '">' + (top ? '+' : '−') + money(t[1]) + '</span></button>';
+    return '<button type="button" class="tx" data-act="tx" data-v="' + x.i + '"><span class="dot">' + I(top ? 'in' : 'out') + '</span><span class="grow"><b>' + (top ? l.txTop : l.places[t[3]]) + '</b><i>' + dfmt(dayOf(t[2]), { weekday: 'short', day: 'numeric', month: 'short' }) + (top ? '' : ' · ' + party(t[4] + 1)) + '</i></span><span class="a num' + (top ? ' plus' : '') + '">' + money(t[1], top ? '+' : '−') + '</span></button>';
   }).join('');
   if (f !== 1) rows += '<div class="tx"><span class="dot">' + I('wallet') + '</span><span class="grow"><b>' + l.txFee + '</b><i>' + dfmt(feeD, { day: 'numeric', month: 'short', year: 'numeric' }) + '</i></span><span class="a num">' + money(W.fee) + '</span></div>';
   var maxBy = Math.max.apply(null, w.by);
   return '<div class="' + (S.hide ? 'hide' : '') + '" style="display:flex;flex-direction:column;gap:22px">' +
-    '<div class="wallet-hero rise"><p class="eyb">' + l.walletEy + ' · ' + l.balanceNow + '</p><div class="amt num' + (w.bal < 0 && !S.hide ? ' neg' : '') + '">' + (w.bal < 0 && !S.hide ? '−' : '') + money(w.bal) + '</div><span class="unit">' + l.unit + (S.hide ? '' : ' · ' + (w.bal < 0 ? l.inDebt : l.inCredit)) + '</span>' +
+    '<div class="wallet-hero rise"><p class="eyb">' + l.walletEy + ' · ' + l.balanceNow + '</p><div class="amt num' + (w.bal < 0 && !S.hide ? ' neg' : '') + '">' + money(w.bal, w.bal < 0 && !S.hide ? '−' : '') + '</div><span class="unit">' + l.unit + (S.hide ? '' : ' · ' + (w.bal < 0 ? l.inDebt : l.inCredit)) + '</span>' +
       '<button type="button" class="eye" data-act="eye">' + I(S.hide ? 'eye' : 'eyeoff') + (S.hide ? l.eyeShow : l.eyeHide) + '</button></div>' +
     '<div class="grid2"><button type="button" class="btn gold" data-act="topup">' + l.topup + '</button><button type="button" class="btn line" data-act="statement">' + l.statementB + '</button></div>' +
     '<div class="panel credit"><div class="sech"><h3 class="h3">' + l.creditT + '</h3><span class="pill' + (atLimit ? ' warn' : ' ok') + '">' + l.availS + ' ' + money(w.avail) + '</span></div>' +
@@ -727,7 +732,7 @@ R('m/wallet', { scene: 'in', html: function () {
 
 R('m/account', { scene: 'in', back: true, html: function () {
   var l = L();
-  var sw = function (act, on, label, v) { return '<div class="row"><span class="grow"><b>' + label + '</b></span><button type="button" class="switch" role="switch" aria-checked="' + !!on + '" aria-label="' + esc(label) + '" data-act="' + act + '"' + (v != null ? ' data-v="' + v + '"' : '') + '></button></div>'; };
+  var sw = function (act, on, label, v) { return '<button type="button" class="row swrow" role="switch" aria-checked="' + !!on + '" data-act="' + act + '"' + (v != null ? ' data-v="' + v + '"' : '') + '><span class="grow"><b>' + label + '</b></span><span class="switch" aria-hidden="true"></span></button>'; };
   return '<div class="cover">' + img('room-garden', '') + '</div><div class="panel rise" style="display:flex;gap:16px;align-items:center"><span class="avatar" style="width:58px;height:58px;font-size:20px;flex-shrink:0">AF</span><span><b style="font-weight:500;font-size:17px">Arash Farahani</b><br><span class="small">' + l.tier + ' · Nº ' + digits('001') + '</span><br><span class="small">' + fill(l.since, dfmt(dayOf(-420), { month: 'long', year: 'numeric' })) + '</span></span></div>' +
     '<div class="sec"><p class="eyb">' + l.guestsH + '</p><div class="list">' + (S.guests.length ? S.guests.map(function (g, i) { return '<div class="row"><span class="grow"><b>' + esc(g) + '</b></span><button type="button" class="more" data-act="rmGuest" data-v="' + i + '" aria-label="×">×</button></div>'; }).join('') : '<p class="small">' + l.noGuests + '</p>') + '</div>' +
       '<div class="phone" style="grid-template-columns:1fr auto"><input class="in" placeholder="' + l.guestPh2 + '" data-k="newGuest" autocomplete="off"><button type="button" class="btn line" style="width:auto;padding:0 18px;height:52px" data-act="addGuest">' + l.guestAdd + '</button></div></div>' +
@@ -762,10 +767,10 @@ var sheetFrom = null;
 function openSheet(title, html) {
   if (!app.classList.contains('sheet-open')) sheetFrom = document.activeElement;
   $('#sheetT').textContent = title; $('#sheetB').innerHTML = html; $('#sheetX').setAttribute('aria-label', L().close);
-  app.classList.add('sheet-open'); hydrate($('#sheetB'));
+  app.classList.add('sheet-open'); [view, bar, dock].forEach(function (x) { x.inert = true; }); hydrate($('#sheetB'));
   setTimeout(function () { $('#sheetX').focus({ preventScroll: true }); }, 60);
 }
-function closeSheet() { if (!app.classList.contains('sheet-open')) return; app.classList.remove('sheet-open'); $('.sheet').style.removeProperty('--drag'); if (sheetFrom && sheetFrom.focus && document.contains(sheetFrom)) sheetFrom.focus({ preventScroll: true }); }
+function closeSheet() { if (!app.classList.contains('sheet-open')) return; app.classList.remove('sheet-open'); [view, bar, dock].forEach(function (x) { x.inert = false; }); $('.sheet').style.removeProperty('--drag'); if (sheetFrom && sheetFrom.focus && document.contains(sheetFrom)) sheetFrom.focus({ preventScroll: true }); }
 (function () {
   var head = $('.sheet-head'), sh = $('.sheet'), y0 = null, dy = 0;
   head.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) return; y0 = e.clientY; dy = 0; sh.classList.add('dragging'); head.setPointerCapture(e.pointerId); });
@@ -797,7 +802,7 @@ app.addEventListener('click', function (e) {
     var to = el.getAttribute('data-go');
     closeSheet();
     if (to === route.path) { var pg = $('.page:not(.leave)'); if (pg) pg.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' }); return; }
-    go(to, { replace: el.hasAttribute('data-replace') && route.key !== '' && route.key.indexOf('m') === to.indexOf('m') }); return;
+    go(to, { replace: el.hasAttribute('data-replace') && route.key !== '' && route.key !== 'm' && route.key.indexOf('m') === to.indexOf('m') }); return;
   }
   if (el.hasAttribute('data-chip')) {
     var path = el.getAttribute('data-chip');
@@ -883,7 +888,7 @@ app.addEventListener('click', function (e) {
     },
     tx: function () {
       var t = W.tx[Number(v)], top = t[0] === 'top', d = dayOf(t[2]);
-      openSheet(top ? l.txTop : l.places[t[3]], '<div class="wallet-hero"><div class="amt num' + (top ? ' plus' : '') + '" style="font-size:34px">' + (top ? '+' : '−') + n(t[1]) + '</div><span class="unit">' + l.unit + '</span></div><div>' +
+      openSheet(top ? l.txTop : l.places[t[3]], '<div class="wallet-hero"><div class="amt num' + (top ? ' plus' : '') + '" style="font-size:34px">' + '<bdi dir="ltr">' + (top ? '+' : '−') + n(t[1]) + '</bdi>' + '</div><span class="unit">' + l.unit + '</span></div><div>' +
         '<div class="kv"><span>' + l.dateT + '</span><span>' + dfmt(d, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</span></div>' +
         (top ? '' : '<div class="kv"><span>' + l.placeT + '</span><span>' + l.places[t[3]] + '</span></div><div class="kv"><span>' + l.guestsT + '</span><span>' + party(t[4] + 1) + '</span></div>') +
         '<div class="kv"><span>' + l.statusT + '</span><span class="plus">' + l.settled + '</span></div><div class="kv"><span>' + l.receipt + '</span><span class="num" dir="ltr">' + digits('R-' + (40211 + Number(v) * 37)) + '</span></div></div>' +

@@ -9,9 +9,10 @@
 <meta name="apple-mobile-web-app-title" content="The Vault">
 <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
 <link rel="icon" href="../assets/icons/icon-192.png">
-<link rel="preload" href="../assets/fonts/Awaken.otf" as="font" crossorigin>
+<link rel="preload" href="fonts/awaken.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="manifest" href="manifest.webmanifest">
 <title>The Vault</title>
-<link rel="stylesheet" href="v2.css?v=9">
+<link rel="stylesheet" href="v2.css?v=10">
 </head>
 <body>
 <div id="app" class="app">
@@ -33,7 +34,7 @@
           <svg class="engrave" viewBox="0 0 400 400"><defs><path id="rim" d="M200,200 m-152,0 a152,152 0 1,1 304,0 a152,152 0 1,1 -304,0"/></defs><text><textPath href="#rim">THE VAULT · TEHRAN · WHERE VALUE IS KEPT · MEMBERS ONLY · MMXXVI ·</textPath></text></svg>
           <div class="handle"><i></i><i></i><i></i></div>
           <div class="index"></div>
-          <div class="dial" id="dial" role="slider" tabindex="-1" aria-valuemin="0" aria-valuemax="99" aria-valuenow="0">
+          <div class="dial" id="dial" role="slider" aria-label="Combination dial" tabindex="-1" aria-valuemin="0" aria-valuemax="99" aria-valuenow="0">
             <svg class="dial-svg" viewBox="0 0 200 200"><g id="dialFace"></g></svg>
             <div class="cap"><span class="mk"></span></div>
           </div>
@@ -55,6 +56,6 @@
   </div>
   <div class="toast" role="status" aria-live="polite"></div>
 </div>
-<script src="v2.js?v=9"></script>
+<script src="v2.js?v=10"></script>
 </body>
 </html>

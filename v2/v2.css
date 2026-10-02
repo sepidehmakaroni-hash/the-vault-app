@@ -1,8 +1,8 @@
 /* The Vault — v2 "The Real Vault".
    One world: brushed steel, brass, and the monogram pattern of the card. The door scene and every page share it. */
-@font-face{font-family:'Awaken';src:url(../assets/fonts/Awaken.otf) format('opentype');font-display:swap}
-@font-face{font-family:'Bodoni Moda';src:url(../assets/fonts/BodoniModa-VF.ttf);font-weight:400 900;font-display:swap}
-@font-face{font-family:'Archivo';src:url(../assets/fonts/Archivo-VF.ttf);font-weight:100 900;font-display:swap}
+@font-face{font-family:'Awaken';src:url(fonts/awaken.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Archivo';src:url(fonts/archivo.woff2) format('woff2');font-weight:400 600;font-display:swap}
 @font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-400.woff2) format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-500.woff2) format('woff2');font-weight:500;font-display:swap}
 @font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-600.woff2) format('woff2');font-weight:600;font-display:swap}
@@ -17,7 +17,7 @@
   --soft:cubic-bezier(.25,.8,.25,1); --heavy:cubic-bezier(.45,0,.15,1);
   --d:min(80vw,350px,max(220px,calc(100dvh - 490px)));
   --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
-  --pat:url(../assets/img/pattern.png);
+  --pat:url(img/pattern.png);
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--ink);color:var(--ivory)}
@@ -433,7 +433,7 @@ select.in option{background:#1b1a18}
 .hinge::before{top:33%}.hinge::after{top:66%}
 /* while the door moves, the chrome steps aside */
 .bar,.dock{transition:opacity .6s var(--soft),transform .6s var(--soft)}
-.app.animating .bar{opacity:0;pointer-events:none}
+.app.hidebar .bar{opacity:0;pointer-events:none}
 
 /* photo cards: the house is seen, not only listed */
 .icard{position:relative;display:block;width:100%;border-radius:6px;overflow:hidden;aspect-ratio:16/10;text-align:start;background:#1e1c19;box-shadow:0 18px 36px rgba(0,0,0,.45),0 0 0 1px var(--line)}
@@ -483,7 +483,7 @@ select.in option{background:#1b1a18}
 .hide .stat b.neg{color:inherit}
 
 /* ---------- type: Persian gets its own display face, and nothing readable is smaller than 13px ---------- */
-[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic',serif;font-weight:400;letter-spacing:0}
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic','Archivo',sans-serif;font-weight:400;letter-spacing:0}
 [dir=rtl] .h1{font-size:clamp(30px,8.6vw,38px);line-height:1.35}
 [dir=rtl] .h2{line-height:1.4}[dir=rtl] .h3{font-weight:500}
 [dir=rtl] .icard .icap b{font-size:23px;line-height:1.35}
@@ -496,9 +496,9 @@ select.in option{background:#1b1a18}
 .cta-bar.static{position:static;margin:26px 0 0!important;padding:0 0 8px;background:none}
 
 /* Persian: Noto Naskh Arabic throughout */
-[dir=rtl],[dir=rtl] button,[dir=rtl] input,[dir=rtl] select,[dir=rtl] textarea{font-family:'Noto Naskh Arabic',serif}
-[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic',serif;font-weight:500}
-[dir=rtl] .num{font-family:'Noto Naskh Arabic',serif;font-weight:400}
+[dir=rtl],[dir=rtl] button,[dir=rtl] input,[dir=rtl] select,[dir=rtl] textarea{font-family:'Noto Naskh Arabic','Archivo',sans-serif}
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic','Archivo',sans-serif;font-weight:500}
+[dir=rtl] .num{font-family:'Noto Naskh Arabic','Archivo',sans-serif;font-weight:400}
 [dir=rtl] .p{line-height:1.9}
 /* door pages: copy sits low, but never slides under the door when it is taller (Persian) */
 .page.door-page{justify-content:flex-start}
@@ -509,3 +509,37 @@ select.in option{background:#1b1a18}
 .door-copy{gap:8px}
 .page.door-page .btns{gap:8px}
 .page.door-page .btn.ghost{height:44px}
+
+/* ---------- CC round 2 ---------- */
+/* header: solid glass once the page moves, so nothing reads through the buttons */
+.app.scrolled .bar{background:rgba(15,14,13,.94);backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);box-shadow:0 1px 0 var(--line)}
+/* sheets never squash their own content */
+.sheet-body>*{flex-shrink:0}
+/* sticky action bars are opaque; focused fields stay clear of them */
+.cta-bar{background:linear-gradient(180deg,rgba(15,14,13,0),#0F0E0D 26%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.cta-bar.static{backdrop-filter:none;-webkit-backdrop-filter:none}
+.page{scroll-padding-bottom:150px}
+/* envelope: seal under the flap point, name clear of it */
+.envelope .addr{bottom:7%}.wax{top:47%}
+/* headlines break evenly, no single-word last lines */
+.h1,.h2,.h3,.icard .icap b,.box b{text-wrap:balance}
+.p,.note{text-wrap:pretty}
+/* touch targets: 44px everywhere */
+.ibtn{min-width:44px;height:44px}
+.chip{min-height:44px}
+.more{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+.swrow{cursor:pointer}
+.swrow[aria-checked=true] .switch{background:var(--gold)}
+.swrow[aria-checked=true] .switch::after{transform:translateX(18px)}
+[dir=rtl] .swrow[aria-checked=true] .switch::after{transform:translateX(-18px)}
+/* day strip: first day sits on the same 22px line as everything else */
+.days{scroll-padding-inline:22px}
+/* small data figures in a clear, even face */
+.kv .num,.tx .a,.refno,.seatsn{font-family:'Archivo','Noto Naskh Arabic',sans-serif;font-variant-numeric:tabular-nums lining-nums;font-weight:500}
+.refno{font-size:26px;letter-spacing:.06em}
+.amtw{unicode-bidi:isolate;white-space:nowrap}
+/* landing breathes above the bottom edge */
+.page.door-page{padding-bottom:calc(max(18px,var(--bot)) + 14px)}
+.bar .lang,.ibtn{min-width:44px;height:44px}
+.avatar{width:44px;height:44px}
+.seg button{height:44px}
