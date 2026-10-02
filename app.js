@@ -149,7 +149,7 @@ howTitle: 'How to request', already: 'Already a member', date: 'Date', place: 'P
 evNote: 'Members reply from their account. Seats are limited and held by name.',
 termsTitle: 'Terms and house rules', termsBody: 'The house runs on a few short rules. They apply to every member and every guest, with no exceptions at the door.',
 rules: [['Guests', 'Every guest is named before the night. A guest never pays.'], ['The bill', 'Nothing is settled at the table. It comes off your charge.'], ['Photography', 'No photographs anywhere in the house.'], ['Privacy', 'The club never confirms or denies who is a member.'], ['Age', 'No one under fifteen, at any hour, in any room.'], ['Smoking', 'The terrace only. Cigars in the bar.']],
-otpTitle: 'Enter the code', otpBody: 'We sent a four-digit code to your mobile number.', resend: 'Send the code again', confirm: 'Open',
+otpTitle: 'Enter the code', otpBody: 'We sent a four-digit code to your mobile number.', resend: 'Send the code again', confirm: 'Open', codeSent: 'A new code is on its way.', resendIn: 'Send again in', sec: 's',
 forgotTitle: 'Reset your password', forgotBody: 'Enter your mobile number. We will send a code, and you can set a new password after it.',
 openToday: 'Open today', nextVisit: 'Your next visit', noVisit: 'Nothing reserved yet', noVisitSub: 'Choose a room and a time', tonight: 'Next at the club',
 qReserve: 'Reserve', qGuest: 'Name a guest', qConc: 'Concierge',
@@ -177,7 +177,7 @@ howTitle: 'مراحل درخواست', already: 'عضو هستید', date: 'تا
 evNote: 'اعضا از حساب خود پاسخ می‌دهند. جا محدود است و به نام نگه داشته می‌شود.',
 termsTitle: 'شرایط و قوانین خانه', termsBody: 'خانه با چند قانون کوتاه اداره می‌شود. این قوانین برای هر عضو و هر مهمان یکسان است و دمِ در استثنا ندارد.',
 rules: [['مهمان', 'نام هر مهمان از قبل داده می‌شود. مهمان هرگز چیزی پرداخت نمی‌کند.'], ['صورتحساب', 'هیچ حسابی سر میز بسته نمی‌شود؛ از شارژ شما کم می‌شود.'], ['عکس', 'در هیچ جای خانه عکس‌برداری نداریم.'], ['حریم', 'کلاب عضویت هیچ‌کس را تأیید یا تکذیب نمی‌کند.'], ['سن', 'زیر پانزده سال، در هیچ ساعتی و هیچ فضایی.'], ['سیگار', 'فقط تراس. سیگار برگ در بار.']],
-otpTitle: 'کد را وارد کنید', otpBody: 'یک کد چهاررقمی به شماره موبایل شما فرستادیم.', resend: 'ارسال دوباره کد', confirm: 'باز کن',
+otpTitle: 'کد را وارد کنید', otpBody: 'یک کد چهاررقمی به شماره موبایل شما فرستادیم.', resend: 'ارسال دوباره کد', confirm: 'باز کن', codeSent: 'کد تازه فرستاده شد.', resendIn: 'ارسال دوباره تا', sec: 'ثانیه',
 forgotTitle: 'بازیابی رمز عبور', forgotBody: 'شماره موبایل خود را وارد کنید. کدی می‌فرستیم و بعد از آن رمز تازه می‌گذارید.',
 openToday: 'امروز باز است', nextVisit: 'حضور بعدی شما', noVisit: 'هنوز چیزی رزرو نشده', noVisitSub: 'یک فضا و یک ساعت انتخاب کنید', tonight: 'برنامهٔ بعدی کلاب',
 qReserve: 'رزرو', qGuest: 'ثبت مهمان', qConc: 'کانسیرج',
@@ -211,7 +211,7 @@ back();
 };
 var pgGo = function (k) { return nav({ screen: 'pg', pg: k }); };
 var evGo = [pgGo('ev0'), pgGo('ev1'), pgGo('ev2')];
-var stepRows = t.steps.map(function (st, i) { return { k: roman[i], t: st, d: '', go: nav({ screen: 's1' }), chev: '' }; });
+var stepRows = t.steps.map(function (st, i) { return { k: roman[i], t: st, d: '', go: nav({ screen: 's' + (i + 1) }), chev: '' }; });
 var ruleRows = xt.rules.map(function (r, i) { return { k: roman[i] || 'VI', t: r[0], d: r[1], go: function () {}, chev: 'nochev' }; });
 var evRows = function (i) { var e = t.events[i]; return [{ k: e.day, t: e.month, d: xt.date, go: function () {}, chev: 'nochev' }, { k: '·', t: e.place, d: xt.place, go: function () {}, chev: 'nochev' }]; };
 var PG = {
@@ -238,7 +238,7 @@ var dayI = s.dayI || 0, timeI = s.timeI == null ? 3 : s.timeI, sizeI = s.sizeI =
 var TIMES = ['12:30', '14:00', '19:30', '20:30', '21:30', '22:30'];
 var rsvp = s.rsvp || {};
 var DONE = {
-resv: [xt.resvDone, xt.resvBody, zr[0], xt.days[dayI] + ' · ' + TIMES[timeI]],
+resv: [xt.resvDone, xt.resvBody, zr[0], xt.days[dayI] + ' · ' + num(TIMES[timeI])],
 conc: [xt.concDone, xt.concDoneBody, xt.request, xt.cats[catI]],
 guests: [xt.guestsDone, xt.guestsDoneBody, xt.names, xt.days[dayI]],
 top: [xt.topDone, xt.topBody, xt.topK, xt.topV],
@@ -255,8 +255,29 @@ if (isM) { if (tab === 'home' && sub === '') { toTop(); } self.setState({ screen
 if (screen === 'home') { toTop(); }
 self.setState({ screen: 'home', hist: [], menu: false });
 };
+// small confirmation that slides up from the bottom and leaves on its own
+var showToast = function (msg) {
+clearTimeout(self._toastT);
+self.setState({ toast: msg });
+self._toastT = setTimeout(function () { self.setState({ toast: '' }); }, 2400);
+};
+// country code: a native picker, so the phone's own wheel / list is used
+var COUNTRIES = isFa
+? [['ایران', '+98'], ['امارات', '+971'], ['ترکیه', '+90'], ['بریتانیا', '+44'], ['آلمان', '+49'], ['فرانسه', '+33'], ['کانادا', '+1'], ['آمریکا', '+1']]
+: [['Iran', '+98'], ['UAE', '+971'], ['Turkey', '+90'], ['United Kingdom', '+44'], ['Germany', '+49'], ['France', '+33'], ['Canada', '+1'], ['United States', '+1']];
+var ccI = s.cc || 0;
+var countries = COUNTRIES.map(function (c, i) { return { label: c[0] + '  \u2066' + c[1] + '\u2069', val: String(i), sel: i === ccI ? 'selected' : null }; });
+// resend code: confirm, then wait 30 seconds before it can be used again
+var waitS = Math.max(0, Math.ceil(((s.resendUntil || 0) - Date.now()) / 1000));
+if (waitS > 0 && screen === 'otp' && !self._tick) { self._tick = setTimeout(function () { self._tick = null; self.setState({ now: Date.now() }); }, 1000); }
 var X = {
 logoHome: logoHome,
+toast: s.toast || '',
+countries: countries,
+pickCountry: function (e) { self.setState({ cc: Number(e.target.value) }); },
+resend: function () { if (waitS > 0) { return; } self.setState({ resendUntil: Date.now() + 30000 }); showToast(xt.codeSent); },
+resendLabel: waitS > 0 ? xt.resendIn + ' ' + num(waitS) + (isFa ? ' ' : '') + xt.sec : xt.resend,
+resendOff: waitS > 0 ? 'true' : null,
 t: xt,
 isPg: screen === 'pg', pg: PG[s.pg || (self.props || {}).pg || 'membership'],
 isOtp: screen === 'otp', enter: function () { self.setState({ screen: 'm', tab: 'home', sub: '', hist: [], menu: false }); }, noop: function () {},
@@ -275,9 +296,9 @@ tabHome: mGo('home'), tabReserve: mGo('reserve'), tabConc: mGo('concierge'), goG
 zones: xt.zones.map(function (z, i) { return { t: z[0], d: z[1], ph: z[2], go: mGo('reserve', 'form', { zone: i }) }; }),
 zone: { t: zr[0], ph: zr[2], note: zr[3] },
 days: xt.days.map(function (d, i) { return chip(d, dayI === i, function () { self.setState({ dayI: i }); }); }),
-times: TIMES.map(function (d, i) { return chip(d, timeI === i, function () { self.setState({ timeI: i }); }); }),
-sizes: ['1', '2', '3', '4', '5', '6+'].map(function (d, i) { return chip(d, sizeI === i, function () { self.setState({ sizeI: i }); }); }),
-confirmResv: function () { self.setState({ hist: hist.concat([snap]), screen: 'm', tab: 'reserve', sub: 'done', done: 'resv', resv: [zr[0], xt.days[dayI] + ' · ' + TIMES[timeI]] }); },
+times: TIMES.map(function (d, i) { return chip(num(d), timeI === i, function () { self.setState({ timeI: i }); }); }),
+sizes: ['1', '2', '3', '4', '5', '6+'].map(function (d, i) { return chip(num(d), sizeI === i, function () { self.setState({ sizeI: i }); }); }),
+confirmResv: function () { self.setState({ hist: hist.concat([snap]), screen: 'm', tab: 'reserve', sub: 'done', done: 'resv', resv: [zr[0], xt.days[dayI] + ' · ' + num(TIMES[timeI])] }); },
 doneTitle: DONE[0], doneBody: DONE[1], doneK: DONE[2], doneV: DONE[3],
 mev: t.events.map(function (e, i) { var on = !!rsvp[i]; var c = chip(on ? xt.going : xt.notGoing, on, function () { var n = Object.assign({}, rsvp); n[i] = !n[i]; self.setState({ rsvp: n }); }); return { day: e.day, month: e.month, title: e.title, place: e.place, ph: ['auction', 'bar', 'lounge'][i], go: evGo[i], rsvp: c.pick, on: c.on, fw: c.fw, bg: c.bg, fg: c.fg, bd: c.bd, label: c.label }; }),
 cats: xt.cats.map(function (d, i) { return chip(d, catI === i, function () { self.setState({ catI: i }); }); }),
@@ -310,7 +331,7 @@ isStep: stepN > 0,
 isS1: screen === 's1', isS2: screen === 's2', isS3: screen === 's3', isS4: screen === 's4', isS5: screen === 's5',
 isSent: screen === 'sent',
 isLogin: screen === 'login',
-toggleLang: function () { self.setState({ lang: isFa ? 'en' : 'fa' }); },
+toggleLang: function () { var l = isFa ? 'en' : 'fa'; try { localStorage.setItem('vault.lang', l); } catch (e) {} self.setState({ lang: l }); },
 goLogin: go('login'), goHome: go('home'), goRequest: go('s1'),
 next: next, back: back2,
 slide: t.slides[slideI],
@@ -344,3 +365,28 @@ mount(VaultApp, document.getElementById("app-template"), document.getElementById
 document.addEventListener('keydown', function (e) {
 if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.tagName !== 'BUTTON') { e.preventDefault(); e.target.click(); }
 });
+
+// Code boxes and date-of-birth boxes: jump to the next box when one is full,
+// go back on Backspace, and spread a pasted / auto-filled code across the boxes.
+(function () {
+var group = function (el) { var g = el.closest('.otpin, .dob'); return g ? Array.from(g.querySelectorAll('input')) : null; };
+document.addEventListener('input', function (e) {
+var el = e.target; if (!el.matches || !el.matches('input[inputmode="numeric"]')) return;
+var all = group(el); if (!all) return;
+var digits = el.value.replace(/\D/g, '');
+if (el.closest('.otpin') && digits.length > 1) {
+var i = all.indexOf(el);
+digits.split('').forEach(function (d, k) { if (all[i + k]) all[i + k].value = d; });
+var last = all[Math.min(i + digits.length, all.length) - 1]; if (last) last.focus();
+return;
+}
+if (digits !== el.value) el.value = digits;
+var max = Number(el.getAttribute('maxlength')) || 1;
+if (el.value.length >= max) { var n = all[all.indexOf(el) + 1]; if (n) { n.focus(); n.select(); } }
+});
+document.addEventListener('keydown', function (e) {
+var el = e.target; if (e.key !== 'Backspace' || !el.matches || !el.matches('input[inputmode="numeric"]') || el.value) return;
+var all = group(el); if (!all) return;
+var p = all[all.indexOf(el) - 1]; if (p) { e.preventDefault(); p.focus(); p.value = ''; }
+});
+})();

@@ -1,5 +1,7 @@
 # The Vault — Members' Club · Front-end handoff
 
+> Behaviour checklist for the production build, section by section: **[HANDOFF.md](HANDOFF.md)** (Persian).
+
 Design direction: **The Combination — original direction: the app is the vault door. A combination dial turns with the scroll, photos open like doors, and the five sign-up steps are five turns of the dial. Pattern: Monogram Field**
 
 This package is one of seven design directions for the same app (same flow, same copy). The colours, type and shapes of this direction are the `.sk-combo` rules and CSS variables at the end of `styles.css`; they override the base tokens listed below.
@@ -68,7 +70,7 @@ Type: English display `Awaken`; English text `Archivo`; Persian `Vazirmatn` (tit
 
 - Form validation and error messages (required fields are only marked, not checked).
 - Submitting the request, sending the SMS code, password login, forgot password.
-- The country-code picker (shown as a button) and date-of-birth validation (three plain inputs; Persian calendar).
+- Date-of-birth validation (three plain inputs; Persian calendar). The country-code picker is a native select with a sample list.
 - The code-entry screen after "Send verification code", the terms page, and everything after login.
 - "View benefits" and the nav links only scroll inside the landing page.
 

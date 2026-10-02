@@ -247,7 +247,7 @@
 <div style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.mobile}} *</span>
 <div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
-<button type="button" class="vb vf" aria-label="{{t.countryCode}}" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 10px; font-size: 14px"><span dir="{{dir}}">{{t.iran}} <span dir="ltr" style="margin-inline-start: 5px">+98</span></span><span style="display: block; width: 6px; height: 6px; border-right: 1.5px solid var(--accent-l); border-bottom: 1.5px solid var(--accent-l); transform: rotate(45deg); margin-bottom: 3px"></span></button>
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
 <input class="vf" type="tel" inputmode="tel" autocomplete="tel" aria-label="{{t.mobile}}" placeholder="09123456789">
 </div>
 </div>
@@ -275,10 +275,10 @@
 </div>
 <div style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.birth}}</span>
-<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
-<input class="vf" type="text" inputmode="numeric" maxlength="2" aria-label="{{t.day}}" placeholder="{{t.day}}" style="text-align: center">
-<input class="vf" type="text" inputmode="numeric" maxlength="2" aria-label="{{t.month}}" placeholder="{{t.month}}" style="text-align: center">
-<input class="vf" type="text" inputmode="numeric" maxlength="4" aria-label="{{t.year}}" placeholder="{{t.year}}" style="text-align: center">
+<div class="dob" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<input class="vf" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" aria-label="{{t.day}}" placeholder="{{t.day}}" style="text-align: center">
+<input class="vf" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-month" aria-label="{{t.month}}" placeholder="{{t.month}}" style="text-align: center">
+<input class="vf" type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" aria-label="{{t.year}}" placeholder="{{t.year}}" style="text-align: center">
 </div>
 </div>
 </div>
@@ -288,15 +288,15 @@
 <div style="display: flex; flex-direction: column; gap: 12px">
 <label style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.web}}</span>
-<input class="vf" type="url" dir="ltr" placeholder="https://example.com">
+<input class="vf" type="url" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="https://example.com">
 </label>
 <label style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.insta}}</span>
-<input class="vf" type="text" dir="ltr" placeholder="{{t.instaPh}}">
+<input class="vf" type="text" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="{{t.instaPh}}">
 </label>
 <label style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.linkedin}}</span>
-<input class="vf" type="text" placeholder="{{t.linkedinPh}}">
+<input class="vf" type="url" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="{{t.linkedinPh}}">
 </label>
 <div style="display: flex; flex-direction: column; gap: 6px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.field}} *</span>
@@ -346,7 +346,7 @@
 <div style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.refPhone}}</span>
 <div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
-<button type="button" class="vb vf" aria-label="{{t.countryCode}}" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 10px; font-size: 14px"><span dir="{{dir}}">{{t.iran}} <span dir="ltr" style="margin-inline-start: 5px">+98</span></span><span style="display: block; width: 6px; height: 6px; border-right: 1.5px solid var(--accent-l); border-bottom: 1.5px solid var(--accent-l); transform: rotate(45deg); margin-bottom: 3px"></span></button>
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
 <input class="vf" type="tel" inputmode="tel" aria-label="{{t.refPhone}}" placeholder="09123456789">
 </div>
 </div>
@@ -434,7 +434,7 @@
 <div style="display: flex; flex-direction: column; gap: 2px">
 <span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.mobile}} *</span>
 <div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
-<button type="button" class="vb vf" aria-label="{{t.countryCode}}" style="display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 0 10px; font-size: 14px"><span dir="{{dir}}">{{t.iran}} <span dir="ltr" style="margin-inline-start: 5px">+98</span></span><span style="display: block; width: 6px; height: 6px; border-right: 1.5px solid var(--accent-l); border-bottom: 1.5px solid var(--accent-l); transform: rotate(45deg); margin-bottom: 3px"></span></button>
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
 <input class="vf" type="tel" inputmode="tel" autocomplete="tel" aria-label="{{t.mobile}}" placeholder="09123456789">
 </div>
 </div>
@@ -484,12 +484,12 @@
 <h1 class="ttl" style="margin: 0; text-align: center; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 28px; line-height: 38px">{{x.t.otpTitle}}</h1>
 <p style="margin: 0; text-align: center; font-size: 14px; line-height: 23px; color: rgb(var(--text-rgb) / .78)">{{x.t.otpBody}}</p>
 <div dir="ltr" class="otpin">
-<input class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="1" placeholder="·">
+<input class="vf" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="1" placeholder="·">
 <input class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="2" placeholder="·">
 <input class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="3" placeholder="·">
 <input class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="4" placeholder="·">
 </div>
-<button type="button" class="vb linkb" onClick="{{x.noop}}">{{x.t.resend}}</button>
+<button type="button" class="vb linkb" onClick="{{x.resend}}" disabled="{{x.resendOff}}" aria-live="polite">{{x.resendLabel}}</button>
 <button type="button" class="vb gold" onClick="{{x.enter}}" style="margin-top: auto; height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.confirm}}</button>
 </div>
 </sc-if>
@@ -618,6 +618,10 @@
 </sc-for>
 </nav>
 </div>
+</sc-if>
+
+<sc-if value="{{x.toast}}" hint-placeholder-val="{{false}}">
+<div class="toast" role="status" aria-live="polite">{{x.toast}}</div>
 </sc-if>
 
 <sc-if value="{{x.menu}}" hint-placeholder-val="{{false}}">

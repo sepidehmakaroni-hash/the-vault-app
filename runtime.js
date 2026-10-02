@@ -8,10 +8,12 @@ class View {
   setState(patch) { this.state = Object.assign({}, this.state || {}, patch); if (this._render) this._render(); }
 }
 
+function savedLang() { try { return localStorage.getItem('vault.lang'); } catch (e) { return null; } }
+
 function mount(ViewClass, templateEl, rootEl) {
   const params = new URLSearchParams(location.search);
   const extra = {}; params.forEach((v, k) => { extra[k] = v; });
-  const view = new ViewClass(Object.assign(extra, { start: params.get('screen') || 'home', lang: params.get('lang') || 'en' }));
+  const view = new ViewClass(Object.assign(extra, { start: params.get('screen') || 'home', lang: params.get('lang') || savedLang() || 'en' }));
 
   const look = (path, scope) => {
     path = path.trim();

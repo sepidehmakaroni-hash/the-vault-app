@@ -292,3 +292,33 @@ button.stat{cursor:pointer}
 
 /* iPhone notch / status bar: keep content below it when opened from the home screen */
 .sk-combo{padding-top:env(safe-area-inset-top,0px)}
+
+/* country code picker: native select dressed as a field */
+.vsel{appearance:none;-webkit-appearance:none;cursor:pointer;padding:0 28px 0 10px;font-size:14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23CDB57E' stroke-width='1.4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:10px 6px;background-position:right 10px center}
+[dir=rtl] .vsel{padding:0 10px 0 28px;background-position:left 10px center}
+.vsel option{background:#1B1C1E;color:#ECE5D6}
+
+/* resend: dimmed while counting down */
+.linkb[disabled]{color:rgb(var(--text-rgb) / .45);text-decoration:none;cursor:default}
+
+/* toast */
+.toast{position:absolute;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;max-width:calc(100% - 48px);box-sizing:border-box;padding:12px 18px;background:#ECE5D6;color:#1B1C1E;font-size:14px;line-height:20px;border-radius:3px;box-shadow:0 10px 30px rgba(0,0,0,.45);animation:toastIn .45s var(--ease,cubic-bezier(.2,.7,.2,1)) both;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+
+/* Persian: no letter-spacing (it breaks joined letters) and nothing under 12.5px */
+[dir=rtl] .eyb,[dir=rtl].sk-combo .scount2,.sk-combo[dir=rtl] .scount2,.sk-combo[dir=rtl] .lab{letter-spacing:0!important}
+.sk-combo[dir=rtl] .lab{font-size:13px!important}
+.sk-combo[dir=rtl] .eyb,.sk-combo[dir=rtl] .scount2{font-size:13px}
+.sk-combo[dir=rtl] .tb{font-size:11.5px;letter-spacing:0}
+
+/* re-rendering the same screen (a chip, a toggle, the resend countdown) must not replay its entrance */
+.still .scr,.still .mb>*,.still .pgbody>*,.still .door,.still .otpdial img,.still .menu,.still .mi,.still .sent .plq,.still .sent .seal,.still .sent::before,.still .dial-hero{animation:none!important}
+
+/* touch: no grey flash, no double-tap zoom delay */
+#app{-webkit-tap-highlight-color:transparent}
+#app button,#app [role=button],#app a,#app .chip,#app .row,#app select{touch-action:manipulation}
+/* phone: the page behind the app matches it, so pulling past the top or bottom shows no seam */
+@media (max-width:480px){html,body{background:#1B1C1E}}
+/* 16px stops iOS from zooming in when the picker is focused */
+.vsel{font-size:16px}
