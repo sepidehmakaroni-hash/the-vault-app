@@ -3,9 +3,10 @@
 @font-face{font-family:'Awaken';src:url(../assets/fonts/Awaken.otf) format('opentype');font-display:swap}
 @font-face{font-family:'Bodoni Moda';src:url(../assets/fonts/BodoniModa-VF.ttf);font-weight:400 900;font-display:swap}
 @font-face{font-family:'Archivo';src:url(../assets/fonts/Archivo-VF.ttf);font-weight:100 900;font-display:swap}
-@font-face{font-family:'Reem Kufi';src:url(fonts/reem-kufi-arabic-400-normal.woff2) format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'Reem Kufi';src:url(fonts/reem-kufi-arabic-500-normal.woff2) format('woff2');font-weight:500;font-display:swap}
-@font-face{font-family:'Vazirmatn';src:url(../assets/fonts/Vazirmatn-VF.ttf);font-weight:100 900;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-400.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-500.woff2) format('woff2');font-weight:500;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-600.woff2) format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-700.woff2) format('woff2');font-weight:700;font-display:swap}
 
 :root{
   --ink:#0F0E0D; --ivory:#ECE5D6; --mute:rgba(236,229,214,.72); --faint:rgba(236,229,214,.58);
@@ -14,13 +15,13 @@
   --foil:linear-gradient(180deg,#E2CC95 0%,#C2A86E 45%,#A08A58 70%,#87713F 100%);
   --brass:linear-gradient(180deg,#EBD59E 0%,#C9AE72 35%,#9A8150 70%,#5E4C26 100%);
   --soft:cubic-bezier(.25,.8,.25,1); --heavy:cubic-bezier(.45,0,.15,1);
-  --d:min(80vw,350px,max(230px,calc(100dvh - 450px)));
+  --d:min(80vw,350px,max(220px,calc(100dvh - 490px)));
   --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
   --pat:url(../assets/img/pattern.png);
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:var(--ink);color:var(--ivory)}
-body{font-family:'Archivo','Vazirmatn',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+body{font-family:'Archivo','Noto Naskh Arabic',sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 @media (min-width:481px){body{background:#070706}}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:none;border:0;padding:0}
@@ -152,9 +153,9 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .small{font-size:12.5px;color:var(--faint);margin:0}
 .num{font-family:'Bodoni Moda',serif;font-variant-numeric:lining-nums}
 [dir=rtl] .eyb{letter-spacing:0;font-size:13px}
-[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3{font-family:'Vazirmatn',sans-serif;font-weight:300}
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3{font-family:'Noto Naskh Arabic',sans-serif;font-weight:300}
 [dir=rtl] .h3{font-weight:400}
-[dir=rtl] .num{font-family:'Vazirmatn',sans-serif;font-weight:300}
+[dir=rtl] .num{font-family:'Noto Naskh Arabic',sans-serif;font-weight:300}
 .center{text-align:center}
 .head{display:flex;flex-direction:column;gap:8px}
 .ornament{display:flex;align-items:center;gap:12px;color:var(--faint);font-size:12px;letter-spacing:.14em;text-transform:uppercase;justify-content:center;margin:0}
@@ -242,7 +243,7 @@ select.in option{background:#1b1a18}
 .row b{display:block;font-weight:500;font-size:15px}
 .row i{display:block;font-style:normal;font-size:12.5px;color:var(--mute);margin-top:2px}
 .row .k{min-width:44px;font-size:24px;color:var(--gold-l);text-align:center;line-height:1}
-.row .k small{display:block;font-size:10.5px;color:var(--mute);font-family:'Archivo','Vazirmatn',sans-serif;margin-top:4px}
+.row .k small{display:block;font-size:10.5px;color:var(--mute);font-family:'Archivo','Noto Naskh Arabic',sans-serif;margin-top:4px}
 .chev{width:8px;height:8px;border-top:1.5px solid var(--gold-l);border-right:1.5px solid var(--gold-l);transform:rotate(45deg);flex-shrink:0}
 [dir=rtl] .chev{transform:rotate(-135deg)}
 .pill{font-size:11.5px;padding:3px 9px;border-radius:20px;border:1px solid var(--line2);color:var(--gold-l);white-space:nowrap}
@@ -343,7 +344,7 @@ select.in option{background:#1b1a18}
 .keyhole{position:absolute;inset-inline-end:16px;top:16px;width:16px;height:24px;opacity:.85}
 .box b{display:block;font-family:'Awaken','Bodoni Moda',serif;font-weight:400;font-size:20px;line-height:1.15}
 .box i{display:block;font-style:normal;margin-top:4px;font-size:12.5px;color:var(--mute)}
-[dir=rtl] .box b{font-family:'Vazirmatn',sans-serif;font-size:18px}
+[dir=rtl] .box b{font-family:'Noto Naskh Arabic',sans-serif;font-size:18px}
 
 /* ---------- inside: dock ---------- */
 .dock{position:absolute;z-index:40;left:12px;right:12px;bottom:calc(var(--bot) + 10px);height:66px;border-radius:16px;display:grid;grid-template-columns:repeat(5,1fr);
@@ -442,11 +443,11 @@ select.in option{background:#1b1a18}
 .icard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,13,0) 35%,rgba(15,14,13,.35) 60%,rgba(15,14,13,.92) 100%)}
 .icard .icap{position:absolute;z-index:1;left:18px;right:18px;bottom:16px;display:flex;flex-direction:column;gap:4px}
 .icard .icap b{font-family:'Awaken','Bodoni Moda',serif;font-weight:400;font-size:24px;line-height:1.15;color:var(--ivory)}
-[dir=rtl] .icard .icap b{font-family:'Vazirmatn',sans-serif;font-weight:400;font-size:21px}
+[dir=rtl] .icard .icap b{font-family:'Noto Naskh Arabic',sans-serif;font-weight:400;font-size:21px}
 .icard .icap i{font-style:normal;font-size:13px;color:rgba(236,229,214,.78)}
 .icard .tag{position:absolute;z-index:1;top:14px;inset-inline-start:14px;padding:6px 10px;border-radius:3px;background:var(--brass);color:#2a2112;font-family:'Bodoni Moda',serif;font-size:13px;line-height:1.1;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4)}
-[dir=rtl] .icard .tag{font-family:'Vazirmatn',sans-serif}
-.icard .tag small{display:block;font-family:'Archivo','Vazirmatn',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+[dir=rtl] .icard .tag{font-family:'Noto Naskh Arabic',sans-serif}
+.icard .tag small{display:block;font-family:'Archivo','Noto Naskh Arabic',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
 .icard .pill{position:absolute;z-index:1;top:14px;inset-inline-end:14px;background:rgba(15,14,13,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .cards{display:flex;flex-direction:column;gap:14px}
 .cover{position:relative;margin:calc(-1 * (var(--top) + 72px)) -22px 0!important;height:calc(var(--top) + 220px);overflow:hidden}
@@ -482,7 +483,7 @@ select.in option{background:#1b1a18}
 .hide .stat b.neg{color:inherit}
 
 /* ---------- type: Persian gets its own display face, and nothing readable is smaller than 13px ---------- */
-[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Reem Kufi','Vazirmatn',sans-serif;font-weight:400;letter-spacing:0}
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic',serif;font-weight:400;letter-spacing:0}
 [dir=rtl] .h1{font-size:clamp(30px,8.6vw,38px);line-height:1.35}
 [dir=rtl] .h2{line-height:1.4}[dir=rtl] .h3{font-weight:500}
 [dir=rtl] .icard .icap b{font-size:23px;line-height:1.35}
@@ -493,3 +494,18 @@ select.in option{background:#1b1a18}
 .icard .tag small{font-size:11px}
 
 .cta-bar.static{position:static;margin:26px 0 0!important;padding:0 0 8px;background:none}
+
+/* Persian: Noto Naskh Arabic throughout */
+[dir=rtl],[dir=rtl] button,[dir=rtl] input,[dir=rtl] select,[dir=rtl] textarea{font-family:'Noto Naskh Arabic',serif}
+[dir=rtl] .h1,[dir=rtl] .h2,[dir=rtl] .h3,[dir=rtl] .box b,[dir=rtl] .icard .icap b,[dir=rtl] .sheet-head .h2{font-family:'Noto Naskh Arabic',serif;font-weight:500}
+[dir=rtl] .num{font-family:'Noto Naskh Arabic',serif;font-weight:400}
+[dir=rtl] .p{line-height:1.9}
+/* door pages: copy sits low, but never slides under the door when it is taller (Persian) */
+.page.door-page{justify-content:flex-start}
+.page.door-page>:first-child{margin-top:auto}
+.page.door-page.login>:first-child{margin-top:0}
+[dir=rtl] .door-copy .h1{font-size:clamp(26px,7.4vw,32px);line-height:1.5}
+.page.door-page.login{padding-top:calc(var(--top) + 84px + var(--d) * .68)}
+.door-copy{gap:8px}
+.page.door-page .btns{gap:8px}
+.page.door-page .btn.ghost{height:44px}
