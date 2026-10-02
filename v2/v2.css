@@ -119,16 +119,16 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .page::-webkit-scrollbar{width:0}
 .app.has-dock .page{padding-bottom:calc(var(--bot) + 104px)}
 .page.enter{animation:pIn .55s var(--soft) both}
-.page.enter.back{animation-name:pInB}
+.page.enter.pback{animation-name:pInB}
 .page.leave{animation:pOut .3s var(--soft) both;pointer-events:none}
-.page.leave.back{animation-name:pOutB}
+.page.leave.pback{animation-name:pOutB}
 @keyframes pIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
 @keyframes pInB{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
 @keyframes pOut{to{opacity:0;transform:translateX(-10px)}}
 @keyframes pOutB{to{opacity:0;transform:translateX(10px)}}
-[dir=rtl] .page.enter{animation-name:pInB}[dir=rtl] .page.enter.back{animation-name:pIn}
-[dir=rtl] .page.leave{animation-name:pOutB}[dir=rtl] .page.leave.back{animation-name:pOut}
-.page.enter.fade,.page.enter.fade.back{animation:fIn .8s var(--soft) both}
+[dir=rtl] .page.enter{animation-name:pInB}[dir=rtl] .page.enter.pback{animation-name:pIn}
+[dir=rtl] .page.leave{animation-name:pOutB}[dir=rtl] .page.leave.pback{animation-name:pOut}
+.page.enter.fade,.page.enter.fade.pback{animation:fIn .8s var(--soft) both}
 .page.leave.fade{animation:fOut .3s both}
 @keyframes fIn{from{opacity:0}to{opacity:1}}
 @keyframes fOut{to{opacity:0}}
@@ -431,3 +431,24 @@ select.in option{background:#1b1a18}
 /* while the door moves, the chrome steps aside */
 .bar,.dock{transition:opacity .6s var(--soft),transform .6s var(--soft)}
 .app.animating .bar{opacity:0;pointer-events:none}
+
+/* photo cards: the house is seen, not only listed */
+.icard{position:relative;display:block;width:100%;border-radius:6px;overflow:hidden;aspect-ratio:16/10;text-align:start;background:#1e1c19;box-shadow:0 18px 36px rgba(0,0,0,.45),0 0 0 1px var(--line)}
+.icard.tall{aspect-ratio:4/4.6}.icard.arch{border-radius:999px 999px 6px 6px;aspect-ratio:4/4.4}
+.icard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--soft)}
+.icard:active img{transform:scale(1.04)}
+.icard::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,13,0) 35%,rgba(15,14,13,.35) 60%,rgba(15,14,13,.92) 100%)}
+.icard .icap{position:absolute;z-index:1;left:18px;right:18px;bottom:16px;display:flex;flex-direction:column;gap:4px}
+.icard .icap b{font-family:'Awaken','Bodoni Moda',serif;font-weight:400;font-size:24px;line-height:1.15;color:var(--ivory)}
+[dir=rtl] .icard .icap b{font-family:'Vazirmatn',sans-serif;font-weight:400;font-size:21px}
+.icard .icap i{font-style:normal;font-size:13px;color:rgba(236,229,214,.78)}
+.icard .tag{position:absolute;z-index:1;top:14px;inset-inline-start:14px;padding:6px 10px;border-radius:3px;background:var(--brass);color:#2a2112;font-family:'Bodoni Moda',serif;font-size:13px;line-height:1.1;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+[dir=rtl] .icard .tag{font-family:'Vazirmatn',sans-serif}
+.icard .tag small{display:block;font-family:'Archivo','Vazirmatn',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.icard .pill{position:absolute;z-index:1;top:14px;inset-inline-end:14px;background:rgba(15,14,13,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cards{display:flex;flex-direction:column;gap:14px}
+.cover{position:relative;margin:calc(-1 * (var(--top) + 72px)) -22px 0!important;height:calc(var(--top) + 220px);overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,13,.55) 0%,rgba(15,14,13,.15) 40%,var(--ink) 100%)}
+.cover+*{margin-top:-46px!important;position:relative}
+.bar .lang{min-width:40px;height:40px}

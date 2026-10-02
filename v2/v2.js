@@ -394,10 +394,10 @@ function render(dir, o) {
   drawBar(def); drawDock();
 
   var pg = document.createElement('div');
-  pg.className = 'page ' + (def.cls || '') + ' enter' + (o.fade || first ? ' fade' : (dir === 'back' ? ' back' : ''));
+  pg.className = 'page ' + (def.cls || '') + ' enter' + (o.fade || first ? ' fade' : (dir === 'back' ? ' pback' : ''));
   pg.innerHTML = def.html(r);
   view.appendChild(pg);
-  if (old) { old.classList.add('leave'); if (dir === 'back') old.classList.add('back'); if (o.fade) old.classList.add('fade'); setTimeout(function () { old.remove(); }, calm ? 0 : 340); }
+  if (old) { old.classList.add('leave'); if (dir === 'back') old.classList.add('pback'); if (o.fade) old.classList.add('fade'); setTimeout(function () { old.remove(); }, calm ? 0 : 340); }
   hydrate(pg);
   if (dir === 'back' && scrolls[path]) pg.scrollTop = scrolls[path];
   if (r.key === 'combo') slots = [];
@@ -405,7 +405,7 @@ function render(dir, o) {
 }
 function rerender() {   // same page, fresh content (errors, toggles): no animation, scroll kept
   var pg = $('.page:not(.leave)', view); if (!pg) return; var top = pg.scrollTop;
-  var def = ROUTES[route.key]; pg.classList.remove('enter', 'fade', 'back'); pg.innerHTML = def.html(route); hydrate(pg); pg.scrollTop = top;
+  var def = ROUTES[route.key]; pg.classList.remove('enter', 'fade', 'pback'); pg.innerHTML = def.html(route); hydrate(pg); pg.scrollTop = top;
   $$('.rise', pg).forEach(function (x) { x.classList.remove('rise'); });
   if (def.after) def.after(pg, route);
 }
@@ -415,7 +415,7 @@ function drawBar(def) {
   var l = L(), monoTo = def.scene === 'in' ? 'm' : '';
   var mono = '<button type="button" class="mono" data-go="' + monoTo + '" aria-label="The Vault"><span class="mk"></span></button>';
   var left = def.back ? '<button type="button" class="back" data-act="back"><i></i><span>' + l.back + '</span></button>' : mono;
-  var right = def.scene === 'in' ? '<button type="button" class="avatar" data-go="m/account" aria-label="' + l.accEy + '">AF</button>'
+  var right = def.scene === 'in' ? '<button type="button" class="ibtn lang" data-act="lang">' + l.lang + '</button><button type="button" class="avatar" data-go="m/account" aria-label="' + l.accEy + '">AF</button>'
     : '<button type="button" class="ibtn" data-act="sound" aria-label="' + l.sound + '" aria-pressed="' + P.sound + '">' + I(P.sound ? 'sound' : 'mute') + '</button><button type="button" class="ibtn" data-act="lang">' + l.lang + '</button>';
   bar.innerHTML = '<div class="bar-l">' + left + '</div>' + (def.back ? '<div>' + mono + '</div>' : '') + '<div class="bar-r">' + right + '</div>';
 }
@@ -473,6 +473,8 @@ function showErrors() {
   var inp = $('input,textarea,select', first); if (inp && inp.type !== 'checkbox') setTimeout(function () { inp.focus({ preventScroll: true }); }, 380);
 }
 var digitsOnly = function (s) { return String(s || '').replace(/[۰-۹]/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d); }).replace(/\D/g, ''); };
+function icard(attrs, photo, title, sub, tag, pill, cls) { return '<button type="button" class="icard' + (cls ? ' ' + cls : '') + '" ' + attrs + '>' + img(photo, '') + (tag || '') + (pill || '') + '<span class="icap"><b>' + title + '</b>' + (sub ? '<i>' + sub + '</i>' : '') + '</span></button>'; }
+function dateTag(d) { return '<span class="tag num">' + dfmt(d, { day: 'numeric' }) + '<small>' + dfmt(d, { month: 'short' }) + '</small></span>'; }
 function img(name, alt) { return '<img src="../assets/photos/' + name + '.jpg" alt="' + esc(alt || '') + '" loading="lazy" decoding="async">'; }
 
 /* ================= pages: the door ================= */
@@ -626,18 +628,19 @@ R('m', { scene: 'in', html: function () {
       '<div class="cside"><div class="cpat"></div><div class="chipm"><span class="mk"></span></div><div class="cword">THE VAULT</div><div class="cmeta" dir="ltr"><span>ARASH FARAHANI</span><span>Nº 001</span></div><div class="glare"></div></div>' +
       '<div class="cside backside"><div class="cpat"></div><div class="qr">' + qr() + '</div><div class="backtext"><b>' + l.cardBackT + '</b><i>' + l.cardBackD + '</i></div></div>' +
     '</div></div><p class="fliphint">' + l.cardHint + '</p></div>' +
+    '<div class="sec"><p class="eyb">' + l.tonight + '</p>' + icard('data-act="event" data-v="0"', EVPH[0], ev[0], ev[1] + ' · ' + ev[2], dateTag(d0), S.rsvp[0] ? '<span class="pill ok">' + l.going + '</span>' : '', 'tall') + '</div>' +
     '<button type="button" class="panel wstrip' + (S.hide ? ' hide' : '') + '" data-go="m/wallet"><span class="top"><span><span class="eyb">' + l.avail + '</span><br><span class="amt num">' + money(w.avail) + '</span> <span class="unit">' + l.unit + '</span></span><span class="chev"></span></span>' +
       '<span class="meter debt" style="--w:' + used + '%"><i></i></span><span class="ends"><span>' + l.owed + ' ' + money(w.debt) + '</span><span>' + fill(l.ofLimit, money(W.limit)) + '</span></span></button>' +
     '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' +
     '<div class="boxes">' + l.boxes.map(function (b, i) { return '<button type="button" class="box" data-go="' + ['m/reserve', 'm/events', 'm/concierge', 'm/wallet'][i] + '"><span class="plate">Nº 0' + (i + 1) + '</span>' + KEYHOLE + '<span><b>' + b[0] + '</b><i>' + b[1] + '</i></span></button>'; }).join('') + '</div>' +
-    '<div class="sec"><p class="eyb">' + l.tonight + '</p><button type="button" class="panel row" data-act="event" data-v="0" style="padding:16px 18px"><span class="k num">' + dfmt(d0, { day: 'numeric' }) + '<small>' + dfmt(d0, { month: 'short' }) + '</small></span><span class="grow"><b>' + ev[0] + '</b><i>' + ev[1] + ' · ' + ev[2] + '</i></span><span class="chev"></span></button></div>';
+    '';
 }, after: function () { cardTilt(); } });
 
 R('m/reserve', { scene: 'in', html: function () {
   var l = L();
   var mine = S.res.length ? '<div class="sec"><p class="eyb">' + l.yourRes + '</p><div class="panel list" style="padding:0 18px">' + S.res.map(function (r, i) { return '<div class="row"><span class="grow"><b>' + resLine(r) + '</b><i>' + party(r.party) + '</i></span><button type="button" class="more" data-act="cancelRes" data-v="' + i + '">' + l.cancel + '</button></div>'; }).join('') + '</div></div>' : '';
   return '<div class="head rise"><p class="eyb">' + l.reserveEy + '</p><h1 class="h1">' + l.reserveTitle + '</h1></div>' + mine +
-    '<div class="list">' + l.rooms.map(function (r, i) { return '<button type="button" class="row" data-go="m/reserve/' + i + '"><img class="thumb" src="../assets/photos/' + r[2] + '.jpg" alt="" loading="lazy" decoding="async"><span class="grow"><b>' + r[0] + '</b><i>' + r[1] + '</i></span><span class="chev"></span></button>'; }).join('') + '</div>';
+    '<div class="cards">' + l.rooms.map(function (r, i) { return icard('data-go="m/reserve/' + i + '"', r[2], r[0], r[1], '', '', i === 0 ? 'tall' : ''); }).join('') + '</div>';
 } });
 var TIMES = ['12:30', '14:00', '19:30', '20:30', '21:30', '22:30'];
 function rf(i) { if (!S.rf[i]) S.rf[i] = { day: 0, time: null, party: 2, guests: '', note: '' }; return S.rf[i]; }
@@ -658,8 +661,8 @@ R('m/room', { scene: 'in', back: true, html: function (r) {
 
 R('m/events', { scene: 'in', html: function () {
   var l = L();
-  return '<div class="head rise"><p class="eyb">' + l.eventsEy + '</p><h1 class="h1">' + l.eventsTitle + '</h1></div><div class="list">' +
-    l.events.map(function (e, i) { var d = dayOf(EV[i].off), on = !!S.rsvp[i]; return '<button type="button" class="row" data-act="event" data-v="' + i + '"><span class="k num">' + dfmt(d, { day: 'numeric' }) + '<small>' + dfmt(d, { month: 'short' }) + '</small></span><span class="grow"><b>' + e[0] + '</b><i>' + e[1] + ' · ' + e[2] + ' · ' + fill(l.seats, digits(seatsLeft(i))) + '</i></span>' + (on ? '<span class="pill ok">' + l.going + '</span>' : '<span class="chev"></span>') + '</button>'; }).join('') + '</div>';
+  return '<div class="head rise"><p class="eyb">' + l.eventsEy + '</p><h1 class="h1">' + l.eventsTitle + '</h1></div><div class="cards">' +
+    l.events.map(function (e, i) { var d = dayOf(EV[i].off), on = !!S.rsvp[i]; return icard('data-act="event" data-v="' + i + '"', EVPH[i], e[0], e[1] + ' · ' + e[2] + ' · ' + fill(l.seats, digits(seatsLeft(i))), dateTag(d), on ? '<span class="pill ok">' + l.going + '</span>' : '', i === 0 ? 'tall' : ''); }).join('') + '</div>';
 } });
 function seatsLeft(i) { return EV[i].seats - (S.rsvp[i] ? 1 + (S.bring[i] || 0) : 0); }
 
@@ -670,7 +673,7 @@ R('m/concierge', { scene: 'in', html: function () {
     var topic = c.seed != null ? l.seedConc[c.seed][0] : l.topics[c.topicI], text = c.seed != null ? l.seedConc[c.seed][1] : c.text;
     return '<button type="button" class="row" data-act="concItem" data-v="' + i + '"><span class="grow"><b>' + esc(topic) + '</b><i>' + esc(String(text).slice(0, 70)) + '</i></span><span class="pill' + (c.st === 2 ? ' ok' : '') + '">' + l.st[c.st] + '</span></button>';
   }).join('') + '</div></div>';
-  return '<div class="head rise"><p class="eyb">' + l.concEy + '</p><h1 class="h1">' + l.concTitle + '</h1><p class="p">' + l.concBody + '</p></div>' +
+  return '<div class="cover">' + img('room-door', '') + '</div><div class="head rise"><p class="eyb">' + l.concEy + '</p><h1 class="h1">' + l.concTitle + '</h1><p class="p">' + l.concBody + '</p></div>' +
     '<div class="fields"><div class="f"><span class="lab">' + l.about + '</span>' + chips('ctopic', 'cf.topic', l.topics, false) + '</div>' +
     fld('ctext', l.tell, { html: '<textarea class="in" data-k="cf.text" placeholder="' + esc(l.tellPh) + '"></textarea>' }, true) +
     '<div class="f"><span class="lab">' + l.soon + '</span>' + chips('cwhen', 'cf.when', l.whens, false) + '</div>' +
@@ -704,7 +707,7 @@ R('m/wallet', { scene: 'in', html: function () {
 R('m/account', { scene: 'in', back: true, html: function () {
   var l = L();
   var sw = function (act, on, label, v) { return '<div class="row"><span class="grow"><b>' + label + '</b></span><button type="button" class="switch" role="switch" aria-checked="' + !!on + '" aria-label="' + esc(label) + '" data-act="' + act + '"' + (v != null ? ' data-v="' + v + '"' : '') + '></button></div>'; };
-  return '<div class="panel rise" style="display:flex;gap:16px;align-items:center"><span class="avatar" style="width:58px;height:58px;font-size:20px;flex-shrink:0">AF</span><span><b style="font-weight:500;font-size:17px">Arash Farahani</b><br><span class="small">' + l.tier + ' · Nº ' + digits('001') + '</span><br><span class="small">' + fill(l.since, dfmt(dayOf(-420), { month: 'long', year: 'numeric' })) + '</span></span></div>' +
+  return '<div class="cover">' + img('room-garden', '') + '</div><div class="panel rise" style="display:flex;gap:16px;align-items:center"><span class="avatar" style="width:58px;height:58px;font-size:20px;flex-shrink:0">AF</span><span><b style="font-weight:500;font-size:17px">Arash Farahani</b><br><span class="small">' + l.tier + ' · Nº ' + digits('001') + '</span><br><span class="small">' + fill(l.since, dfmt(dayOf(-420), { month: 'long', year: 'numeric' })) + '</span></span></div>' +
     '<div class="sec"><p class="eyb">' + l.guestsH + '</p><div class="list">' + (S.guests.length ? S.guests.map(function (g, i) { return '<div class="row"><span class="grow"><b>' + esc(g) + '</b></span><button type="button" class="more" data-act="rmGuest" data-v="' + i + '" aria-label="×">×</button></div>'; }).join('') : '<p class="small">' + l.noGuests + '</p>') + '</div>' +
       '<div class="phone" style="grid-template-columns:1fr auto"><input class="in" placeholder="' + l.guestPh2 + '" data-k="newGuest" autocomplete="off"><button type="button" class="btn line" style="width:auto;padding:0 18px;height:52px" data-act="addGuest">' + l.guestAdd + '</button></div></div>' +
     '<div class="sec"><p class="eyb">' + l.settings + '</p><div class="list">' +
