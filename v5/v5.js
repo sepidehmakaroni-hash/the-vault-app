@@ -748,6 +748,7 @@ const Q = {
   level: QPIN ? +QPIN[1] : (((navigator.deviceMemory || 8) <= 3 || (navigator.hardwareConcurrency || 8) <= 4) ? 1 : 2),
   locked: !!QPIN
 };
+window.__v5q = () => Q.level; /* testing aid */
 const qDpr = l => { const d = Math.min(2, window.devicePixelRatio || 1); return l >= 2 ? d : l === 1 ? Math.min(d, 1.5) : Math.min(d, 1); };
 let THREE_P = null;
 const loadThree = () => (THREE_P || (THREE_P = import('./lib/three.r186.min.js' + V)));
@@ -796,7 +797,7 @@ const FINISH = {
     ' col+=vec3(.010,.007,.002);',
     ' col*=mix(1.,smoothstep(1.08,.22,r),uVig);',
     ' col+=(h(uv*uRes+fract(uTime*7.)*91.)-.5)*uGrain;',
-    ' col+=uFlash*vec3(1.,.84,.58);',
+    ' col+=uFlash*vec3(1.,.84,.58)*(1.15-r*.9);',
     ' gl_FragColor=vec4(col*uFade,1.);}'
   ].join('\n')
 };
@@ -1181,9 +1182,9 @@ function makeKey(T) {
     pipe.size(w, h);
     dm.uniforms.uPx.value = bm.uniforms.uPx.value = burstM.uniforms.uPx.value = qDpr(Q.level);
     camera.aspect = w / h;
-    const copyTop = copy ? copy.getBoundingClientRect().top - keyHost.getBoundingClientRect().top : h * 0.62;
-    const barH = $('.scr-land:not(.leave) .pill') ? 118 : 62;
-    const free = Math.max(170, copyTop - barH + 26);
+    const copyTop = copy && copy.offsetHeight ? h - copy.offsetHeight - (parseFloat(getComputedStyle(copy).bottom) || 0) : h * 0.62;
+    const barH = $('.scr-land:not(.leave) .pill') ? 112 : 58;
+    const free = Math.max(170, copyTop - barH + 6);
     /* the key and the plinth top must fit the space between the bar and the words */
     const content = 5.75;
     const visH = Math.max(content / (free / h), 3.3 / camera.aspect);
@@ -1216,30 +1217,31 @@ function makeKey(T) {
       turn = eback(cl((u - 0.5) / 0.45));
       if (u > 0.92 && burstM.uniforms.uT.value < 0) {
         burstM.uniforms.uT.value = 0;
-        pivot.localToWorld(tmp.set(0, -1.2, 0));
+        pivot.localToWorld(tmp.set(0, KEY.bowY - 0.25, 0.1));
         burstM.uniforms.uO.value.copy(tmp);
       }
       if (burstM.uniforms.uT.value >= 0) burstM.uniforms.uT.value += dt;
       flash = cl((u - 0.88) / 0.18) * (1 - cl((u - 1.15) / 0.5));
       if (u > 1.32 && unlockDone) { const f = unlockDone; unlockDone = null; f(); }
     }
-    /* the key: idle turn, bob, or the unlock move (bit towards the lens, then a quarter turn) */
+    /* the key: idle turn and bob — or the unlock: it squares up, comes to the lens, and turns a quarter, as in a lock */
     spin.rotation.y = unlockT >= 0 ? lerp(unlockFrom, Math.round(unlockFrom / (Math.PI * 2)) * Math.PI * 2, fly) + turn * Math.PI / 2 : ang;
-    pivot.rotation.x = lerp(tiltX, -Math.PI / 2, fly);
+    pivot.rotation.x = lerp(tiltX, 0, fly);
     pivot.rotation.z = lerp(0.2 + Math.sin(t * 0.33) * 0.025, 0, fly);
-    pivot.position.set(0, lerp(keyY + Math.sin(t * 0.55) * 0.07, fitY, fly), lerp(0, dist - 2.6, fly * fly));
+    pivot.position.set(0, lerp(keyY + Math.sin(t * 0.55) * 0.07, fitY + 0.15, fly), lerp(0, dist - 8.5, fly));
     /* camera: slow dolly, a breath of orbit, parallax from drag and tilt */
-    const d = dist * (1 + 0.035 * Math.sin(t * 0.16));
+    const push = unlockT > 0.95 ? eio(cl((unlockT - 0.95) / 0.5)) : 0;
+    const d = dist * (1 + 0.035 * Math.sin(t * 0.16)) - push * 5.2;
     const orb = 0.06 * Math.sin(t * 0.11) + parX * 0.22;
-    camera.position.set(Math.sin(orb) * d, fitY + 1.9 + parY * 0.6, Math.cos(orb) * d);
+    camera.position.set(Math.sin(orb) * d * (1 - fly), fitY + lerp(1.9 + parY * 0.6, 0, fly), Math.cos(orb) * d);
     look.set(0, fitY, 0);
     camera.lookAt(look);
     rim.position.x = 4 * Math.cos(t * 0.21); rim.position.z = -4 + Math.sin(t * 0.21) * 1.5;
     spot.intensity = 60 * (0.92 + 0.08 * Math.sin(t * 0.7)) * (1 + flash * 2);
     shafts.forEach(s => { s.material.uniforms.uTime.value = t; });
     dm.uniforms.uTime.value = bm.uniforms.uTime.value = t;
-    pipe.bloom.strength = 0.38 + flash * 1.8 + fly * 0.3;
-    pipe.fin.uniforms.uFlash.value = flash * 0.55;
+    pipe.bloom.strength = 0.38 + flash * 1.2 + fly * 0.25;
+    pipe.fin.uniforms.uFlash.value = flash * 0.42;
     pipe.fin.uniforms.uTilt.value = 0.55 * (1 - fly);
     if (mirror) mirror.visible = Q.level >= 2;
   }
@@ -1294,6 +1296,8 @@ function makeKey(T) {
 
   keyHost.appendChild(canvas);
   fit($('.scr-land .land-copy'));
+  /* testing aid: render the unlock at a fixed moment */
+  window.__v5unlockAt = u => { isActive = false; sync(); unlockFrom = ang; unlockT = u; burstM.uniforms.uT.value = u > 0.92 ? u - 0.92 : -1; if (u > 0.92) { pivot.updateMatrixWorld(); } update(0); draw(0); };
 
   return {
     frame(copy) { fit(copy); },
@@ -1833,6 +1837,11 @@ function cTex(TH, w, h, draw) {
   if (draw) o.draw(draw);
   return o;
 }
+function drawV(g, cx, cy, size, col) {
+  g.save(); g.fillStyle = col; g.beginPath();
+  KEY.V.forEach((p, i) => { const x = cx + p[0] / 0.38 * size, y = cy - p[1] / 0.38 * size; if (i) g.lineTo(x, y); else g.moveTo(x, y); });
+  g.closePath(); g.fill(); g.restore();
+}
 function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 function spaced(g, txt, x, y, sp) { /* letter-spaced Latin caps, centred on x */
   if (!sp) { g.fillText(txt, x, y); return; }
@@ -1851,7 +1860,7 @@ function disposeScene(o) {
 }
 const GOLD = 0xd6a85c;
 /* scenes are composed for a 4:3-ish frame; on a tall phone the camera steps back along its line of sight */
-const fitK = (C, base) => Math.min(1.75, Math.max(1, (base || 0.72) / C.aspect));
+const fitK = (C, base, max) => Math.min(max || 1.75, Math.max(1, (base || 0.72) / C.aspect));
 function aim(cam, look, K) { cam.position.sub(look).multiplyScalar(K).add(look); cam.lookAt(look); }
 
 async function makeSeqGL(stage, ov, q) {
@@ -2197,16 +2206,16 @@ const GL_SCENES = {
     });
     drawCard(0);
     const paper = new TH.MeshStandardMaterial({ color: 0xe9dfca, roughness: 0.86 });
-    const pc = new TH.Group(); pc.position.set(0, 0, -1.2); scene.add(pc);
+    const pc = new TH.Group(); pc.position.set(-0.15, 0, -0.85); scene.add(pc);
     const fG = new TH.PlaneGeometry(pcW, pcH); fG.translate(0, pcH / 2, 0);
     const front = new TH.Mesh(fG, new TH.MeshStandardMaterial({ map: face.tx, roughness: 0.82, side: TH.FrontSide }));
     const frontB = new TH.Mesh(fG, paper); frontB.rotation.y = Math.PI;
     const fp = new TH.Group(); fp.add(front, frontB); fp.position.z = 0.24; fp.rotation.x = -0.33; pc.add(fp);
     const bp = new TH.Mesh(fG, paper); bp.position.z = -0.24; bp.rotation.x = 0.33; bp.rotation.y = Math.PI; pc.add(bp);
     const pcShadow = new TH.Mesh(new TH.PlaneGeometry(2.1, 0.9), new TH.MeshBasicMaterial({ map: spriteTex(TH), color: 0x000000, transparent: true, opacity: 0.0, depthWrite: false }));
-    pcShadow.rotation.x = -Math.PI / 2; pcShadow.position.set(0, 0.008, -1.2); scene.add(pcShadow);
+    pcShadow.rotation.x = -Math.PI / 2; pcShadow.position.set(-0.15, 0.008, -0.85); scene.add(pcShadow);
     /* the candle */
-    const cx = 1.75, cz = -1.15;
+    const cx = 0.95, cz = -1.85;
     const holder = new TH.Mesh(new TH.LatheGeometry(v2([[0, 0], [0.34, 0], [0.36, 0.03], [0.3, 0.06], [0.1, 0.1], [0.07, 0.3], [0.09, 0.42], [0.2, 0.47], [0.22, 0.5], [0.13, 0.52], [0, 0.52]]), 64), goldM);
     holder.position.set(cx, 0, cz); scene.add(holder);
     const wax = new TH.MeshPhysicalMaterial({ color: 0xf0e7d6, roughness: 0.45, sheen: 0.6, sheenColor: new TH.Color(0xffd7a6), emissive: 0xffa555, emissiveIntensity: 0 });
@@ -2257,9 +2266,9 @@ const GL_SCENES = {
         sparks.visible = t > 3.95 && t < 4.8; sp.uniforms.uTime.value = (t - 3.95) * 3; sp.uniforms.uAlpha.value = 1 - ph(t, 4.2, 4.8);
         motes.uniforms.uTime.value = t;
         const k = ph(t, 0, 7.2, x => eio(x));
-        cam.position.set(lerp(-1.3, 0.55, k), lerp(3.0, 1.75, k), lerp(5.9, 3.9, k));
-        look.set(lerp(0.3, 0.75, k), lerp(0.45, 0.85, k), lerp(-0.5, -0.95, k));
-        aim(cam, look, fitK(C, 0.78));
+        cam.position.set(lerp(-0.9, 0.35, k), lerp(3.4, 2.3, k), lerp(5.8, 4.4, k));
+        look.set(lerp(-0.05, 0.08, k), lerp(0.95, 1.1, k), lerp(-0.7, -0.95, k));
+        aim(cam, look, fitK(C, 0.74));
         show01(card, ph(t, 5.1, 5.9, eout));
       }
     };
@@ -2310,7 +2319,7 @@ const GL_SCENES = {
         g.fillText(n > 1 ? (fa() ? N(11) + ' تا ' + N(10 + n) : '11–' + (10 + n)) : N(11), cS, 600);
       }
       /* the monogram, in foil */
-      g.fillStyle = gold; g.font = '700 74px "Bodoni Moda"'; g.fillText('V', Wc / 2, 720);
+      drawV(g, Wc / 2, 690, 62, gold); g.fillStyle = gold;
       g.font = CF.lat(20, 600); spaced(g, 'THE VAULT', Wc / 2, 752, 6);
       /* perforation */
       g.fillStyle = foil ? 'rgba(0,0,0,0)' : 'rgba(30,24,19,.55)';
@@ -2331,7 +2340,7 @@ const GL_SCENES = {
       g.lineWidth = 3; g.strokeRect(30, 30, w - 60, h - 60);
       for (let y = 90; y < h - 60; y += 70) for (let x = 70 + ((y / 70) % 2) * 35; x < w - 50; x += 70) { g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.strokeRect(-9, -9, 18, 18); g.restore(); }
       g.fillStyle = '#000'; g.fillRect(w / 2 - 150, h * 0.36, 300, 260); g.fillStyle = '#fff';
-      g.textAlign = 'center'; g.font = '700 180px "Bodoni Moda"'; g.fillText('V', w / 2, h * 0.36 + 190); g.font = CF.lat(24, 600); spaced(g, 'THE VAULT', w / 2, h * 0.36 + 240, 8);
+      g.textAlign = 'center'; drawV(g, w / 2, h * 0.36 + 120, 150, '#fff'); g.font = CF.lat(24, 600); spaced(g, 'THE VAULT', w / 2, h * 0.36 + 240, 8);
     });
     backFoil.tx.colorSpace = TH.LinearSRGBColorSpace;
     const part = (v0, v1, y0, y1) => {
@@ -2383,7 +2392,7 @@ const GL_SCENES = {
         const k = ph(t, 0, 7.2, eio);
         cam.position.set(lerp(-0.9, 0.35, k), lerp(2.2, 0.95, k), lerp(9.4, 7.4, k));
         look.set(0, lerp(1.7, 0.35, k), 0);
-        aim(cam, look, fitK(C, 0.6));
+        aim(cam, look, fitK(C, 0.74));
         show01(card, ph(t, 5.2, 6.0, eout));
       }
     };
@@ -2400,22 +2409,23 @@ const GL_SCENES = {
     const keyL = new TH.DirectionalLight(0xffe0bd, 1.1); keyL.position.set(-3, 6, 4); scene.add(keyL);
     const rim = new TH.DirectionalLight(0xa9c2ff, 2.0); rim.position.set(4, 3, -4); scene.add(rim);
     const warm = new TH.PointLight(0xffb36b, 3, 0, 2); warm.position.set(1.5, 1.2, 2.5); scene.add(warm);
+    const top = new TH.SpotLight(0xfff0dc, 55, 0, 0.42, 0.85, 2); top.position.set(0.4, 7.5, 2.6); top.target.position.set(0, 1.6, 0); scene.add(top, top.target);
     /* a cupped petal */
     const pg = new TH.PlaneGeometry(1, 1, 8, 10); pg.translate(0, 0.5, 0);
     const pp = pg.attributes.position, col = new Float32Array(pp.count * 3);
     for (let i = 0; i < pp.count; i++) {
       const x = pp.getX(i), y = pp.getY(i);
-      const w = Math.pow(Math.sin(Math.PI * Math.min(1, y * 0.96 + 0.04)), 0.7) * (0.55 + 0.45 * y);
-      const X2 = x * 2 * w * 0.5;
-      pp.setXYZ(i, X2, y, 0.55 * X2 * X2 * 4 * 0.5 + 0.22 * y * y);
+      const w = (0.22 + 0.78 * Math.pow(Math.sin(Math.PI * Math.min(1, y * 0.6 + 0.1)), 0.6)) * (y > 0.9 ? Math.sqrt(Math.max(0, 1 - Math.pow((y - 0.9) / 0.1, 2))) * 0.6 + 0.4 : 1);
+      const X2 = x * w;
+      pp.setXYZ(i, X2, y * 0.9, -1.0 * X2 * X2 - 0.16 * y * y + 0.02 * Math.sin(x * 18) * y);
       const k = 0.55 + 0.45 * y;
       col[i * 3] = lerp(0.82, 1.0, k); col[i * 3 + 1] = lerp(0.72, 0.96, k); col[i * 3 + 2] = lerp(0.52, 0.9, k);
     }
     pg.setAttribute('color', new TH.BufferAttribute(col, 3));
     pg.computeVertexNormals();
-    const petalM = new TH.MeshPhysicalMaterial({ color: 0xe9dfcf, vertexColors: true, roughness: 0.6, sheen: 0.8, sheenRoughness: 0.5, sheenColor: new TH.Color(0xd9b48a), side: TH.DoubleSide });
-    const blooms = [[0, 2.45, 0, 0, 0, 1], [-0.72, 2.1, 0.32, -0.38, 0.12, 0.82], [0.7, 2.05, -0.28, 0.36, -0.1, 0.8]];
-    const rings = [[5, 0.03, 0.18, 0.36], [7, 0.07, 0.42, 0.44], [9, 0.11, 0.7, 0.52], [11, 0.15, 0.98, 0.6], [13, 0.19, 1.22, 0.66], [15, 0.22, 1.42, 0.7]];
+    const petalM = new TH.MeshPhysicalMaterial({ color: 0xf6ece0, vertexColors: true, roughness: 0.72, sheen: 1, sheenRoughness: 0.35, sheenColor: new TH.Color(0xf1cdb4), side: TH.DoubleSide, emissive: 0x3a2414, emissiveIntensity: 0.12 });
+    const blooms = [[0, 2.05, 0, 0, 0, 1], [-0.62, 1.8, 0.3, -0.42, 0.14, 0.86], [0.62, 1.76, -0.24, 0.4, -0.12, 0.84]];
+    const rings = [[5, 0.03, 0.05, 0.26], [7, 0.06, 0.16, 0.31], [9, 0.09, 0.28, 0.36], [11, 0.12, 0.42, 0.41], [13, 0.15, 0.56, 0.45], [15, 0.18, 0.7, 0.48], [17, 0.2, 0.84, 0.5]];
     const targets = [];
     const qa = new TH.Quaternion(), qb = new TH.Quaternion(), eu = new TH.Euler(), v = new TH.Vector3(), sc = new TH.Vector3(), m4 = new TH.Matrix4();
     const rr = rng(42);
@@ -2426,8 +2436,8 @@ const GL_SCENES = {
           const a = k / cnt * Math.PI * 2 + ri * 0.37 + bi;
           const o = new TH.Object3D();
           o.rotation.order = 'YXZ'; o.rotation.set(tilt, a, 0);
-          o.position.set(Math.sin(a) * rad * s, -ri * 0.025 * s, Math.cos(a) * rad * s);
-          o.scale.setScalar(size * s * (0.9 + rr() * 0.2));
+          o.position.set(Math.sin(a) * rad * s, -ri * 0.045 * s, Math.cos(a) * rad * s);
+          o.scale.setScalar(size * s * (0.92 + rr() * 0.12));
           o.updateMatrix();
           const mm = new TH.Matrix4().makeRotationFromQuaternion(bq).setPosition(bx, by, bz).multiply(o.matrix);
           const P = new TH.Vector3(), Qt = new TH.Quaternion(), S = new TH.Vector3(); mm.decompose(P, Qt, S);
@@ -2442,12 +2452,12 @@ const GL_SCENES = {
     /* stems, wrap, ribbon */
     const stemM = new TH.MeshStandardMaterial({ color: 0x3e3a22, roughness: 0.6, metalness: 0.2 });
     blooms.forEach(([bx, by, bz]) => { const c = new TH.CatmullRomCurve3([new TH.Vector3(bx, by - 0.1, bz), new TH.Vector3(bx * 0.5, by - 0.9, bz * 0.5), new TH.Vector3(0, 0.5, 0), new TH.Vector3(bx * -0.1, -0.4, bz * -0.1)]); scene.add(new TH.Mesh(new TH.TubeGeometry(c, 40, 0.035, 8), stemM)); });
-    const wrapG = new TH.CylinderGeometry(1.15, 0.28, 1.9, 48, 1, true); wrapG.translate(0, 0.65, 0);
-    const wrap = new TH.Mesh(wrapG, new TH.MeshPhysicalMaterial({ color: 0xbfb39c, roughness: 0.9, sheen: 0.7, sheenRoughness: 0.5, sheenColor: new TH.Color(0xd8c39c), side: TH.DoubleSide }));
+    const wrapG = new TH.CylinderGeometry(0.78, 0.22, 1.45, 48, 1, true); wrapG.translate(0, 0.7, 0);
+    const wrap = new TH.Mesh(wrapG, new TH.MeshPhysicalMaterial({ color: 0x2b241c, roughness: 0.85, sheen: 1, sheenRoughness: 0.4, sheenColor: new TH.Color(0xc9a46a), side: TH.DoubleSide }));
     scene.add(wrap);
     const satin = new TH.MeshPhysicalMaterial({ color: 0xd2a35a, metalness: 0.75, roughness: 0.3, sheen: 0.6, sheenColor: new TH.Color(0xffe0a0) });
-    const band = new TH.Mesh(new TH.TorusGeometry(0.5, 0.05, 12, 64), satin); band.rotation.x = Math.PI / 2; band.position.y = 0.32; band.scale.z = 1.6; scene.add(band);
-    [-1, 1].forEach(sx => { const loop = new TH.Mesh(new TH.TorusGeometry(0.2, 0.04, 10, 40), satin); loop.position.set(sx * 0.22, 0.34, 0.52); loop.rotation.set(0.2, sx * 0.6, 0); loop.scale.set(1.3, 0.8, 1); scene.add(loop); });
+    const band = new TH.Mesh(new TH.TorusGeometry(0.4, 0.035, 12, 64), satin); band.rotation.x = Math.PI / 2; band.position.y = 0.55; scene.add(band);
+    [-1, 1].forEach(sx => { const loop = new TH.Mesh(new TH.TorusGeometry(0.14, 0.028, 10, 40), satin); loop.position.set(sx * 0.15, 0.56, 0.42); loop.rotation.set(0.2, sx * 0.6, 0); loop.scale.set(1.3, 0.8, 1); scene.add(loop); });
     let gift = null;
     if (q.o.what !== 'flowers') {
       gift = new TH.Group(); gift.position.set(1.55, 0.42, 0.9); gift.rotation.y = -0.5; scene.add(gift);
@@ -2480,9 +2490,9 @@ const GL_SCENES = {
         if (gift) { const g2 = ph(t, 4.4, 5.4, eback); gift.scale.setScalar(Math.max(0.001, g2)); }
         pollen.uniforms.uTime.value = t;
         const a = lerp(-0.55, 0.25, ph(t, 0, 7.4, eio)), d = lerp(8.2, 6.0, ph(t, 0, 7.4, eio));
-        cam.position.set(Math.sin(a) * d, lerp(3.6, 2.5, ph(t, 0, 7.4, eio)), Math.cos(a) * d);
-        look.set(0.15, lerp(2.1, 1.45, ph(t, 0, 7.4)), 0);
-        aim(cam, look, fitK(C, 0.7));
+        cam.position.set(Math.sin(a) * d, lerp(5.4, 4.3, ph(t, 0, 7.4, eio)), Math.cos(a) * d);
+        look.set(0.05, lerp(1.75, 1.45, ph(t, 0, 7.4)), 0);
+        aim(cam, look, fitK(C, 0.62));
         show01(card, ph(t, 5.3, 6.1, eout));
       }
     };
@@ -2519,12 +2529,12 @@ const GL_SCENES = {
     const atm = new TH.Mesh(new TH.SphereGeometry(GR * 1.12, 48, 32), new TH.ShaderMaterial({
       transparent: true, depthWrite: false, blending: TH.AdditiveBlending, side: TH.BackSide,
       vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-      fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.);gl_FragColor=vec4(vec3(1.,.78,.45)*1.4,f*.55);}'
+      fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.);gl_FragColor=vec4(vec3(1.,.78,.45)*.9,f*.28);}'
     }));
     globe.add(atm);
     const city = { thr: [35.7, 51.4], ist: [41.0, 29.0], dxb: [25.2, 55.3], kih: [26.5, 54.0], cdg: [48.9, 2.35] };
     const from = THEO(city.thr[0], city.thr[1], GR), dc = city[q.o.to] || city.ist, to = THEO(dc[0], dc[1], GR);
-    const dot = p => { const s = glowSprite(TH, 0xffd08a, 0.42, 1.8); s.position.copy(p).multiplyScalar(1.01); globe.add(s); return s; };
+    const dot = p => { const s = glowSprite(TH, 0xffd08a, 0.22, 1.4); s.position.copy(p).multiplyScalar(1.01); globe.add(s); return s; };
     dot(from); const dDot = dot(to);
     /* the arc */
     const arcPts = [];
@@ -2533,7 +2543,7 @@ const GL_SCENES = {
     const arcG = new TH.TubeGeometry(arcC, 160, 0.014, 6, false);
     const arc = new TH.Mesh(arcG, new TH.MeshBasicMaterial({ color: new TH.Color(0xffd28c).multiplyScalar(2.4) }));
     globe.add(arc);
-    const head = glowSprite(TH, 0xffe0a8, 0.55, 2.4); globe.add(head);
+    const head = glowSprite(TH, 0xffe0a8, 0.32, 1.8); globe.add(head);
     /* orient the globe so the journey faces us */
     const mid = new TH.Vector3().addVectors(from, to).normalize();
     const baseQ = new TH.Quaternion().setFromUnitVectors(mid, new TH.Vector3(0, 0.35, 1).normalize());
@@ -2546,7 +2556,7 @@ const GL_SCENES = {
       g.fillStyle = '#d6aa62'; g.textBaseline = 'middle'; g.textAlign = fa() ? 'right' : 'left';
       g.font = fa() ? CF.txt(36, 600) : CF.lat(24, 600);
       if (fa()) g.fillText('کارت پرواز', W - 300 - 50, 48); else spaced(g, 'BOARDING PASS', 50, 48, 6);
-      g.textAlign = 'left'; g.font = '700 42px "Bodoni Moda"'; g.fillText('V', fa() ? 50 : W - 330, 50);
+      g.textAlign = 'left'; drawV(g, fa() ? 70 : W - 316, 46, 30, '#d6aa62');
       g.strokeStyle = 'rgba(30,24,19,.45)'; g.setLineDash([6, 8]); g.lineWidth = 3; g.beginPath(); g.moveTo(W - 290, 110); g.lineTo(W - 290, H - 20); g.stroke(); g.setLineDash([]);
       g.fillStyle = '#1d1711'; g.font = CF.bod(120); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
       g.fillText('IKA', 50, 250); g.fillText(code, 470, 250);
@@ -2572,7 +2582,7 @@ const GL_SCENES = {
       g.font = CF.disp(fa() ? 64 : 72, true); g.fillText(X(PEOPLE.hotelName[q.o.to] || PEOPLE.hotelName.ist), fa() ? W - 70 : 70, 440);
       g.font = fa() ? CF.txt(38, 600) : CF.lat(26, 600); g.fillStyle = '#cfae6e';
       if (fa()) g.fillText('اتاق ' + N(512), W - 70, 500); else spaced(g, 'ROOM 512', 70, 500, 6);
-      g.textAlign = 'right'; g.font = '700 60px "Bodoni Moda"'; g.fillText('V', W - 70, 110);
+      g.textAlign = 'right'; drawV(g, W - 100, 90, 44, '#cfae6e');
     });
     const kpm = new TH.Mesh(new TH.PlaneGeometry(2.3, 1.44), new TH.MeshBasicMaterial({ map: kprint.tx, transparent: true }));
     kpm.position.z = 0.037; kc.add(kpm);
@@ -2585,14 +2595,14 @@ const GL_SCENES = {
     const ko = showPass ? 0 : -1.4;
     const look = new TH.Vector3(), segs = arcG.index.count;
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.75, thresh: 0.8, tilt: 0.5, focus: 0.45,
+      scene, camera: cam, dur: 7.4, bloom: 0.45, thresh: 0.88, tilt: 0.5, focus: 0.45,
       frame(t) {
         globe.quaternion.copy(baseQ).premultiply(new TH.Quaternion().setFromAxisAngle(new TH.Vector3(0, 1, 0), (t - 3.5) * 0.05));
         const k = ph(t, 0.5, 2.9);
         arcG.setDrawRange(0, Math.floor(segs * k / 6) * 6);
         head.position.copy(arcC.getPointAt(Math.min(1, k)));
         head.material.opacity = ph(t, 0.5, 0.8) * (1 - ph(t, 3.0, 3.6));
-        dDot.scale.setScalar(0.42 * (1 + ph(t, 2.7, 3.1) * 0.8 * (1 - ph(t, 3.1, 3.8))));
+        dDot.scale.setScalar(0.22 * (1 + ph(t, 2.7, 3.1) * 0.8 * (1 - ph(t, 3.1, 3.8))));
         const b = ph(t, 1.9, 3.3, eout);
         passM.position.set(-0.15, lerp(-4.6, -0.55, b), 1.6);
         passM.rotation.set(lerp(-0.5, -0.12, b), lerp(0.25, 0.06, b), lerp(-0.12, -0.05, b));
@@ -2603,7 +2613,7 @@ const GL_SCENES = {
         const m = ph(t, 0, 7.4, eio);
         cam.position.set(lerp(0.4, 0, m), lerp(1.9, 0.75, m), lerp(6.6, 8.4, m));
         look.set(0, lerp(1.6, 0.45, m), 0);
-        aim(cam, look, fitK(C, 0.66));
+        aim(cam, look, fitK(C, 0.8));
         show01(card, ph(t, 5.3, 6.1, eout));
       }
     };
@@ -2614,7 +2624,7 @@ const GL_SCENES = {
     const q = C.q, scene = new TH.Scene();
     scene.background = new TH.Color(0x060505);
     const cam = new TH.PerspectiveCamera(34, C.aspect, 0.05, 80);
-    const xa = -2.9, xb = 2.9;
+    const xa = -1.9, xb = 1.9;
     const ribbons = [];
     for (let i = 0; i < 6; i++) {
       const g = new TH.PlaneGeometry(xb - xa, 0.012 + i * 0.006, 360, 1);
@@ -2622,10 +2632,10 @@ const GL_SCENES = {
         transparent: true, depthWrite: false, blending: TH.AdditiveBlending, side: TH.DoubleSide,
         uniforms: { uT: { value: 0 }, uA: { value: 0 }, uI: { value: i } },
         vertexShader: 'uniform float uT,uI;varying float vX,vP;' +
-          'float pulse(float x,float c){float d=(x-c)/.35;return exp(-d*d)*sin(d*3.2);}' +
-          'void main(){vec3 p=position;float x=(p.x+2.9)/5.8;vX=x;float env=sin(3.1416*x);' +
+          'float pulse(float x,float c){float d=(x-c)/.26;return exp(-d*d)*sin(d*3.2);}' +
+          'void main(){vec3 p=position;float x=(p.x+1.9)/3.8;vX=x;float env=sin(3.1416*x);' +
           'float y=sin(x*9.+uT*1.3+uI*.8)*.06+sin(x*23.-uT*2.1+uI)*.025;float P=0.;' +
-          'for(int k=0;k<6;k++){float b=1.3+float(k)*1.15;float c=-2.9+(uT-b)/1.05*5.8;if(uT>b&&uT<b+1.3)P+=pulse(p.x,c);}' +
+          'for(int k=0;k<6;k++){float b=1.3+float(k)*1.15;float c=-1.9+(uT-b)/1.05*3.8;if(uT>b&&uT<b+1.3)P+=pulse(p.x,c);}' +
           'vP=abs(P);y+=P*(.55-uI*.06);p.y+=y*env*(1.-uI*.09);p.z+=uI*.09-.25+sin(x*5.+uT)*.05*uI;' +
           'gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}',
         fragmentShader: 'uniform float uA,uI;varying float vX,vP;void main(){float e=smoothstep(0.,.08,vX)*smoothstep(1.,.92,vX);vec3 c=vec3(1.,.76,.4)*(1.3+vP*4.);gl_FragColor=vec4(c,e*uA*(1.-uI*.13));}'
@@ -2672,9 +2682,9 @@ const GL_SCENES = {
         });
         sparks.uniforms.uTime.value = t;
         const m = ph(t, 0, 7, eio);
-        cam.position.set(lerp(-1.6, 0.6, m), lerp(0.9, 0.35, m), lerp(6.4, 5.4, m));
-        look.set(lerp(-0.2, 0.2, m), 0.05, 0);
-        aim(cam, look, fitK(C, 1.05));
+        cam.position.set(lerp(-0.9, 0.4, m), lerp(0.9, 0.35, m), lerp(6.4, 5.4, m));
+        look.set(lerp(-0.1, 0.1, m), 0.05, 0);
+        aim(cam, look, fitK(C, 1.3, 3));
         show01(card, ph(t, 3.6, 4.4, eout));
         big.textContent = fmtLeft(Math.round(lerp(target + 40, target, ph(t, 3.8, 6.6, eout))));
       }
