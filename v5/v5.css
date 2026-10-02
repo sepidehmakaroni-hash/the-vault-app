@@ -1,8 +1,8 @@
 /* The Vault — v5 «هر چه بخواهید» / "Ask for anything". Mobile-first; a phone-width column on desktop. */
-@font-face{font-family:'Bodoni Moda';src:url(../v2/fonts/bodoni.woff2?v=7) format('woff2');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Archivo';src:url(../v2/fonts/archivo.woff2?v=7) format('woff2');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-400.woff2?v=7) format('woff2');font-weight:400 500;font-display:swap}
-@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-600.woff2?v=7) format('woff2');font-weight:600 700;font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(../v2/fonts/bodoni.woff2?v=8) format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Archivo';src:url(../v2/fonts/archivo.woff2?v=8) format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-400.woff2?v=8) format('woff2');font-weight:400 500;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-600.woff2?v=8) format('woff2');font-weight:600 700;font-display:swap}
 
 :root{
   --ink:#0A0908; --ink2:#13110E; --ink3:#1C1914;
@@ -404,6 +404,9 @@ bdi{unicode-bidi:isolate}
 .lbls{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
 .lbl{position:absolute;left:0;top:0;white-space:nowrap;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:rgba(239,232,218,.7);text-shadow:0 1px 10px #000,0 0 2px #000;translate:-50% -50%;will-change:transform,opacity;opacity:0}
 .lbl.hi{color:var(--gold-hi)}
+.lbl.lead{translate:0 -50%;padding-inline-start:30px;direction:ltr}
+.fa .lbl.lead{direction:rtl;padding-inline-start:0;padding-inline-end:30px}
+.lbl.lead::before{content:"";position:absolute;left:0;top:50%;width:24px;height:1px;background:var(--gold);box-shadow:0 0 4px rgba(0,0,0,.8)}
 .fa .lbl{font-size:15px;letter-spacing:0;text-transform:none;font-weight:600}
 .ended .lbls{opacity:0;transition:opacity .6s}
 
@@ -460,5 +463,12 @@ bdi{unicode-bidi:isolate}
 .still-svg .seq{position:absolute;inset:0;width:100%;height:100%}
 .card-img img[data-baked=travel]{--op:50% 76%;--o:50% 70%}
 .lbl.gold{color:var(--gold)}
-.card-img img[data-baked=flowers]{--op:50% 50%;--s0:1.02;--s1:1.08}
+.p-mark .card-top .ico{display:none}
+/* flowers: typographic card, a finely drawn gold peony on the dark ground */
+.mark{position:absolute;inset:0;background:radial-gradient(42% 30% at 50% 34%,rgba(207,174,110,.11),rgba(207,174,110,0) 70%),radial-gradient(80% 60% at 50% 38%,#1d160f,#0b0a08 75%)}
+.mark .peony{position:absolute;left:50%;top:calc(46px + (100% - 92px) * .12);height:min(96px,calc((100% - 92px) * .27));width:auto;aspect-ratio:1;transform:translateX(-50%);overflow:visible;filter:drop-shadow(0 0 8px rgba(241,217,162,.28))}
+.hero .mark .peony{top:calc(10px + (100% - 20px) * .2);height:min(96px,calc((100% - 20px) * .3))}
+.peony path{fill:none;stroke:var(--gold-hi);stroke-width:.85;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:icoDraw 2.4s .3s var(--slow) forwards}
+.peony .ico-live{animation:icoDraw 1.2s 2s var(--slow) forwards,icoLive 2.6s 3.4s ease-in-out infinite}
+.card.p-mark .veil{background:linear-gradient(to top,rgba(10,9,8,.9) 0%,rgba(10,9,8,.5) 32%,rgba(10,9,8,0) 60%)}
 .lbl.gold{color:#CFAE6E;text-shadow:0 0 1px #000,0 0 2px #000,0 1px 8px rgba(0,0,0,.9);margin-top:-12px}

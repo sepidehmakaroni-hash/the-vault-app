@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=7';
+const V = '?v=8';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -96,7 +96,7 @@ const REQS = [
         { k: 'when', l: ['When', 'کی'], o: ['thisweek', 'weekend', 'pick'], pick: 'day' },
         { k: 'n', l: ['Seats', 'چند صندلی'], step: [1, 6, 2], u: [['seat', 'seats'], 'صندلی'] },
         { k: 'seat', l: ['Where', 'کجای سالن'], o: ['best', 'aisle'] }] },
-  { id: 'flowers', img: null, fit: 'p-still',
+  { id: 'flowers', img: null, fit: 'p-mark', mark: true,
     t: ['Flowers or a gift', 'گل یا هدیه'], d: ['Chosen, wrapped and delivered.', 'انتخاب، بسته‌بندی و تحویل.'],
     short: ['Flowers', 'گل'],
     g: [{ k: 'what', l: ['What', 'چه چیزی'], o: ['flowers', 'gift', 'both'] },
@@ -388,8 +388,19 @@ const ICONS = {
 };
 /* a card's picture: a photograph, or, for flowers and travel, a still rendered from their own 3D scene */
 /* flowers and travel use stills baked at full quality from their own 3D scenes (img/), never a live low-quality render */
-const BAKED = { flowers: () => 'img/peony.webp', travel: () => 'img/travel-' + lang + '.webp' };
-const art = (r, lazy) => r.img ? '<img src="' + r.img + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>' : '<img class="still on" data-baked="' + r.id + '" src="' + BAKED[r.id]() + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>';
+const BAKED = { travel: () => 'img/travel-' + lang + '.webp' };
+/* flowers is typographic: one finely drawn gold peony on the card's dark ground */
+const PEONY = '<svg class="peony" viewBox="0 0 96 96" aria-hidden="true">' +
+  '<path pathLength="1" d="M20 44 C19 58 32 70 48 70 C64 70 77 58 76 44"/>' +
+  '<path pathLength="1" d="M20 44 C21 37 27 34 32 36 C34 30 41 28 44 32 C46 27 52 27 54 32 C57 28 63 30 64 36 C69 34 75 37 76 44"/>' +
+  '<path pathLength="1" d="M20 44 C24 50 30 52 34 50 C38 55 44 55 48 52 C52 55 58 55 62 50 C66 52 72 50 76 44"/>' +
+  '<path pathLength="1" d="M31 44.5 C33 40 37.5 39 40 41 C42 37 46 36.5 48 39.5 C50 36.5 54 37 56 41 C58.5 39 63 40 65 44.5"/>' +
+  '<path pathLength="1" d="M37 47.5 C39.5 45 42.5 45 44.5 46.8 C46.5 44.6 49.5 44.6 51.5 46.8 C53.5 45 56.5 45 59 47.5"/>' +
+  '<path pathLength="1" d="M34 50 C32.5 57 34.5 63.5 39.5 67.5 M62 50 C63.5 57 61.5 63.5 56.5 67.5"/>' +
+  '<path pathLength="1" d="M48 70 C48.6 77 47.6 83 45.6 90"/>' +
+  '<path pathLength="1" d="M47.8 80 C43 74.5 35.5 74 31.5 77.5 C35.5 81.5 42 82.5 47.8 80 M47.8 80 C42.5 78.5 37.5 78 34 78"/>' +
+  '<path class="ico-live" pathLength="1" d="M70 22 L71.4 18.6 M77 28 L80.4 26.8 M25 24 L23.6 20.6"/></svg>';
+const art = (r, lazy) => r.mark ? '<span class="mark">' + PEONY + '</span>' : r.img ? '<img src="' + r.img + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>' : '<img class="still on" data-baked="' + r.id + '" src="' + BAKED[r.id]() + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>';
 const STILL = {};
 let stillQ = Promise.resolve();
 function stillFor(id) {
@@ -835,20 +846,20 @@ function perfGuard(onDrop) {
 const FINISH = {
   uniforms: {
     tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: null },
-    uVig: { value: 0.9 }, uGrain: { value: 0.035 }, uCA: { value: 1 }, uTilt: { value: 0.6 }, uFocus: { value: 0.55 }, uFlash: { value: 0 }, uFade: { value: 1 }
+    uVig: { value: 0.9 }, uGrain: { value: 0.035 }, uCA: { value: 1 }, uTilt: { value: 0.6 }, uFocus: { value: 0.55 }, uBlur: { value: 2.6 }, uB0: { value: 0.16 }, uB1: { value: 0.55 }, uFlash: { value: 0 }, uFade: { value: 1 }
   },
   vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader: [
-    'uniform sampler2D tDiffuse;uniform float uTime,uVig,uGrain,uCA,uTilt,uFocus,uFlash,uFade;uniform vec2 uRes;varying vec2 vUv;',
+    'uniform sampler2D tDiffuse;uniform float uTime,uVig,uGrain,uCA,uTilt,uFocus,uFlash,uFade,uBlur,uB0,uB1;uniform vec2 uRes;varying vec2 vUv;',
     'float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}',
     'void main(){',
     ' vec2 uv=vUv,c=uv-.5;float asp=uRes.x/uRes.y;float r=length(c*vec2(asp,1.));',
     ' vec2 o=c*uCA*r*.0105;',
     ' vec3 col=vec3(texture2D(tDiffuse,uv+o).r,texture2D(tDiffuse,uv).g,texture2D(tDiffuse,uv-o).b);',
-    ' float b=smoothstep(.16,.55,abs(uv.y-uFocus))*uTilt;',
-    ' if(b>.01){vec2 px=b*2.6/uRes*vec2(1.,1.);vec3 s=col*.28;',
-    '  s+=texture2D(tDiffuse,uv+vec2(px.x,px.y)).rgb*.18;s+=texture2D(tDiffuse,uv+vec2(-px.x,px.y)).rgb*.18;',
-    '  s+=texture2D(tDiffuse,uv+vec2(px.x,-px.y)).rgb*.18;s+=texture2D(tDiffuse,uv+vec2(-px.x,-px.y)).rgb*.18;col=s;}',
+    ' float b=smoothstep(uB0,uB1,abs(uv.y-uFocus))*uTilt;',
+    ' if(b>.01){vec2 px=b*uBlur/uRes;vec3 s=col;float n=1.;float j=h(uv*uRes)*6.2832;',          /* a 24-tap disc: soft, round out-of-focus */
+    '  for(int i=0;i<24;i++){float a=float(i)*2.39996+j;float r=sqrt((float(i)+.5)/24.);s+=texture2D(tDiffuse,uv+vec2(cos(a),sin(a))*r*px).rgb;n+=1.;}',
+    '  col=s/n;}',
     ' col=col*col*(3.-2.*col)*.22+col*.78;',                 /* gentle S-curve */
     ' col=pow(max(col,0.),vec3(1.0,1.02,1.08));',            /* warm grade */
     ' col+=vec3(.010,.007,.002);',
@@ -1982,6 +1993,8 @@ async function makeSeqGL(stage, ov, q, still) {
   P.bloom.radius = 0.6;
   P.fin.uniforms.uTilt.value = sc.tilt != null ? sc.tilt : 0.45;
   P.fin.uniforms.uFocus.value = sc.focus != null ? sc.focus : 0.5;
+  P.fin.uniforms.uBlur.value = (sc.blur != null ? sc.blur : 2.6) * (sc.blur != null ? qDpr(Q.level) : 1);
+  P.fin.uniforms.uB0.value = sc.b0 != null ? sc.b0 : 0.16; P.fin.uniforms.uB1.value = sc.b1 != null ? sc.b1 : 0.55;
   P.fin.uniforms.uFlash.value = 0; P.fin.uniforms.uFade.value = 1; P.fin.uniforms.uVig.value = 0.95;
   const pv = new TH.Vector3();
   let last = performance.now();
@@ -2065,7 +2078,7 @@ const GL_SCENES = {
     /* fog matched to the sky's horizon, so the far ground melts into it (no dark band) */
     const FOGC = new TH.Color().setRGB(0.13, 0.085, 0.05);
     scene.background = FOGC.clone();
-    scene.fog = new TH.FogExp2(FOGC, 0.024);
+    scene.fog = new TH.FogExp2(FOGC, 0.0144);
     scene.environmentIntensity = 0.28;
     const cam = new TH.PerspectiveCamera(36, C.aspect, 0.1, 400);
     const r = rng(23), cell = 1.6;
@@ -2227,7 +2240,7 @@ const GL_SCENES = {
     const lbls = {
       club: C.label(X(['The Vault', 'والت']), new TH.Vector3(0, 1.1, 0), 'hi'),
       dest: C.label(X(({ home: ['Niavaran', 'نیاوران'], thr: ['Mehrabad', 'مهرآباد'], ika: ['Imam Khomeini Airport', 'فرودگاه امام'], office: ['Vanak', 'ونک'] })[q.o.to] || ['', '']), new TH.Vector3(dst[0], 1.1, dst[1]), 'hi'),
-      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-5.8, 12.4, -24), 'hi'),
+      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-5.8 + 0.95, 7.25, -24), 'hi lead'),   /* beside the pod, on a hairline leader */
       valiasr: C.label(X(['Valiasr', 'ولیعصر']), new TH.Vector3(3.0, 0.6, -14), 'gold'),
       alborz: C.label(X(['Alborz', 'البرز']), new TH.Vector3(30, 17, -133))
     };
@@ -2259,7 +2272,7 @@ const GL_SCENES = {
         car.lookAt(cp2.x + (cp2.x - cp.x) * 50, 0.12, cp2.z + (cp2.z - cp.z) * 50);
         carL.intensity = 9 * ph(t, 3.0, 3.6);
         halo.scale.setScalar(0.7 + Math.sin(t * 6) * 0.05);
-        fogs.forEach((m, i) => { m.material.uniforms.uA.value = ph(t, 0.2, 1.5) * (0.22 - i * 0.05); });
+        fogs.forEach((m, i) => { m.material.uniforms.uA.value = ph(t, 0.2, 1.5) * (0.22 - i * 0.05) * 0.6; });
         const pulse = (t * 0.7) % 1;
         mClub.ring.scale.setScalar(1 + pulse * 2.4); mClub.ring.material.opacity = (1 - pulse) * ph(t, 0.6, 1.2);
         mClub.b.material.uniforms.uI.value = ph(t, 0.5, 1.5) * 0.22;
@@ -2567,13 +2580,14 @@ const GL_SCENES = {
     const back = new TH.Mesh(new TH.PlaneGeometry(60, 40), new TH.ShaderMaterial({ depthWrite: false, vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vUv;void main(){float d=length((vUv-vec2(.42,.55))*vec2(1.4,1.));gl_FragColor=vec4(mix(vec3(.085,.06,.045),vec3(.016,.013,.011),smoothstep(0.,.5,d)),1.);}' }));
     back.position.set(0, -6, -10); back.lookAt(0, 6, 8); scene.add(back);
     /* light: a warm key from the side, a cool rim behind, a breath of fill */
-    const keyL = new TH.DirectionalLight(0xffdcb6, 1.4); keyL.position.set(4, 3.5, 3); scene.add(keyL);
-    const rim = new TH.DirectionalLight(0xffd9b0, 2.8); rim.position.set(-3, 2.6, -5); scene.add(rim); /* warm backlight, behind-left, 2x the key */
+    const keyL = new TH.DirectionalLight(0xffdcb6, 1.1); keyL.position.set(4, 3.5, 3); scene.add(keyL);
+    const rim = new TH.DirectionalLight(0xffd2a0, 3.6); rim.position.set(-2, 2.2, -5); scene.add(rim); /* warm backlight, behind-left, 2x the key */
     const fill = new TH.DirectionalLight(0xffeedd, 0.35); fill.position.set(2, 5, 4); scene.add(fill);
+    const glow = new TH.DirectionalLight(0xffc48a, 0.9); glow.position.set(0.6, 0.15, 4); scene.add(glow); /* warm light from low in front: the backlit guard petals glow amber */
     /* the petal: a soft oval, cupped across on a sine profile, creased along its length,
        and the outer quarter of the rim curled back by 20–35° (a different curl per variant) */
     const petalGeo = (curlDeg, cup, seed) => {
-      const g = new TH.PlaneGeometry(1, 1, 20, 36); g.translate(0, 0.5, 0);
+      const g = new TH.PlaneGeometry(1, 1, 36, 40); g.translate(0, 0.5, 0);
       const pa = g.attributes.position, curl = curlDeg * Math.PI / 180;
       for (let i = 0; i < pa.count; i++) {
         const u = pa.getX(i) * 2, y = pa.getY(i);
@@ -2589,14 +2603,14 @@ const GL_SCENES = {
           const s2 = (y - 0.75) / 0.25;
           z += Math.tan(curl) * 0.25 * s2 * s2 * 0.7;
         }
-        z += 0.04 * Math.sin(u * 7 + seed * 3) * Math.sin(y * 3 + seed) * y * y;   /* soft ruffle */
+        z += 0.04 * Math.sin(u * 7 + seed * 3) * Math.sin(y * 3 + seed) * y * y + 0.05 * Math.sin(y * 9 + seed * 1.7) * Math.pow(Math.abs(u), 3) * y;   /* soft ruffle */
         pa.setXYZ(i, X, Y, z);
       }
       g.computeVertexNormals();
       return g;
     };
     const tint = cTex(TH, 128, 256, (g, W, H) => {
-      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#e6d2bc'); gr.addColorStop(0.25, '#efe2cf'); gr.addColorStop(0.75, '#fbf2e9'); gr.addColorStop(1, '#fff7f0');
+      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#e9dccb'); gr.addColorStop(0.25, '#f1e6d6'); gr.addColorStop(0.75, '#fbf2e9'); gr.addColorStop(1, '#fff7f0');
       g.fillStyle = gr; g.fillRect(0, 0, W, H);
       g.strokeStyle = 'rgba(170,120,100,.06)'; g.lineWidth = 1;
       for (let k = 0; k < 13; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 6) * 4, H * 0.5, W / 2 + (k - 6) * 10, 4); g.stroke(); }
@@ -2604,11 +2618,11 @@ const GL_SCENES = {
     const petalM = new TH.MeshPhysicalMaterial({
       color: 0xffffff, map: tint.tx, side: TH.DoubleSide, roughness: 0.5, envMapIntensity: 0.35,
       sheen: 1, sheenRoughness: 0.45, sheenColor: new TH.Color(0xfff4ea),
-      transmission: Q.level >= 1 ? 0.25 : 0, thickness: 0.4, attenuationColor: new TH.Color(0xf4d9c4), attenuationDistance: 0.6
+      transmission: 0, thickness: 0.4, attenuationColor: new TH.Color(0xf4d9c4), attenuationDistance: 0.6
     });
     /* rims glow warm against the dark */
     petalM.onBeforeCompile = sh => {
-      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nfloat fr = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 3.0);\ntotalEmissiveRadiance += vec3(1.0, 0.76, 0.56) * fr * 0.32;');
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nfloat fr = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 3.0);\ntotalEmissiveRadiance += vec3(1.0, 0.74, 0.5) * fr * 0.22;');
     };
     /* rings, each a little further out than the last (by more than a petal's thickness) so nothing
        intersects; inner rings smaller and more tightly cupped. Outer rings open first. */
@@ -2617,25 +2631,26 @@ const GL_SCENES = {
       { n: 9, r0: 0.09, r1: 0.12, t0: -0.04, t1: 0.16, s: 0.62, cup: 0.28, start: 2.1 },
       { n: 10, r0: 0.12, r1: 0.16, t0: 0.02, t1: 0.3, s: 0.74, cup: 0.26, start: 1.6 },
       { n: 11, r0: 0.15, r1: 0.21, t0: 0.08, t1: 0.45, s: 0.86, cup: 0.24, start: 1.1 },
-      { n: 12, r0: 0.18, r1: 0.26, t0: 0.14, t1: 0.62, s: 0.96, cup: 0.22, start: 0.6 },
-      { n: 12, r0: 0.21, r1: 0.32, t0: 0.22, t1: 0.95, s: 1.04, cup: 0.2, start: 0.3 }
+      { n: 12, r0: 0.18, r1: 0.26, t0: 0.12, t1: 0.46, s: 0.96, cup: 0.22, start: 0.6 },
+      { n: 12, r0: 0.21, r1: 0.32, t0: 0.18, t1: 0.6, s: 1.04, cup: 0.2, start: 0.3 }
     ];
     const meshes = [], info = [], rr = rng(31), col = new TH.Color();
     RINGS.forEach((R, ri) => {
-      const m = new TH.InstancedMesh(petalGeo(20 + ri * 3.5, R.cup, ri + 1), petalM, R.n); scene.add(m); meshes.push(m);
+      const m = new TH.InstancedMesh(petalGeo(14 + ri * 2.5, R.cup, ri + 1), petalM, R.n); scene.add(m); meshes.push(m);
       for (let k = 0; k < R.n; k++) {
-        const a = k / R.n * Math.PI * 2 + ri * 0.53;
+        const a = k / R.n * Math.PI * 2 + (ri === 5 ? -0.5 : ri === 4 ? -0.5 + Math.PI / 12 : ri * 0.53);   /* a guard petal square to the lens */
         info.push({ R, a, mesh: m, slot: k, stag: (k % 2) * 0.012, roll: (rr() - 0.5) * 0.18, sz: R.s * (0.95 + rr() * 0.1), wide: 1.05 + rr() * 0.2 });   /* petals nearly as wide as long, overlapping their neighbours */
-        const v = (0.86 + 0.14 * ri / (RINGS.length - 1)) * (1 + (rr() - 0.5) * 0.08); col.setRGB(v, v * (1 + (rr() - 0.5) * 0.04), v * (1 + (rr() - 0.5) * 0.06)); m.setColorAt(k, col);
+        const wk = ri >= 4 ? 1.3 : 1; info[info.length - 1].wide *= wk;
+        const v = Math.max(0.88, (0.9 + 0.1 * ri / (RINGS.length - 1)) * (1 + (rr() - 0.5) * 0.04)); col.setRGB(v, v * (1 + (rr() - 0.5) * 0.04), v * (1 + (rr() - 0.5) * 0.06)); m.setColorAt(k, col);
       }
     });
     /* the closed soft dome at the heart: 12 small, tightly cupped petals curving over the centre */
     const domeG = petalGeo(6, 0.55, 9);
     const NC = 22, centre = new TH.InstancedMesh(domeG, petalM, NC);
     { const o2 = new TH.Object3D(); o2.rotation.order = 'YXZ';
-      for (let i = 0; i < NC; i++) { const layer = i < 9 ? 0 : i < 16 ? 1 : 2, a = i * 2.39996, rad = 0.025 + layer * 0.025; o2.rotation.set(-0.42 + layer * 0.2, a, 0); o2.position.set(Math.sin(a) * rad, 0.06 - layer * 0.01, Math.cos(a) * rad); const sc = 0.34 + layer * 0.08; o2.scale.set(sc * 1.2, sc, sc * 1.2); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); const v = 0.78 + layer * 0.06; col.setRGB(v, v * 0.97, v * 0.93); centre.setColorAt(i, col); } }
+      for (let i = 0; i < NC; i++) { const layer = i < 9 ? 0 : i < 16 ? 1 : 2, a = i * 2.39996, rad = 0.025 + layer * 0.025; o2.rotation.set(-0.42 + layer * 0.2, a, 0); o2.position.set(Math.sin(a) * rad, 0.06 - layer * 0.01, Math.cos(a) * rad); const sc = 0.34 + layer * 0.08; o2.scale.set(sc * 1.2, sc, sc * 1.2); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); const v = 0.9 + layer * 0.04; col.setRGB(v, v * 0.98, v * 0.95); centre.setColorAt(i, col); } }
     scene.add(centre);
-    const core = new TH.Mesh(new TH.SphereGeometry(0.11, 24, 16), new TH.MeshStandardMaterial({ color: 0x3a2a1c, roughness: 0.9 })); core.position.y = 0.05; scene.add(core);
+    const core = new TH.Mesh(new TH.SphereGeometry(0.11, 24, 16), new TH.MeshStandardMaterial({ color: 0xcdb99f, roughness: 0.9 })); core.position.y = 0.05; scene.add(core);
     /* contact shadow under the bloom */
     const ao = new TH.Mesh(new TH.PlaneGeometry(3.4, 3.4), new TH.MeshBasicMaterial({ map: spriteTex(TH), color: 0x000000, transparent: true, opacity: 0.7, depthWrite: false }));
     ao.rotation.x = -Math.PI / 2; ao.position.y = -0.2; scene.add(ao);
@@ -2643,14 +2658,6 @@ const GL_SCENES = {
     const st = new TH.InstancedMesh(new TH.SphereGeometry(0.018, 8, 6), new TH.MeshStandardMaterial({ color: 0xe9bf5c, roughness: 0.5, emissive: 0x4a3008, emissiveIntensity: 0.4 }), 70);
     for (let i = 0; i < 70; i++) { const rad = Math.sqrt(i / 70) * 0.13, a = i * 2.39996; const m4 = new TH.Matrix4().setPosition(Math.cos(a) * rad, 0.1 + (0.13 - rad) * 0.5, Math.sin(a) * rad); st.setMatrixAt(i, m4); }
     scene.add(st);
-    /* leaves and a short stem */
-    const lg = new TH.PlaneGeometry(0.5, 1.5, 6, 10); lg.translate(0, 0.75, 0);
-    const lp = lg.attributes.position;
-    for (let i = 0; i < lp.count; i++) { const x = lp.getX(i), y = lp.getY(i) / 1.5; const w = Math.sin(Math.PI * Math.min(1, y * 0.95 + 0.03)); lp.setXYZ(i, x * w, y * 1.5, -0.25 * x * x * 4 + 0.15 * y * y); }
-    lg.computeVertexNormals();
-    const leafM = new TH.MeshPhysicalMaterial({ color: 0x26321b, roughness: 0.7, sheen: 0.5, sheenColor: new TH.Color(0x7d8d5a), side: TH.DoubleSide });
-    [[0.5, 1.35], [2.6, 1.25], [4.4, 1.3]].forEach(([a, tl]) => { const l = new TH.Mesh(lg, leafM); l.rotation.order = 'YXZ'; l.rotation.set(tl, a, 0); l.position.y = -0.12; scene.add(l); });
-    const stem = new TH.Mesh(new TH.CylinderGeometry(0.05, 0.06, 2, 12), leafM); stem.position.y = -1.1; scene.add(stem);
     /* bokeh and a few drifting motes */
     const bm = dustMaterial(TH, { size: 14, alpha: 0.12, ring: 0.7, beamR: 20, span: 10, rise: 0.01 });
     scene.add(dustPoints(TH, 22, [-6, 6, -4, 2, -9, -3], 7, bm));
@@ -2662,7 +2669,7 @@ const GL_SCENES = {
     const o = new TH.Object3D(), look = new TH.Vector3();
     o.rotation.order = 'YXZ';
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.36, thresh: 0.92, tilt: 1.25, focus: 0.5,
+      scene, camera: cam, dur: 7.4, bloom: 0.42, thresh: 0.88, tilt: 1, focus: 0.36, blur: 10, b0: 0.04, b1: 0.2,
       frame(t) {
         info.forEach(p => {
           const R = p.R, k = ph(t, R.start + p.stag * 20, R.start + 2.6, eio) * (0.65 + 0.35 * Math.pow((RINGS.indexOf(R) + 1) / RINGS.length, 1.6));
@@ -2676,8 +2683,8 @@ const GL_SCENES = {
         meshes.forEach(m => { m.instanceMatrix.needsUpdate = true; });
         st.visible = t > 2.2;
         pollen.uniforms.uTime.value = t; bm.uniforms.uTime.value = t;
-        const m = ph(t, 0, 7.4, eio), a = lerp(-0.6, -0.4, m), el = lerp(0.66, 0.56, m), d = lerp(14.6, 12.8, m) * fitK(C, 0.5, 1.3) * (C.still ? 0.72 : 1);
-        look.set(0, lerp(0.15, 0.05, m), 0);
+        const m = ph(t, 0, 7.4, eio), a = lerp(-0.6, -0.45, m), el = lerp(0.56, 0.52, m), d = lerp(7.6, 6.8, m) * fitK(C, 0.5, 1.3);
+        look.set(0, lerp(0.12, 0.06, m), 0);
         cam.position.set(Math.sin(a) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(a) * Math.cos(el) * d);
         cam.lookAt(look);
         show01(card, ph(t, 5.3, 6.1, eout));
