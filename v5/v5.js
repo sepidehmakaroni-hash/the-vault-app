@@ -266,6 +266,7 @@ function applyLang() {
 
 function renderBar() {
   const showBack = route.name !== 'land';
+  bar.classList.toggle('has-back', showBack);
   bar.innerHTML =
     '<div class="bar-s">' + (showBack ? '<button type="button" class="nb back" data-act="back"><span class="arr" aria-hidden="true"></span><span>' + X(T.back) + '</span></button>' : '') + '</div>' +
     '<button type="button" class="word" data-act="home" aria-label="' + X(T.home) + '" lang="en"><span>THE VAULT</span></button>' +
@@ -352,6 +353,7 @@ function pill(el) {
   if (!slot) return;
   const q = S.req;
   if (!q) { slot.innerHTML = ''; return; }
+  const fresh = !$('.pill', slot);
   const r = REQ(q.id), L = LIVE[q.id], s = reqState(q);
   const done = s.k === 3 && (s.left === 0 || !L.onCd);
   const txt = X(r.short) + ' — ' + (s.left > 0 ? fmtLeft(s.left) : X(L.after));
@@ -364,6 +366,7 @@ function pill(el) {
   b.classList.toggle('is-done', done);
   b.setAttribute('aria-label', aria);
   $('.pill-t', b).textContent = txt;
+  if (fresh && key && key.frame) requestAnimationFrame(() => key.frame($('.land-copy', el || view)));
 }
 
 /* ---------- 2. choose a request ---------- */
@@ -839,7 +842,7 @@ function make3D(THREE) {
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     const copyTop = copy ? copy.getBoundingClientRect().top - keyHost.getBoundingClientRect().top : h * 0.62;
-    const barH = 64;
+    const barH = $('.scr-land:not(.leave) .pill') ? 118 : 64;
     const free = Math.max(160, copyTop - barH);
     const visH = Math.max(4.25 / (free / h * 0.92), 2.7 / camera.aspect);
     dist = visH / 2 / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
