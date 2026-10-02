@@ -133,7 +133,7 @@ var L = function () { return T[P.lang]; };
 var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, function (_, i) { return a[i]; }); };
 var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x); };
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
-var money = function (x) { return '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; };
+var money = function (x) { return S.hide ? '<span class="money" aria-label="hidden">••••••</span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; };
 var dfmt = function (d, o) { return new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 
@@ -141,7 +141,7 @@ var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return
 var S = (function () {
   var base = { form: { cc: 0, interests: {}, fields: {} }, errs: {}, done: {}, reviewing: false, sent: null, authed: false,
     res: [], rf: {}, rsvp: { 0: true }, bring: {}, conc: null, cf: { topic: 0, when: 0, text: '' }, guests: ['Shirin Ahmadi', 'Kaveh Tehrani'],
-    pend: [], hide: false, filt: 0, notif: [true, true, true], faceid: false, login: { mode: 0, cc: 0 }, fp: { step: 0, cc: 0 }, typing: false };
+    pend: [], hide: true, filt: 0, notif: [true, true, true], faceid: false, login: { mode: 0, cc: 0 }, fp: { step: 0, cc: 0 }, typing: false };
   try { var s = JSON.parse(sessionStorage.getItem('vault.v2') || 'null'); if (s) return Object.assign(base, s); } catch (e) {}
   return base;
 })();
@@ -327,7 +327,8 @@ function unlock() {
     [[0, function () { SFX.bolts(); buzz(30); }], [1600, SFX.seal], [2000, SFX.swing]],
     function () {
       if (!entered) { app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
-      app.classList.remove('animating'); clearVars(); view.style.transition = ''; slots = []; busy = false;
+      app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();
+      requestAnimationFrame(function () { app.classList.remove('instant'); }); view.style.transition = ''; slots = []; busy = false;
     });
 }
 function lockVault() {
@@ -380,6 +381,7 @@ function render(dir, o) {
   var path = curPath(), r = resolve(path);
   if (r.key.indexOf('m') === 0 && !S.authed) { history.replaceState({ i: depth }, '', '#/'); r = { key: '' }; path = ''; }
   if (r.key === 'sent' && !S.sent) r = { key: 'apply', step: 1 };
+  if (r.key === 'm/wallet' && dir !== 'same' && route.key !== 'm/wallet') { S.hide = true; save(); }
   var def = ROUTES[r.key];
   var old = $('.page:not(.leave)', view);
   if (old && route.path != null) scrolls[route.path] = old.scrollTop;
@@ -645,8 +647,6 @@ R('m', { scene: 'in', html: function () {
       icard('data-go="m/reserve/4"', 'room-terrace', l.terrT, l.terrD, '<span class="tag">' + l.today + '</span>', '', 'story') +
       icard('data-act="event" data-v="2"', EVPH[2], l.events[2][0], l.events[2][1] + ' · ' + l.events[2][2], dateTag(dayOf(EV[2].off)), S.rsvp[2] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
     '</div></div>' +
-    '<button type="button" class="panel wstrip' + (S.hide ? ' hide' : '') + '" data-go="m/wallet"><span class="top"><span><span class="eyb">' + l.avail + '</span><br><span class="amt num">' + money(w.avail) + '</span> <span class="unit">' + l.unit + '</span></span><span class="chev"></span></span>' +
-      '<span class="meter debt" style="--w:' + used + '%"><i></i></span><span class="ends"><span>' + l.owed + ' ' + money(w.debt) + '</span><span>' + fill(l.ofLimit, money(W.limit)) + '</span></span></button>' +
     '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' +
     '<div class="boxes">' + l.boxes.map(function (b, i) { return '<button type="button" class="box" data-go="' + ['m/reserve', 'm/events', 'm/concierge', 'm/wallet'][i] + '"><span class="plate">Nº 0' + (i + 1) + '</span>' + KEYHOLE + '<span><b>' + b[0] + '</b><i>' + b[1] + '</i></span></button>'; }).join('') + '</div>' +
     '';
@@ -706,7 +706,7 @@ R('m/wallet', { scene: 'in', html: function () {
   if (f !== 1) rows += '<div class="tx"><span class="dot">' + I('wallet') + '</span><span class="grow"><b>' + l.txFee + '</b><i>' + dfmt(feeD, { day: 'numeric', month: 'short', year: 'numeric' }) + '</i></span><span class="a num">' + money(W.fee) + '</span></div>';
   var maxBy = Math.max.apply(null, w.by);
   return '<div class="' + (S.hide ? 'hide' : '') + '" style="display:flex;flex-direction:column;gap:22px">' +
-    '<div class="wallet-hero rise"><p class="eyb">' + l.walletEy + ' · ' + l.balanceNow + '</p><div class="amt num' + (w.bal < 0 ? ' neg' : '') + '">' + (w.bal < 0 ? '−' : '') + money(w.bal) + '</div><span class="unit">' + l.unit + ' · ' + (w.bal < 0 ? l.inDebt : l.inCredit) + '</span>' +
+    '<div class="wallet-hero rise"><p class="eyb">' + l.walletEy + ' · ' + l.balanceNow + '</p><div class="amt num' + (w.bal < 0 && !S.hide ? ' neg' : '') + '">' + (w.bal < 0 && !S.hide ? '−' : '') + money(w.bal) + '</div><span class="unit">' + l.unit + (S.hide ? '' : ' · ' + (w.bal < 0 ? l.inDebt : l.inCredit)) + '</span>' +
       '<button type="button" class="eye" data-act="eye">' + I(S.hide ? 'eye' : 'eyeoff') + (S.hide ? l.eyeShow : l.eyeHide) + '</button></div>' +
     '<div class="grid2"><button type="button" class="btn gold" data-act="topup">' + l.topup + '</button><button type="button" class="btn line" data-act="statement">' + l.statementB + '</button></div>' +
     '<div class="panel credit"><div class="sech"><h3 class="h3">' + l.creditT + '</h3><span class="pill' + (atLimit ? ' warn' : ' ok') + '">' + l.availS + ' ' + money(w.avail) + '</span></div>' +

@@ -473,3 +473,8 @@ select.in option{background:#1b1a18}
 @keyframes riseUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
 .riser .cta-bar{margin-left:-22px!important;margin-right:-22px!important}
 @media (prefers-reduced-motion:reduce){.icard,.arch,.cover,.hero-full{animation:none}}
+
+/* hidden amounts: dots, and no bar that gives the proportion away */
+.hide .money{filter:none;letter-spacing:.12em}
+.hide .meter i{opacity:0}
+.hide .stat b.neg{color:inherit}
