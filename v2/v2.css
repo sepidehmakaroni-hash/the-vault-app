@@ -560,3 +560,5 @@ select.in option{background:#1b1a18}
 .check{min-height:44px}
 .toast{background:rgba(28,26,22,.94);color:var(--ivory);box-shadow:0 0 0 1px var(--line2),0 14px 34px rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .door-copy .h1{text-wrap:wrap}
+
+.sign{font-family:'Archivo',sans-serif;font-weight:500;margin-inline-end:.08em}

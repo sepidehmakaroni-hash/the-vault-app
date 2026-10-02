@@ -133,7 +133,7 @@ var L = function () { return T[P.lang]; };
 var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, function (_, i) { return a[i]; }); };
 var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x).replace(/\u066C/g, ','); };
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
-var money = function (x, sign) { var inner = S.hide ? '<span class="money mask" role="img" aria-label="' + (fa() ? 'پنهان' : 'hidden') + '"></span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; return '<bdi dir="ltr" class="amtw">' + (sign || '') + inner + '</bdi>'; };
+var money = function (x, sign) { var inner = S.hide ? '<span class="money mask" role="img" aria-label="' + (fa() ? 'پنهان' : 'hidden') + '"></span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; return '<bdi dir="ltr" class="amtw">' + (sign ? '<span class="sign">' + sign + '</span>' : '') + inner + '</bdi>'; };
 var dfmt = function (d, o) { var s2 = new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); return fa() ? s2.replace(/,/g, '،') : s2; };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 
@@ -310,17 +310,17 @@ function timeline(total, frame, cues, done) {
   })(t0);
 }
 function doorFrame(t) {   // t in ms, opening direction
-  var swing = seg(t, 800, 4200, E.sine), cam = seg(t, 3500, 5600, E.io);
+  var swing = seg(t, 700, 3000, E.sine), cam = seg(t, 2600, 4300, E.io);
   return {
-    '--bolt': seg(t, 0, 650), '--hrot': (-80 * seg(t, 50, 850, E.back)) + 'deg', '--pop': (10 * seg(t, 550, 950, E.out)) + 'px',
-    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 1300, 3600, E.sine),
-    '--logo': seg(t, 1600, 3400, E.sine) * (1 - seg(t, 4500, 5200, E.sine)), '--halo': 1 - seg(t, 1100, 2000),
-    '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 4400, 5300), '--fade': 1 - seg(t, 5000, 5700, E.sine)
+    '--bolt': seg(t, 0, 600), '--hrot': (-80 * seg(t, 50, 800, E.back)) + 'deg', '--pop': (10 * seg(t, 500, 850, E.out)) + 'px',
+    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 900, 2800, E.sine),
+    '--logo': seg(t, 1100, 2600, E.sine) * (1 - seg(t, 3500, 4100, E.sine)), '--halo': 1 - seg(t, 700, 1500),
+    '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 3300, 4100), '--fade': 1 - seg(t, 3800, 4500, E.sine)
   };
 }
-var OPEN_T = 5700, ENTER_T = 4900;
+var OPEN_T = 4500, ENTER_T = 3900;
 // the short way in: the same moves, compressed (short ms -> long-timeline ms)
-var SHORT = [[0, 0], [350, 650], [500, 800], [1700, 4000], [2500, 5700]];
+var SHORT = [[0, 0], [300, 600], [450, 700], [1500, 3000], [2300, 4500]];
 function warp(t, k) { for (var i = 1; i < k.length; i++) if (t <= k[i][0]) { var a = k[i - 1], b = k[i]; return a[1] + (b[1] - a[1]) * (t - a[0]) / (b[0] - a[0]); } return k[k.length - 1][1]; }
 function unlock() {
   busy = true; S.authed = true; S.typing = false; save();
@@ -330,7 +330,7 @@ function unlock() {
   var today = new Date().toDateString(), full = ls.get('vault.fullOpen') !== today; ls.set('vault.fullOpen', today);
   var T = full ? OPEN_T : SHORT[SHORT.length - 1][0], at = function (t) { return full ? t : warp(t, SHORT); };
   timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= ENTER_T) { entered = true; $$('.page', view).forEach(function (p) { p.remove(); }); app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
-    full ? [[0, function () { SFX.bolts(); buzz(30); }], [550, SFX.seal], [800, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
+    full ? [[0, function () { SFX.bolts(); buzz(30); }], [500, SFX.seal], [700, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
     function () {
       if (!entered) { $$('.page', view).forEach(function (p) { p.remove(); }); app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
       app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();
@@ -340,12 +340,12 @@ function unlock() {
 function lockVault() {
   if (busy) return; closeSheet(true); S.authed = false; save();
   busy = true; app.classList.add('animating', 'hidebar');
-  setVars(doorFrame(4500));
+  setVars(doorFrame(3400));
   view.style.transition = 'none'; view.style.opacity = '0';
   go('', { replace: true, fade: true });
   app.classList.remove('inside');
   // the same moves backwards, quicker: step out of the pattern, the door swings shut, the bolts go home
-  var FROM = 4500, T = 3000, map = function (t) { return FROM - t * (FROM / T); };
+  var FROM = 3400, T = 2800, map = function (t) { return FROM - t * (FROM / T); };
   timeline(T, function (t) { setVars(doorFrame(map(t))); },
     [[700, SFX.swing], [T - 700, function () { SFX.shut(); buzz(40); view.style.transition = 'opacity .7s'; view.style.opacity = ''; app.classList.remove('hidebar'); }], [T - 300, SFX.bolts]],
     function () { app.classList.remove('animating'); clearVars(); view.style.transition = ''; busy = false; toast(L().locked); });
