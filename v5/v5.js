@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=5';
+const V = '?v=6';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -215,7 +215,7 @@ const LIVE = {
     caps: [[0, ['The seats are held.', 'صندلی‌ها نگه داشته شد.']], [1.2, ['Printing your tickets.', 'بلیت‌ها چاپ می‌شود.']], [4, ['Torn and kept for you.', 'جدا شد و برایتان نگه داشته شد.']]] },
   flowers: { cd: ['Delivered in', 'تا تحویل'], after: ['Delivered', 'تحویل شد'], onCd: true,
     head: [['Your flowers are being arranged.', 'گل‌هایتان آماده می‌شود.'], ['Delivered, by hand.', 'با دست تحویل داده شد.']],
-    sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['White peonies, in linen', 'صدتومانی سفید، در کتان'], ['With Sina, the courier', 'همراه سینا، پیک خانه'], ['Delivered', 'تحویل شد']],
+    sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['White peonies, by hand', 'صدتومانی سفید، دست‌چین'], ['With Sina, the courier', 'همراه سینا، پیک خانه'], ['Delivered', 'تحویل شد']],
     caps: [[0, ['The florist is choosing.', 'گل‌فروش در حال انتخاب است.']], [2.6, ['White peonies, opening.', 'صدتومانی‌های سفید، شکفته.']], [4.6, ['On its way to you.', 'در راه شماست.']]] },
   travel: { cd: ['Departure in', 'تا پرواز'], after: ['Bon voyage', 'سفر بخیر'],
     head: [['Your journey is being arranged.', 'سفرتان آماده می‌شود.'], ['Everything is ready.', 'همه‌چیز آماده است.']],
@@ -399,7 +399,7 @@ function stillFor(id) {
     document.body.appendChild(st);
     const r = REQ(id), o = {}; r.g.forEach(g => { o[g.k] = g.step ? g.step[2] : (g.def || g.o[0]); });
     try {
-      const ctl = await makeSeqGL(st, document.createElement('div'), { id, o, t0: Date.now(), at: Date.now() + 864e5 * 3 });
+      const ctl = await makeSeqGL(st, document.createElement('div'), { id, o, t0: Date.now(), at: Date.now() + 864e5 * 3 }, true);
       ctl.frame(ctl.dur, true);
       STILL[k] = SG.canvas.toDataURL('image/jpeg', 0.84);
       ctl.dispose();
@@ -631,7 +631,7 @@ function details(q) {
       rows.push([['Seats', 'صندلی'], seatsTxt(o)]);
       break;
     case 'flowers':
-      rows.push([['What', 'چه چیزی'], X(o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : o.what === 'both' ? ['White peonies, and a gift', 'صدتومانی سفید، همراه یک هدیه'] : ['White peonies, wrapped in linen', 'صدتومانی سفید، پیچیده در کتان'])]);
+      rows.push([['What', 'چه چیزی'], X(o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : o.what === 'both' ? ['White peonies, and a gift', 'صدتومانی سفید، همراه یک هدیه'] : ['White peonies, by hand', 'صدتومانی سفید، دست‌چین'])]);
       rows.push([['For', 'مناسبت'], X(O[o.for]) + ' — ' + X(O[o.budget])]);
       rows.push([['Delivery', 'تحویل'], whenTxt()]);
       break;
@@ -1698,7 +1698,7 @@ const SCENES = {
     petals.slice().sort((A, B) => B.ri - A.ri).forEach(p => bloom.appendChild(p.el));
     const core = E('g', { opacity: 0 }, bloom);
     for (let k = 0; k < 14; k++) { const a = k * 2.4, d = 3 + k * 0.9; E('circle', { cx: Math.cos(a) * d, cy: Math.sin(a) * d, r: 1.6, fill: '#FFE7B0' }, core); }
-    const card = ovCard(ov, '<div class="ov-row"><span class="ov-who"><span class="ov-n">' + X(q.o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : ['White peonies, in linen', 'صدتومانی سفید، در کتان']) + '</span><span class="ov-m">' + X(O[q.o.for]) + ' — ' + X(O[q.o.budget]) + '</span></span></div>');
+    const card = ovCard(ov, '<div class="ov-row"><span class="ov-who"><span class="ov-n">' + X(q.o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : ['White peonies, by hand', 'صدتومانی سفید، دست‌چین']) + '</span><span class="ov-m">' + X(O[q.o.for]) + ' — ' + X(O[q.o.budget]) + '</span></span></div>');
     show01(card, 0);
     return {
       dur: 7.2,
@@ -1884,7 +1884,7 @@ const SCENES = {
 /* ================= motion sequences in WebGL ================= */
 /* one renderer for all six sequences; each scene is built on demand and disposed when the screen leaves */
 const SG = { r: null, canvas: null, env: null, pipe: null };
-const FONTS_GL = ['italic 400 64px "Bodoni Moda"', '400 64px "Bodoni Moda"', '700 64px "Bodoni Moda"', '400 64px "Noto Naskh Arabic"', '600 64px "Noto Naskh Arabic"', '400 64px Archivo', '600 64px Archivo'];
+const FONTS_GL = ['italic 400 120px "Bodoni Moda"', '400 120px "Bodoni Moda"', 'italic 400 64px "Bodoni Moda"', '400 64px "Bodoni Moda"', '700 64px "Bodoni Moda"', '400 64px "Noto Naskh Arabic"', '600 64px "Noto Naskh Arabic"', '400 64px Archivo', '600 64px Archivo'];
 const fontsGL = () => Promise.all(FONTS_GL.map(f => (document.fonts ? document.fonts.load(f).catch(() => null) : null)));
 const CF = {
   disp: (px, it) => (fa() ? '400 ' + px + 'px "Noto Naskh Arabic"' : (it ? 'italic ' : '') + '400 ' + px + 'px "Bodoni Moda"'),
@@ -1907,6 +1907,26 @@ function drawV(g, cx, cy, size, col) {
   g.closePath(); g.fill(); g.restore();
 }
 function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+/* shrink a font until the text's real ink (italic overhang included) fits maxW */
+function fitFont(g, fontOf, size, txt, maxW, sp) {
+  let px = size;
+  for (; px > 10; px -= 2) {
+    g.font = fontOf(px);
+    const m = g.measureText(txt), ink = (m.actualBoundingBoxLeft || 0) + (m.actualBoundingBoxRight || m.width);
+    if (Math.max(ink, m.width) + (sp || 0) * (Array.from(txt).length - 1) <= maxW) break;
+  }
+  return px;
+}
+/* "11–12" with the dash drawn as a rule, so it never depends on the font having the glyph */
+function rangeText(g, a, b, x, y, px) {
+  const wa = g.measureText(a).width, wb = g.measureText(b).width, dw = px * 0.42, gap = px * 0.1, tot = wa + gap + dw + gap + wb;
+  const al = g.textAlign; g.textAlign = 'left';
+  let cx = x - tot / 2;
+  g.fillText(a, cx, y); cx += wa + gap;
+  g.fillRect(cx, y - px * 0.3, dw, Math.max(2, px * 0.055)); cx += dw + gap;
+  g.fillText(b, cx, y);
+  g.textAlign = al;
+}
 function spaced(g, txt, x, y, sp) { /* letter-spaced Latin caps, centred on x */
   if (!sp) { g.fillText(txt, x, y); return; }
   const ch = Array.from(txt), ws = ch.map(c => g.measureText(c).width), tot = ws.reduce((a, b) => a + b, 0) + sp * (ch.length - 1);
@@ -1927,7 +1947,7 @@ const GOLD = 0xd6a85c;
 const fitK = (C, base, max) => Math.min(max || 1.75, Math.max(1, (base || 0.72) / C.aspect));
 function aim(cam, look, K) { cam.position.sub(look).multiplyScalar(K).add(look); cam.lookAt(look); }
 
-async function makeSeqGL(stage, ov, q) {
+async function makeSeqGL(stage, ov, q, still) {
   const TH = await loadThree();
   await fontsGL();
   if (!SG.r) {
@@ -1948,10 +1968,11 @@ async function makeSeqGL(stage, ov, q) {
   SG.pipe.size(w, h);
   const labels = [];
   const C = {
-    TH, q, ov, w, h, aspect: w / h, env: SG.env,
+    TH, q, ov, w, h, aspect: w / h, env: SG.env, still: !!still,
     label(text, v, cls) { const el = document.createElement('span'); el.className = 'lbl ' + (cls || ''); el.textContent = text; lbl.appendChild(el); const L = { el, v: v.clone(), o: 0 }; labels.push(L); return L; }
   };
   const sc = GL_SCENES[q.id](TH, C);
+  window.__v5scene = sc.scene; /* testing aid */
   if (!sc.scene.environment) sc.scene.environment = SG.env;
   const P = SG.pipe;
   P.rp.scene = sc.scene; P.rp.camera = sc.camera;
@@ -1978,7 +1999,7 @@ async function makeSeqGL(stage, ov, q) {
       sc.camera.updateMatrixWorld();
       labels.forEach(L => {
         pv.copy(L.v).project(sc.camera);
-        const vis = pv.z < 1 && L.o > 0.01;
+        const vis = pv.z < 1 && L.o > 0.01 && (-pv.y * 0.5 + 0.5) * C.h > 170; /* never under the caption */
         L.el.style.opacity = vis ? L.o : 0;
         if (vis) L.el.style.transform = 'translate(' + ((pv.x * 0.5 + 0.5) * C.w).toFixed(1) + 'px,' + ((-pv.y * 0.5 + 0.5) * C.h).toFixed(1) + 'px)';
       });
@@ -2066,10 +2087,13 @@ const GL_SCENES = {
       mp.setY(i, hgt);
     }
     mg.computeVertexNormals();
-    const mtn = new TH.Mesh(mg, new TH.MeshStandardMaterial({ color: 0x18130f, roughness: 1, fog: false }));
+    { const cols = new Float32Array(mp.count * 3);
+      for (let i = 0; i < mp.count; i++) { const y = mp.getY(i), snow = Math.max(0, Math.min(1, (y - 9.5) / 3)) * (0.6 + 0.4 * Math.sin(mp.getX(i) * 0.7) ** 2); cols[i * 3] = 0.09 + snow * 0.55; cols[i * 3 + 1] = 0.075 + snow * 0.52; cols[i * 3 + 2] = 0.06 + snow * 0.5; }
+      mg.setAttribute('color', new TH.BufferAttribute(cols, 3)); }
+    const mtn = new TH.Mesh(mg, new TH.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 1, fog: false }));
     mtn.position.z = -125; scene.add(mtn);
     for (let x = -210; x <= 210; x += 1) crest.push(new TH.Vector3(x, ridge(x) + 0.1, -133));
-    const crestL = new TH.Line(new TH.BufferGeometry().setFromPoints(crest), new TH.LineBasicMaterial({ color: new TH.Color(0xd9a75a).multiplyScalar(0.55), transparent: true, opacity: 0.7, fog: false }));
+    const crestL = new TH.Line(new TH.BufferGeometry().setFromPoints(crest), new TH.LineBasicMaterial({ color: new TH.Color(0xffe2b0).multiplyScalar(0.9), transparent: true, opacity: 0.85, fog: false }));
     scene.add(crestL);
     const moonL = new TH.DirectionalLight(0x9fb3d8, 0.5); moonL.position.set(-30, 40, -60); scene.add(moonL);
     /* the city: blocks of buildings that rise, windows lit by world position */
@@ -2090,6 +2114,10 @@ const GL_SCENES = {
       sh.vertexShader = 'attribute float aSide;varying float vSide;varying vec3 vWP;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvSide=aSide;\n#ifdef USE_INSTANCING\nvWP=(modelMatrix*instanceMatrix*vec4(transformed,1.)).xyz;\n#else\nvWP=(modelMatrix*vec4(transformed,1.)).xyz;\n#endif');
       sh.fragmentShader = 'varying float vSide;varying vec3 vWP;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', 'totalEmissiveRadiance*=texture2D(emissiveMap,vec2((vWP.x+vWP.z)*1.9,vWP.y*1.5+.13)).rgb*vSide;');
     };
+    const R0 = { home: [[0, 0], [0, -4.8], [4.8, -4.8], [4.8, -11.2], [9.6, -11.2], [9.6, -14.4]], thr: [[0, 0], [0, 3.2], [-9.6, 3.2], [-9.6, 1.6], [-19.2, 1.6], [-19.2, 3.2]], ika: [[0, 0], [0, 4.8], [-3.2, 4.8], [-3.2, 14.4], [-6.4, 14.4], [-6.4, 24]], office: [[0, 0], [1.6, 0], [1.6, 4.8], [-3.2, 4.8], [-3.2, 8]] };
+    const pts = R0[q.o.to] || R0.thr;
+    /* distance from a point to the route, so the blocks along it can thin out and the road reads */
+    const routeD = (x, z) => { let b = 1e9; for (let i = 1; i < pts.length; i++) { const [ax, az] = pts[i - 1], [bx, bz] = pts[i], dx = bx - ax, dz = bz - az, L = dx * dx + dz * dz || 1, u = Math.max(0, Math.min(1, ((x - ax) * dx + (z - az) * dz) / L)); b = Math.min(b, Math.hypot(x - ax - u * dx, z - az - u * dz)); } return b; };
     const mats = [];
     for (let gx = -18; gx < 18; gx++) for (let gz = -26; gz < 20; gz++) {
       const cx = gx * cell + cell / 2, cz = gz * cell + cell / 2, dd = Math.hypot(cx, cz * 0.85);
@@ -2101,6 +2129,9 @@ const GL_SCENES = {
         const wdt = half * (0.7 + r() * 0.28), dep = half * (0.7 + r() * 0.28);
         let hh = (0.16 + Math.pow(r(), 2.8) * 1.5) * (0.75 + centre * 0.4);
         if (r() < 0.02) hh = 2.4 + r() * 2;
+        const rd = routeD(ox + half / 2, oz + half / 2);
+        if (rd < 2.8 && r() < 0.45) continue;            /* about 40% fewer blocks along the route */
+        if (rd < 1.6) hh = Math.min(hh, 0.45);            /* and low ones right beside it */
         mats.push([ox + half / 2, oz + half / 2, wdt, hh, dep]);
       }
     }
@@ -2118,7 +2149,7 @@ const GL_SCENES = {
     /* Valiasr: the long, gently curving artery from Tajrish down through the city; and Hemmat across it */
     const valiasr = new TH.CatmullRomCurve3([[7.5, -46], [6.2, -32], [3.4, -20], [2.6, -9], [1.1, 0.8], [-1.6, 10], [-3.2, 20], [-6.4, 32]].map(v => new TH.Vector3(v[0], 0, v[1])));
     const hemmat = new TH.CatmullRomCurve3([[-30, -6], [-16, -7.8], [-4, -6.4], [8, -8.6], [30, -7]].map(v => new TH.Vector3(v[0], 0, v[1])));
-    const hw = [[valiasr, 0.16, 1.25], [hemmat, 0.1, 0.6]].map(([c, wdt, k]) => new TH.Mesh(ribbonGeo(TH, c.getPoints(200).map(v => [v.x, v.z]), wdt, 0.018), addMat(TH, 0xffd08a, k, 0)));
+    const hw = [[valiasr, 0.14, 0.85], [hemmat, 0.1, 0.5]].map(([c, wdt, k]) => new TH.Mesh(ribbonGeo(TH, c.getPoints(200).map(v => [v.x, v.z]), wdt, 0.018), addMat(TH, 0xffd08a, k, 0)));
     hw.forEach(m => scene.add(m));
     /* exponential height fog, layered close to the ground */
     const fogs = [0.35, 0.8, 1.4].map((y, i) => {
@@ -2146,14 +2177,15 @@ const GL_SCENES = {
     });
     const traffic = new TH.Points(tg, tMat); traffic.frustumCulled = false; scene.add(traffic);
     /* Milad tower */
-    const tw = new TH.Group(); tw.position.set(-14.4, 0, -4.8); scene.add(tw);
+    const tw = new TH.Group(); tw.position.set(-6.4, 0, -28.8); tw.scale.setScalar(1.45); scene.add(tw);
     const towerPts = [[0.95, 0], [0.55, 0.35], [0.24, 1.1], [0.18, 6.2], [0.5, 6.35], [0.78, 6.7], [0.8, 7.05], [0.6, 7.35], [0.3, 7.55], [0.16, 7.8], [0.07, 10.6], [0, 11.2]].map(p => new TH.Vector2(p[0], p[1]));
     tw.add(new TH.Mesh(new TH.LatheGeometry(towerPts, 40), new TH.MeshStandardMaterial({ color: 0x2a231b, metalness: 0.7, roughness: 0.35 })));
     [6.72, 7.0].forEach(y => { const ring = new TH.Mesh(new TH.TorusGeometry(0.79, 0.03, 8, 60), new TH.MeshBasicMaterial({ color: new TH.Color(0xffcf8a).multiplyScalar(2.2) })); ring.rotation.x = Math.PI / 2; ring.position.y = y; tw.add(ring); });
     const twTip = glowSprite(TH, 0xffb070, 1.2, 1.4); twTip.position.y = 11.3; tw.add(twTip);
+    const twPod = glowSprite(TH, 0xffcf8a, 3.2, 0.9); twPod.position.y = 6.9; tw.add(twPod);
+    const twShaft = new TH.Mesh(new TH.CylinderGeometry(0.03, 0.03, 5, 8), new TH.MeshBasicMaterial({ color: new TH.Color(0xffcf8a).multiplyScalar(1.4) })); twShaft.position.set(0, 3.7, 0.2); tw.add(twShaft);
     /* the route */
-    const R0 = { home: [[0, 0], [0, -4.8], [4.8, -4.8], [4.8, -11.2], [9.6, -11.2], [9.6, -14.4]], thr: [[0, 0], [0, 3.2], [-9.6, 3.2], [-9.6, 1.6], [-19.2, 1.6], [-19.2, 3.2]], ika: [[0, 0], [0, 4.8], [-3.2, 4.8], [-3.2, 14.4], [-6.4, 14.4], [-6.4, 24]], office: [[0, 0], [1.6, 0], [1.6, 4.8], [-3.2, 4.8], [-3.2, 8]] };
-    const pts = R0[q.o.to] || R0.thr;
+
     const curve = new TH.CurvePath();
     for (let i = 1; i < pts.length; i++) curve.add(new TH.LineCurve3(new TH.Vector3(pts[i - 1][0], 0, pts[i - 1][1]), new TH.Vector3(pts[i][0], 0, pts[i][1])));
     const rMat = new TH.ShaderMaterial({
@@ -2192,9 +2224,9 @@ const GL_SCENES = {
     const lbls = {
       club: C.label(X(['The Vault', 'والت']), new TH.Vector3(0, 1.1, 0), 'hi'),
       dest: C.label(X(({ home: ['Niavaran', 'نیاوران'], thr: ['Mehrabad', 'مهرآباد'], ika: ['Imam Khomeini Airport', 'فرودگاه امام'], office: ['Vanak', 'ونک'] })[q.o.to] || ['', '']), new TH.Vector3(dst[0], 1.1, dst[1]), 'hi'),
-      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-14.4, 12.4, -4.8)),
-      valiasr: C.label(X(['Valiasr', 'ولیعصر']), new TH.Vector3(3.0, 0.6, -14)),
-      alborz: C.label(X(['Alborz', 'البرز']), new TH.Vector3(-30, 16, -133))
+      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-6.4, 13.6, -28.8), 'hi'),
+      valiasr: C.label(X(['Valiasr', 'ولیعصر']), new TH.Vector3(3.0, 0.6, -14), 'gold'),
+      alborz: C.label(X(['Alborz', 'البرز']), new TH.Vector3(30, 17, -133))
     };
     /* the driver card */
     const mins = L.mins[q.o.to] || 30;
@@ -2232,14 +2264,14 @@ const GL_SCENES = {
         mDest.s.material.opacity = ph(t, 2.6, 3.2);
         const p2 = (t * 0.7 + 0.5) % 1; mDest.ring.scale.setScalar(1 + p2 * 2.4); mDest.ring.material.opacity = (1 - p2) * ph(t, 2.6, 3.2);
         /* camera: overview → over the shoulder of the route */
-        const a = ph(t, 0, 2.8, eio);
+        const a = ph(t, 1.2, 3.4, eio);
         camP.lerpVectors(P0, P1, a); camL.lerpVectors(L0, L1, a);
-        const f = ph(t, 2.6, 4.8);
+        const f = ph(t, 3.0, 5.0);
         const off = tmp.set(4.2, 12.5, 11.5).applyAxisAngle(new TH.Vector3(0, 1, 0), -0.3 * ph(t, 3, 7.6));
         camP.lerp(cp2.copy(cp).add(off), f);
         camL.lerp(cp, f);
         cam.position.copy(camP); cam.lookAt(camL);
-        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 1.4, 2.2) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 1.2, 2.0) * 0.8 * (1 - ph(t, 4.2, 4.8)); lbls.valiasr.o = ph(t, 1.6, 2.4) * 0.85 * (1 - ph(t, 4.4, 5));
+        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 0.8, 1.6) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 0.6, 1.4) * 0.85 * (1 - ph(t, 3.0, 3.6)); lbls.valiasr.o = ph(t, 1.6, 2.4) * 0.8 * (1 - ph(t, 4.4, 5));
         show01(card, ph(t, 4.4, 5.2, eout));
         big.textContent = liveLeft(q);
       }
@@ -2291,14 +2323,15 @@ const GL_SCENES = {
       g.fillStyle = '#b48a43'; [[26, 26], [W - 26, 26], [26, H - 26], [W - 26, H - 26]].forEach(([x, y]) => { g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.fillRect(-7, -7, 14, 14); g.restore(); });
       /* the name inks in word by word, each word whole: never clipped mid-glyph */
       g.fillStyle = '#1d1711'; g.textBaseline = 'middle'; g.textAlign = 'left'; g.direction = 'ltr';
-      g.font = CF.disp(fa() ? 104 : 116, true);
+      fitFont(g, px => CF.disp(px, true), fa() ? 104 : 116, nameTxt, W * 0.8);
       const words = nameTxt.split(' '), sp = g.measureText(' ').width, ws = words.map(x => g.measureText(x).width);
       const tot = ws.reduce((a, b) => a + b, 0) + sp * (words.length - 1);
       const order = fa() ? words.map((x, i) => i).reverse() : words.map((x, i) => i);
       let xx = W / 2 - tot / 2;
       order.forEach(i => { g.globalAlpha = cl(w * words.length * 1.15 - i); g.fillText(words[i], xx, H * 0.43); xx += ws[i] + sp; });
       g.globalAlpha = 1; g.direction = fa() ? 'rtl' : 'ltr';
-      g.globalAlpha = cl((w - 0.85) / 0.15); g.fillStyle = '#9a7434'; g.textAlign = 'center'; g.font = CF.txt(fa() ? 38 : 30, fa() ? 600 : 400);
+      g.globalAlpha = cl((w - 0.85) / 0.15); g.fillStyle = '#9a7434'; g.textAlign = 'center';
+      fitFont(g, px => CF.txt(px, fa() ? 600 : 400), fa() ? 38 : 30, fa() ? sub : sub.toUpperCase(), W * 0.8, fa() ? 0 : 4);
       if (fa()) g.fillText(sub, W / 2, H * 0.76); else spaced(g, sub.toUpperCase(), W / 2, H * 0.76, 4);
       g.globalAlpha = 1;
     });
@@ -2418,12 +2451,13 @@ const GL_SCENES = {
       g.strokeStyle = gold; g.lineWidth = 6; g.strokeRect(22, 22, Wc - 44, Hc * cut - 34); g.lineWidth = 2; g.strokeRect(38, 38, Wc - 76, Hc * cut - 66);
       g.strokeRect(22, Hc * cut + 12, Wc - 44, Hc * (1 - cut) - 34);
       g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-      g.fillStyle = gold; g.font = fa() ? CF.txt(40, 600) : CF.lat(30, 600);
+      const inner = (Wc - 76) * 0.8;
+      g.fillStyle = gold; fitFont(g, px => (fa() ? CF.txt(px, 600) : CF.lat(px, 600)), fa() ? 40 : 30, fa() ? hall : hall.toUpperCase(), inner, fa() ? 0 : 7);
       if (fa()) g.fillText(hall, Wc / 2, 120); else spaced(g, hall.toUpperCase(), Wc / 2, 118, 7);
       if (!foil) {
-        g.fillStyle = ink; g.font = CF.disp(fa() ? 54 : 64, true); g.fillText(show[0], Wc / 2, 230);
-        if (show[1]) { g.font = CF.txt(fa() ? 38 : 32); g.fillStyle = '#5b4a35'; g.fillText(show[1], Wc / 2, 290); }
-        g.font = CF.txt(fa() ? 34 : 28); g.fillStyle = '#5b4a35'; g.fillText(dayFmt(at, true) + ' — ' + hm(at), Wc / 2, 350);
+        g.fillStyle = ink; fitFont(g, px => CF.disp(px, true), fa() ? 54 : 64, show[0], inner); g.fillText(show[0], Wc / 2, 230);
+        if (show[1]) { fitFont(g, px => CF.txt(px), fa() ? 38 : 32, show[1], inner); g.fillStyle = '#5b4a35'; g.fillText(show[1], Wc / 2, 290); }
+        const dl = dayFmt(at, true) + ' — ' + hm(at); fitFont(g, px => CF.txt(px), fa() ? 34 : 28, dl, inner); g.fillStyle = '#5b4a35'; g.fillText(dl, Wc / 2, 350);
       }
       g.fillStyle = gold; g.fillRect(90, 400, Wc - 180, 3);
       const cR = Wc * (fa() ? 0.73 : 0.27), cS = Wc * (fa() ? 0.3 : 0.7);
@@ -2432,8 +2466,10 @@ const GL_SCENES = {
       if (!foil) {
         g.fillStyle = ink; g.font = fa() ? CF.disp(92) : CF.bod(110);
         g.fillText(fa() ? N(6) : 'F', cR, 600);
-        g.font = fa() ? CF.disp(n > 1 ? 70 : 92) : CF.bod(n > 1 ? 92 : 110);
-        g.fillText(n > 1 ? (fa() ? N(11) + ' تا ' + N(10 + n) : '11–' + (10 + n)) : N(11), cS, 600);
+        const sz = fa() ? (n > 1 ? 70 : 92) : (n > 1 ? 92 : 110);
+        g.font = fa() ? CF.disp(sz) : CF.bod(sz);
+        if (n > 1 && !fa()) rangeText(g, '11', String(10 + n), cS, 600, sz);
+        else g.fillText(n > 1 ? N(11) + ' تا ' + N(10 + n) : N(11), cS, 600);
       }
       /* the monogram, in foil */
       drawV(g, Wc / 2, 690, 62, gold); g.fillStyle = gold;
@@ -2529,46 +2565,57 @@ const GL_SCENES = {
     back.position.set(0, -6, -10); back.lookAt(0, 6, 8); scene.add(back);
     /* light: a warm key from the side, a cool rim behind, a breath of fill */
     const keyL = new TH.DirectionalLight(0xffd8ac, 2.4); keyL.position.set(-5, 3.5, 2); scene.add(keyL);
-    const rim = new TH.DirectionalLight(0xbfd0ff, 1.6); rim.position.set(3.5, 2.5, -4.5); scene.add(rim);
+    const rim = new TH.DirectionalLight(0xfff0e0, 2.2); rim.position.set(2.5, 2.2, -5); scene.add(rim);
     const fill = new TH.DirectionalLight(0xffeedd, 0.35); fill.position.set(2, 5, 4); scene.add(fill);
-    /* the petal: a cupped spoon with a ruffled lip; soft edges come from its alpha */
-    const pg = new TH.PlaneGeometry(1, 1, 12, 16); pg.translate(0, 0.5, 0);
-    const pp = pg.attributes.position;
-    for (let i = 0; i < pp.count; i++) {
-      const x = pp.getX(i), y = pp.getY(i);
-      const w = 0.5 * (0.16 + 0.84 * Math.sin(Math.PI * Math.min(1, y * 0.6 + 0.13)));
-      const X2 = x * 2 * w;
-      pp.setXYZ(i, X2, y, -1.25 * X2 * X2 - 0.12 * y * y + 0.014 * Math.sin(x * 14) * y * y * y);
-    }
-    pg.computeVertexNormals();
-    const alpha = cTex(TH, 256, 256, (g, W, H) => {
-      g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
-      const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.07, '#fff'); gr.addColorStop(0.93, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = gr; g.beginPath(); g.moveTo(0, H);
-      for (let k = 0; k <= 5; k++) { const x0 = k / 5 * W; g.quadraticCurveTo(x0 - W / 10, 2, x0, 12 + (k % 2) * 6); }
-      g.lineTo(W, H); g.closePath(); g.fill();
-    });
-    alpha.tx.colorSpace = TH.LinearSRGBColorSpace;
+    /* the petal: a smooth oval spoon, 12×24 segments, cupped on a sine profile, its rim ruffled by 2D noise.
+       Three variants so neighbouring petals never share a ruffle. */
+    const vn = (x, y) => Math.sin(x * 1.7 + y * 3.1) * 0.5 + Math.sin(x * 4.3 - y * 2.2) * 0.3 + Math.sin(x * 9.1 + y * 6.7) * 0.2;
+    const petalGeo = seed => {
+      const g = new TH.PlaneGeometry(1, 1, 12, 24); g.translate(0, 0.5, 0);
+      const pa = g.attributes.position;
+      for (let i = 0; i < pa.count; i++) {
+        const u = pa.getX(i) * 2, y = pa.getY(i);                         /* u: -1..1 across, y: 0..1 along */
+        const e = y < 0.58 ? (y - 0.58) / 0.58 : (y - 0.58) / 0.42;
+        let w = 0.5 * Math.sqrt(Math.max(0, 1 - e * e)) * (0.35 + 0.65 * Math.min(1, y * 1.6 + 0.1));
+        const edge = Math.abs(u);
+        w *= 1 + 0.06 * Math.sin(y * 5 + seed * 2.3) * edge;              /* ruffled outline */
+        const X = u * w;
+        let z = -0.62 * w * (1 - Math.cos(Math.PI * u)) / 2 * (0.6 + 0.4 * y); /* sine cup across */
+        z += -0.18 * y * y;                                                   /* gentle curl inward */
+        z += 0.035 * Math.sin(u * 4 + seed * 7 + y * 2) * edge * edge * y * y; /* soft rim ruffle */
+        pa.setXYZ(i, X, y, z);
+      }
+      g.computeVertexNormals();
+      return g;
+    };
     const tint = cTex(TH, 128, 256, (g, W, H) => {
-      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#d9a99a'); gr.addColorStop(0.3, '#efd6c8'); gr.addColorStop(0.7, '#fbf1e6'); gr.addColorStop(1, '#fffaf2');
+      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#dcae9e'); gr.addColorStop(0.28, '#f0d9cc'); gr.addColorStop(0.65, '#fbf2e8'); gr.addColorStop(1, '#fffaf3');
       g.fillStyle = gr; g.fillRect(0, 0, W, H);
-      g.strokeStyle = 'rgba(170,120,100,.10)'; g.lineWidth = 1;
-      for (let k = 0; k < 9; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 4) * 6, H * 0.5, W / 2 + (k - 4) * 15, 10); g.stroke(); }
+      g.strokeStyle = 'rgba(170,120,100,.07)'; g.lineWidth = 1;
+      for (let k = 0; k < 11; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 5) * 5, H * 0.5, W / 2 + (k - 5) * 12, 6); g.stroke(); }
     });
     const petalM = new TH.MeshPhysicalMaterial({
-      color: 0xffffff, map: tint.tx, alphaMap: alpha.tx, alphaTest: 0.45, alphaToCoverage: Q.level >= 2, side: TH.DoubleSide,
-      roughness: 0.6, sheen: 1, sheenRoughness: 0.38, sheenColor: new TH.Color(0xffe2d6),
-      transmission: Q.level >= 2 ? 0.12 : 0, thickness: 0.05, emissive: 0x2c1810, emissiveIntensity: 0.18
+      color: 0xffffff, map: tint.tx, side: TH.DoubleSide, roughness: 0.55,
+      sheen: 1, sheenRoughness: 0.4, sheenColor: new TH.Color(0xfff4ea),
+      transmission: Q.level >= 1 ? 0.2 : 0, thickness: 0.3, emissive: 0x2a1610, emissiveIntensity: 0.1
     });
-    /* phyllotaxis: inner petals tight, outer petals open first */
-    const NP = 56, petals = new TH.InstancedMesh(pg, petalM, NP), info = [];
+    /* phyllotaxis, wide petals so neighbours overlap 20–30°; outer petals open first */
+    const NP = 42, VAR = 3, meshes = [], info = [];
     const rr = rng(31), col = new TH.Color();
+    for (let v = 0; v < VAR; v++) { const m = new TH.InstancedMesh(petalGeo(v + 1), petalM, Math.ceil(NP / VAR)); m.count = 0; meshes.push(m); scene.add(m); }
     for (let i = 0; i < NP; i++) {
-      const r = Math.sqrt((i + 0.5) / NP), a = i * 2.39996;
-      info.push({ r, a, roll: (rr() - 0.5) * 0.3, s: lerp(0.42, 1.15, Math.pow(r, 0.8)) * (0.92 + rr() * 0.14), start: 0.35 + (1 - r) * 2.5 + rr() * 0.25 });
-      col.setRGB(1, lerp(0.95, 1, rr()), lerp(0.9, 1, rr())); petals.setColorAt(i, col);
+      const r = Math.sqrt((i + 0.5) / NP), a = i * 2.39996, mesh = meshes[i % VAR], slot = mesh.count++;
+      info.push({ r, a, mesh, slot, roll: (rr() - 0.5) * 0.25, s: lerp(0.55, 1.45, Math.pow(r, 0.9)) * (0.94 + rr() * 0.1), wide: lerp(1.25, 1.7, r), start: 0.35 + (1 - r) * 2.5 + rr() * 0.25 });
+      col.setRGB(1, lerp(0.95, 1, rr()), lerp(0.9, 1, rr())); mesh.setColorAt(slot, col);
     }
-    scene.add(petals);
+    /* a cluster of small, tightly curled petals closing the centre */
+    const centre = new TH.InstancedMesh(petalGeo(7), petalM, 14);
+    { const o2 = new TH.Object3D(); o2.rotation.order = 'YXZ';
+      for (let i = 0; i < 14; i++) { const a = i * 2.39996, r = Math.sqrt(i / 14) * 0.06; o2.rotation.set(0.12 + i * 0.012, a, 0); o2.position.set(Math.sin(a) * r, 0.14, Math.cos(a) * r); o2.scale.set(0.3, 0.26, 0.38); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); } }
+    scene.add(centre);
+    /* contact shadow under the bloom */
+    const ao = new TH.Mesh(new TH.PlaneGeometry(3.4, 3.4), new TH.MeshBasicMaterial({ map: spriteTex(TH), color: 0x000000, transparent: true, opacity: 0.7, depthWrite: false }));
+    ao.rotation.x = -Math.PI / 2; ao.position.y = -0.2; scene.add(ao);
     /* the heart: gold stamens */
     const st = new TH.InstancedMesh(new TH.SphereGeometry(0.018, 8, 6), new TH.MeshStandardMaterial({ color: 0xe9bf5c, roughness: 0.5, emissive: 0x4a3008, emissiveIntensity: 0.4 }), 70);
     for (let i = 0; i < 70; i++) { const rad = Math.sqrt(i / 70) * 0.13, a = i * 2.39996; const m4 = new TH.Matrix4().setPosition(Math.cos(a) * rad, 0.1 + (0.13 - rad) * 0.5, Math.sin(a) * rad); st.setMatrixAt(i, m4); }
@@ -2587,28 +2634,28 @@ const GL_SCENES = {
     const pollen = dustMaterial(TH, { size: 0.9, alpha: 0.7, beamR: 2, span: 3, rise: 0.05 });
     pollen.uniforms.uBeam.value.set(0, 0.4, 0);
     scene.add(dustPoints(TH, 120, [-1.6, 1.6, -0.2, 2, -1.6, 1.6], 21, pollen));
-    const card = ovCard(C.ov, '<div class="ov-row"><span class="ov-who"><span class="ov-n">' + X(q.o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : ['White peonies, in linen', 'صدتومانی سفید، در کتان']) + '</span><span class="ov-m">' + X(O[q.o.for]) + ' — ' + X(O[q.o.budget]) + '</span></span></div>');
+    const card = ovCard(C.ov, '<div class="ov-row"><span class="ov-who"><span class="ov-n">' + X(q.o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : ['White peonies, by hand', 'صدتومانی سفید، دست‌چین']) + '</span><span class="ov-m">' + X(O[q.o.for]) + ' — ' + X(O[q.o.budget]) + '</span></span></div>');
     show01(card, 0);
     const o = new TH.Object3D(), look = new TH.Vector3();
     o.rotation.order = 'YXZ';
     return {
       scene, camera: cam, dur: 7.4, bloom: 0.42, thresh: 0.9, tilt: 1.0, focus: 0.5,
       frame(t) {
-        info.forEach((p, i) => {
+        info.forEach(p => {
           const k = ph(t, p.start, p.start + 2.7, eio);
           const r = p.r;
-          const tilt = lerp(lerp(0.03, 0.3, r), lerp(0.2, 1.42, Math.pow(r, 1.1)), k);
-          const rad = lerp(lerp(0.02, 0.15, r), lerp(0.04, 0.4, r), k);
-          const sz = p.s * lerp(lerp(0.7, 1, r), 1, k);
+          const tilt = lerp(lerp(0.03, 0.3, r), lerp(0.3, 1.5, Math.pow(r, 1.4)), k);
+          const rad = lerp(lerp(0.01, 0.1, r), lerp(0.02, 0.34, r), k);
+          const sz = p.s * lerp(lerp(0.72, 1, r), 1, k);
           o.rotation.set(tilt, p.a + (1 - k) * 0.25, p.roll * k);
-          o.position.set(Math.sin(p.a) * rad, lerp(lerp(0.14, 0.0, r), lerp(0.12, -0.1, r), k), Math.cos(p.a) * rad);
-          o.scale.set(sz * 0.95, sz, sz);
-          o.updateMatrix(); petals.setMatrixAt(i, o.matrix);
+          o.position.set(Math.sin(p.a) * rad, lerp(lerp(0.14, 0.0, r), lerp(0.12, -0.08, r), k), Math.cos(p.a) * rad);
+          o.scale.set(sz * p.wide, sz, sz);
+          o.updateMatrix(); p.mesh.setMatrixAt(p.slot, o.matrix);
         });
-        petals.instanceMatrix.needsUpdate = true;
+        meshes.forEach(m => { m.instanceMatrix.needsUpdate = true; });
         st.visible = t > 2.2;
         pollen.uniforms.uTime.value = t; bm.uniforms.uTime.value = t;
-        const m = ph(t, 0, 7.4, eio), a = lerp(-0.35, 0.2, m), el = lerp(1.0, 0.86, m), d = lerp(12.5, 13.8, m) * fitK(C, 0.5, 1.3);
+        const m = ph(t, 0, 7.4, eio), a = lerp(-0.35, 0.2, m), el = lerp(0.82, 0.66, m), d = lerp(13.8, 14.2, m) * fitK(C, 0.5, 1.3) * (C.still ? 1.35 : 1);
         look.set(0, lerp(0.15, 0.05, m), 0);
         cam.position.set(Math.sin(a) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(a) * Math.cos(el) * d);
         cam.lookAt(look);
@@ -2629,13 +2676,8 @@ const GL_SCENES = {
     const globe = new TH.Group(); globe.position.set(0, 1.55, -1.5); scene.add(globe);
     const GR = 2.1;
     globe.add(new TH.Mesh(new TH.SphereGeometry(GR, 64, 40), new TH.MeshStandardMaterial({ color: 0x0e0c0a, roughness: 0.85, metalness: 0.1, envMapIntensity: 0.15 })));
-    /* a fresnel rim and one thin specular, instead of studio reflections */
-    globe.add(new TH.Mesh(new TH.SphereGeometry(GR * 1.002, 64, 40), new TH.ShaderMaterial({
-      transparent: true, depthWrite: false, blending: TH.AdditiveBlending,
-      uniforms: { uL: { value: new TH.Vector3(-0.5, 0.6, 0.62).normalize() } },
-      vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-      fragmentShader: 'uniform vec3 uL;varying vec3 vN,vV;void main(){float f=pow(1.-max(dot(vN,vV),0.),4.);vec3 h=normalize(uL+vV);float sp=pow(max(dot(vN,h),0.),900.);gl_FragColor=vec4(vec3(1.,.8,.5)*f*.24+vec3(1.,.95,.85)*sp*.18,1.);}'
-    })));
+    /* a thin fresnel rim (the atmosphere shell below) and one small specular light, instead of studio reflections */
+    const spec = new TH.PointLight(0xfff2dc, 6, 0, 2); spec.position.set(-2.2, 2.6, 2.6); globe.add(spec);
     const grat = [];
     for (let la = -60; la <= 60; la += 20) for (let lo = 0; lo < 360; lo += 4) { const a = THEO(la, lo, GR * 1.003), b = THEO(la, lo + 4, GR * 1.003); grat.push(a, b); }
     for (let lo = 0; lo < 360; lo += 20) for (let la = -80; la < 80; la += 4) { grat.push(THEO(la, lo, GR * 1.003), THEO(la + 4, lo, GR * 1.003)); }
@@ -2688,9 +2730,10 @@ const GL_SCENES = {
       g.fillText('IKA', 50, 250); g.fillText(code, 470, 250);
       g.strokeStyle = '#a9813d'; g.lineWidth = 3; g.beginPath(); g.moveTo(320, 205); g.lineTo(420, 205); g.moveTo(405, 192); g.lineTo(420, 205); g.lineTo(405, 218); g.stroke();
       g.font = CF.txt(fa() ? 34 : 28); g.fillStyle = '#5b4a35';
-      g.textAlign = 'left'; g.fillText(X(['Tehran', 'تهران']), 54, 300); g.fillText(X(O[q.o.to]), 474, 300);
+      g.textAlign = 'left'; g.fillText(X(['Tehran', 'تهران']), 54, 300);
+      fitFont(g, px => CF.txt(px), fa() ? 34 : 28, X(O[q.o.to]), 300); g.fillText(X(O[q.o.to]), 474, 300);
       const cols = [[['FLIGHT', 'پرواز'], N(PEOPLE.flight[q.o.to] || 'TK 879')], [['DATE', 'تاریخ'], N(new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', { day: 'numeric', month: 'short' }).format(dep))], [['SEAT', 'صندلی'], fa() ? N(2) + 'A' : '2A'], [['BOARDS', 'سوار شدن'], hm(new Date(q.at - 30 * 60000))]];
-      cols.forEach((c, i) => { const x = 54 + i * 190; g.fillStyle = '#a9813d'; g.font = fa() ? CF.txt(28, 600) : CF.lat(20, 600); if (fa()) g.fillText(X(c[0]), x, 380); else spaced(g, X(c[0]), x, 380, 3); g.fillStyle = '#1d1711'; g.font = CF.txt(fa() ? 38 : 34, 600); g.fillText(c[1], x, 430); });
+      cols.forEach((c, i) => { const x = 54 + i * 190; g.fillStyle = '#a9813d'; g.font = fa() ? CF.txt(28, 600) : CF.lat(20, 600); if (fa()) g.fillText(X(c[0]), x, 380); else spaced(g, X(c[0]), x, 380, 3); g.fillStyle = '#1d1711'; fitFont(g, px => CF.txt(px, 600), fa() ? 38 : 34, c[1], 170); g.fillText(c[1], x, 430); });
       const r2 = rng(9); g.fillStyle = '#1d1711'; for (let y = 130; y < H - 40; y += 9) { g.fillRect(W - 240, y, 190, 2 + Math.floor(r2() * 4)); }
       g.restore();
     });
@@ -2705,7 +2748,8 @@ const GL_SCENES = {
       g.fillStyle = '#e2bd77'; rrect(g, 70, 210, 130, 100, 14); g.fill(); g.strokeStyle = '#6b5026'; g.lineWidth = 3; g.beginPath(); g.moveTo(70, 260); g.lineTo(200, 260); g.moveTo(135, 210); g.lineTo(135, 310); g.moveTo(100, 210); g.lineTo(100, 310); g.moveTo(170, 210); g.lineTo(170, 310); g.stroke();
       g.fillStyle = '#f1d9a2'; g.textBaseline = 'alphabetic';
       g.textAlign = fa() ? 'right' : 'left';
-      g.font = CF.disp(fa() ? 64 : 72, true); g.fillText(X(PEOPLE.hotelName[q.o.to] || PEOPLE.hotelName.ist), fa() ? W - 70 : 70, 440);
+      const hn = X(PEOPLE.hotelName[q.o.to] || PEOPLE.hotelName.ist);
+      fitFont(g, px => CF.disp(px, true), fa() ? 64 : 72, hn, (W - 140) * 0.8); g.fillText(hn, fa() ? W - 70 : 70, 440);
       g.font = fa() ? CF.txt(38, 600) : CF.lat(26, 600); g.fillStyle = '#cfae6e';
       if (fa()) g.fillText('اتاق ' + N(512), W - 70, 500); else spaced(g, 'ROOM 512', 70, 500, 6);
       g.textAlign = 'right'; drawV(g, W - 100, 90, 44, '#cfae6e');
@@ -2730,7 +2774,7 @@ const GL_SCENES = {
         head.material.opacity = ph(t, 0.5, 0.8) * (1 - ph(t, 3.0, 3.6));
         dDot.scale.setScalar(0.22 * (1 + ph(t, 2.7, 3.1) * 0.8 * (1 - ph(t, 3.1, 3.8))));
         const b = ph(t, 1.9, 3.3, eout);
-        passM.position.set(-0.15, lerp(-4.6, -0.55, b), 1.6);
+        passM.position.set(0.05, lerp(-4.6, -0.55, b), 1.6); passM.scale.setScalar(0.88);
         passM.rotation.set(lerp(-0.5, -0.12, b), lerp(0.25, 0.06, b), lerp(-0.12, -0.05, b));
         const c = ph(t, 3.5 + ko, 4.9 + ko, eout);
         kc.position.set(lerp(4.4, showPass ? 0.55 : 0.0, c), showPass ? -1.15 : -0.6, showPass ? 2.2 : 1.9);
