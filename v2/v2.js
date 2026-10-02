@@ -35,7 +35,7 @@ cardHint: 'Tap the card to show it at the door', cardBackT: 'Show at the door', 
 avail: 'Available to spend', owed: 'Owed', ofLimit: 'of %1 credit',
 nextVisit: 'Your next visit', nothing: 'Nothing reserved yet', chooseRoom: 'choose a room and a time',
 boxes: [['Reserve', 'A table, a room'], ['Calendar', 'What is on'], ['Concierge', 'Anything, tonight'], ['Wallet', 'Charge and credit']],
-tonight: 'Next at the house',
+tonight: 'Tonight and this week', chefT: 'The chef’s table', chefD: 'Tonight · eight seats · a menu of the season', terrT: 'The terrace is open', terrD: 'Dinner under the sky · until midnight', today: 'Today', swipe: 'Swipe',
 dock: ['Home', 'Reserve', 'Events', 'Concierge', 'Wallet'],
 reserveEy: 'Reserve', reserveTitle: 'Where would you like to sit?', yourRes: 'Your reservations', cancel: 'Cancel', cancelQ: 'Cancel this reservation?', cancelYes: 'Yes, cancel it', keep: 'Keep it', cancelled: 'The reservation is cancelled.',
 rooms: [['The lounge', 'The heart of the club. No reservation needed by day.', 'lounge'], ['Dining room', 'One room, one service. Lunch and dinner.', 'room-table'], ['Sushi counter', 'Eight seats in front of the itamae.', 'room-sushi'], ['Bar and humidor', 'Cigars are smoked here and nowhere else.', 'room-humidor'], ['The terrace', 'Open air. Dinner served. Smoking.', 'room-terrace'], ['The Japanese garden', 'Granted, not sold. Ask the concierge.', 'room-garden']],
@@ -88,7 +88,7 @@ cardHint: 'برای نشان دادن در ورودی، روی کارت بزنی
 avail: 'قابل خرج', owed: 'بدهی', ofLimit: 'از %1 اعتبار',
 nextVisit: 'حضور بعدی شما', nothing: 'هنوز رزروی نیست', chooseRoom: 'یک فضا و یک ساعت انتخاب کنید',
 boxes: [['رزرو', 'یک میز، یک فضا'], ['تقویم', 'برنامهٔ خانه'], ['کانسیرژ', 'هر چه بخواهید'], ['کیف پول', 'شارژ و اعتبار']],
-tonight: 'برنامهٔ بعدی خانه',
+tonight: 'امشب و این هفته', chefT: 'میز سرآشپز', chefD: 'امشب · هشت صندلی · منوی فصل', terrT: 'تراس باز است', terrD: 'شام زیر آسمان · تا نیمه‌شب', today: 'امروز', swipe: 'ورق بزنید',
 dock: ['خانه', 'رزرو', 'رویدادها', 'کانسیرژ', 'کیف پول'],
 reserveEy: 'رزرو', reserveTitle: 'کجا می‌خواهید بنشینید؟', yourRes: 'رزروهای شما', cancel: 'لغو', cancelQ: 'این رزرو لغو شود؟', cancelYes: 'بله، لغو شود', keep: 'نگه دار', cancelled: 'رزرو لغو شد.',
 rooms: [['لانژ', 'قلب باشگاه. روزها بدون رزرو.', 'lounge'], ['سالن غذاخوری', 'یک سالن، یک سرویس. ناهار و شام.', 'room-table'], ['پیشخوان سوشی', 'هشت صندلی روبه‌روی ایتامه.', 'room-sushi'], ['بار و هیومیدور', 'سیگار برگ فقط اینجا.', 'room-humidor'], ['تراس', 'فضای باز، با شام. سیگار آزاد.', 'room-terrace'], ['باغچهٔ ژاپنی', 'فروشی نیست، داده می‌شود. از کانسیرژ بپرسید.', 'room-garden']],
@@ -133,7 +133,7 @@ var L = function () { return T[P.lang]; };
 var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, function (_, i) { return a[i]; }); };
 var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x); };
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
-var money = function (x) { return '<span class="money">' + n(Math.abs(x)) + '</span>'; };
+var money = function (x) { return '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; };
 var dfmt = function (d, o) { return new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 
@@ -402,6 +402,7 @@ function render(dir, o) {
   if (dir === 'back' && scrolls[path]) pg.scrollTop = scrolls[path];
   if (r.key === 'combo') slots = [];
   if (def.after) def.after(pg, r);
+  countUp(pg); photos(pg);
 }
 function rerender() {   // same page, fresh content (errors, toggles): no animation, scroll kept
   var pg = $('.page:not(.leave)', view); if (!pg) return; var top = pg.scrollTop;
@@ -426,6 +427,16 @@ function drawDock() {
 }
 
 /* ================= form plumbing: every keystroke is kept ================= */
+function countUp(root) {
+  if (calm) return;
+  $$('.amt .money[data-to], .stat .money[data-to]', root).forEach(function (el) {
+    var to = Number(el.getAttribute('data-to')); if (!to) return;
+    var t0 = performance.now(), dur = 1100;
+    (function f(now) { var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 4); el.textContent = n(Math.round(to * e / 1000) * 1000 || 0); if (p < 1) requestAnimationFrame(f); else el.textContent = n(to); })(t0);
+  });
+}
+function photos(root) { $$('img', root).forEach(function (im) { if (im.complete && im.naturalWidth) im.classList.add('ok'); }); }
+document.addEventListener('load', function (e) { if (e.target && e.target.tagName === 'IMG') e.target.classList.add('ok'); }, true);
 function hydrate(root) {
   $$('[data-k]', root).forEach(function (el) { var v = get(el.getAttribute('data-k')); if (el.type === 'checkbox') el.checked = !!v; else if (v != null) el.value = v; });
   $$('[data-count]', root).forEach(countUpdate);
@@ -628,7 +639,12 @@ R('m', { scene: 'in', html: function () {
       '<div class="cside"><div class="cpat"></div><div class="chipm"><span class="mk"></span></div><div class="cword">THE VAULT</div><div class="cmeta" dir="ltr"><span>ARASH FARAHANI</span><span>Nº 001</span></div><div class="glare"></div></div>' +
       '<div class="cside backside"><div class="cpat"></div><div class="qr">' + qr() + '</div><div class="backtext"><b>' + l.cardBackT + '</b><i>' + l.cardBackD + '</i></div></div>' +
     '</div></div><p class="fliphint">' + l.cardHint + '</p></div>' +
-    '<div class="sec"><p class="eyb">' + l.tonight + '</p>' + icard('data-act="event" data-v="0"', EVPH[0], ev[0], ev[1] + ' · ' + ev[2], dateTag(d0), S.rsvp[0] ? '<span class="pill ok">' + l.going + '</span>' : '', 'tall') + '</div>' +
+    '<div class="sec"><div class="sech"><p class="eyb">' + l.tonight + '</p><span class="small">' + l.swipe + (fa() ? ' ←' : ' →') + '</span></div><div class="reel">' +
+      icard('data-act="event" data-v="0"', EVPH[0], ev[0], ev[1] + ' · ' + ev[2], dateTag(d0), S.rsvp[0] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
+      icard('data-go="m/reserve/1"', 'dining', l.chefT, l.chefD, '<span class="tag">' + l.today + '</span>', '', 'story') +
+      icard('data-go="m/reserve/4"', 'room-terrace', l.terrT, l.terrD, '<span class="tag">' + l.today + '</span>', '', 'story') +
+      icard('data-act="event" data-v="2"', EVPH[2], l.events[2][0], l.events[2][1] + ' · ' + l.events[2][2], dateTag(dayOf(EV[2].off)), S.rsvp[2] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
+    '</div></div>' +
     '<button type="button" class="panel wstrip' + (S.hide ? ' hide' : '') + '" data-go="m/wallet"><span class="top"><span><span class="eyb">' + l.avail + '</span><br><span class="amt num">' + money(w.avail) + '</span> <span class="unit">' + l.unit + '</span></span><span class="chev"></span></span>' +
       '<span class="meter debt" style="--w:' + used + '%"><i></i></span><span class="ends"><span>' + l.owed + ' ' + money(w.debt) + '</span><span>' + fill(l.ofLimit, money(W.limit)) + '</span></span></button>' +
     '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' +
@@ -649,14 +665,13 @@ R('m/room', { scene: 'in', back: true, html: function (r) {
   var l = L(), room = l.rooms[r.room], f = rf(r.room);
   var days = '<div class="days" role="group">' + Array.apply(null, Array(10)).map(function (_, i) { var d = dayOf(i); return '<button type="button" class="day" data-act="rday" data-v="' + i + '" aria-pressed="' + (f.day === i) + '"><span>' + dfmt(d, { weekday: 'short' }) + '</span><b class="num">' + dfmt(d, { day: 'numeric' }) + '</b></button>'; }).join('') + '</div>';
   var times = '<div class="chips">' + TIMES.map(function (t, i) { var full = isFull(f.day, i, r.room); return '<button type="button" class="chip" data-act="rtime" data-v="' + i + '" aria-pressed="' + (f.time === i) + '"' + (full ? ' disabled aria-label="' + t + ' · ' + l.full + '"' : '') + '>' + digits(t) + '</button>'; }).join('') + '</div>';
-  return '<div class="arch" style="aspect-ratio:4/3.3">' + img(room[2], room[0]) + '</div>' +
-    '<div class="head rise"><p class="eyb">' + l.reserveEy + '</p><h1 class="h1">' + room[0] + '</h1><p class="p">' + room[1] + '</p></div>' +
-    '<div class="fields"><div class="f"><span class="lab">' + l.when + '</span>' + days + '</div>' +
+  return '<div class="hero-full">' + img(room[2], room[0]) + '<div class="hero-cap"><p class="eyb">' + l.reserveEy + '</p><h1 class="h1">' + room[0] + '</h1><p class="p">' + room[1] + '</p></div></div>' +
+    '<div class="riser"><div class="grab"></div><div class="fields"><div class="f"><span class="lab">' + l.when + '</span>' + days + '</div>' +
     '<div class="f' + (S.errs.rtime ? ' bad' : '') + '" data-f="rtime"><span class="lab">' + l.time + '</span>' + times + err('rtime') + '</div>' +
     '<div class="f"><span class="lab">' + l.party + '</span><div class="stepper"><button type="button" data-act="party" data-v="-1" aria-label="−">−</button><output class="num">' + digits(f.party) + '</output><button type="button" data-act="party" data-v="1" aria-label="+">+</button></div></div>' +
     (f.party > 1 ? '<div class="f"><label class="lab">' + l.guestNames + '</label><textarea class="in" style="min-height:90px" placeholder="' + l.guestPh + '" data-k="rf.' + r.room + '.guests"></textarea></div>' : '') +
     '<div class="f"><label class="lab">' + l.noteLab + '</label><input class="in" placeholder="' + esc(l.notePh) + '" data-k="rf.' + r.room + '.note"></div></div>' +
-    '<div class="cta-bar"><button type="button" class="btn gold" data-act="hold">' + l.hold + '</button></div>';
+    '<div class="cta-bar"><button type="button" class="btn gold" data-act="hold">' + l.hold + '</button></div></div>';
 } });
 
 R('m/events', { scene: 'in', html: function () {

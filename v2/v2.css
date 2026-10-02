@@ -452,3 +452,24 @@ select.in option{background:#1b1a18}
 .cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,13,.55) 0%,rgba(15,14,13,.15) 40%,var(--ink) 100%)}
 .cover+*{margin-top:-46px!important;position:relative}
 .bar .lang{min-width:40px;height:40px}
+
+/* home: a reel of what is on, swiped sideways */
+.reel{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px!important;padding:2px 22px 10px;scroll-padding:0 22px}
+.reel::-webkit-scrollbar{height:0}
+.icard.story{flex:0 0 78%;aspect-ratio:4/5;scroll-snap-align:start}
+/* photos fade in over a soft shimmer instead of popping in */
+.icard,.arch,.cover,.hero-full{background:linear-gradient(110deg,#1b1a17 30%,#25231f 50%,#1b1a17 70%) 0 0/300% 100%;animation:shimmer 1.6s linear infinite}
+.icard img,.arch img,.cover img,.hero-full img{opacity:0;transition:opacity .7s var(--soft),transform 1.2s var(--soft)}
+.icard img.ok,.arch img.ok,.cover img.ok,.hero-full img.ok{opacity:1}
+@keyframes shimmer{to{background-position:-300% 0}}
+/* room: the place first, the choices rise over it */
+.hero-full{position:relative;margin:calc(-1 * (var(--top) + 72px)) -22px 0!important;height:min(70dvh,560px);overflow:hidden}
+.hero-full img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.06);transition:opacity .7s var(--soft),transform 6s var(--soft)}
+.hero-full img.ok{transform:none}
+.hero-full::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,14,13,.55) 0%,rgba(15,14,13,0) 28%,rgba(15,14,13,.15) 55%,rgba(15,14,13,.92) 100%)}
+.hero-cap{position:absolute;z-index:1;left:22px;right:22px;bottom:48px;display:flex;flex-direction:column;gap:8px}
+.riser{position:relative;z-index:2;margin:-30px -22px 0!important;padding:4px 22px 0;border-radius:20px 20px 0 0;background:linear-gradient(180deg,#1d1b17,var(--ink) 120px);box-shadow:0 -1px 0 var(--line2),0 -20px 40px rgba(0,0,0,.5);animation:riseUp .8s var(--soft) .15s both}
+.riser .grab{margin:10px auto 18px}
+@keyframes riseUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+.riser .cta-bar{margin-left:-22px!important;margin-right:-22px!important}
+@media (prefers-reduced-motion:reduce){.icard,.arch,.cover,.hero-full{animation:none}}
