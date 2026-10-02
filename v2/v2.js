@@ -310,9 +310,9 @@ function timeline(total, frame, cues, done) {
   })(t0);
 }
 function doorFrame(t) {   // t in ms, opening direction
-  var swing = seg(t, 1100, 4200, E.sine), cam = seg(t, 3500, 5600, E.io);
+  var swing = seg(t, 800, 4200, E.sine), cam = seg(t, 3500, 5600, E.io);
   return {
-    '--bolt': seg(t, 0, 700), '--hrot': (-80 * seg(t, 100, 1000, E.back)) + 'deg', '--pop': (10 * seg(t, 850, 1300, E.out)) + 'px',
+    '--bolt': seg(t, 0, 650), '--hrot': (-80 * seg(t, 50, 850, E.back)) + 'deg', '--pop': (10 * seg(t, 550, 950, E.out)) + 'px',
     '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 1300, 3600, E.sine),
     '--logo': seg(t, 1600, 3400, E.sine) * (1 - seg(t, 4500, 5200, E.sine)), '--halo': 1 - seg(t, 1100, 2000),
     '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 4400, 5300), '--fade': 1 - seg(t, 5000, 5700, E.sine)
@@ -320,7 +320,7 @@ function doorFrame(t) {   // t in ms, opening direction
 }
 var OPEN_T = 5700, ENTER_T = 4900;
 // the short way in: the same moves, compressed (short ms -> long-timeline ms)
-var SHORT = [[0, 0], [400, 700], [600, 1100], [1700, 4000], [2500, 5700]];
+var SHORT = [[0, 0], [350, 650], [500, 800], [1700, 4000], [2500, 5700]];
 function warp(t, k) { for (var i = 1; i < k.length; i++) if (t <= k[i][0]) { var a = k[i - 1], b = k[i]; return a[1] + (b[1] - a[1]) * (t - a[0]) / (b[0] - a[0]); } return k[k.length - 1][1]; }
 function unlock() {
   busy = true; S.authed = true; S.typing = false; save();
@@ -330,7 +330,7 @@ function unlock() {
   var today = new Date().toDateString(), full = ls.get('vault.fullOpen') !== today; ls.set('vault.fullOpen', today);
   var T = full ? OPEN_T : SHORT[SHORT.length - 1][0], at = function (t) { return full ? t : warp(t, SHORT); };
   timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= ENTER_T) { entered = true; app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
-    full ? [[0, function () { SFX.bolts(); buzz(30); }], [850, SFX.seal], [1100, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
+    full ? [[0, function () { SFX.bolts(); buzz(30); }], [550, SFX.seal], [800, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
     function () {
       if (!entered) { app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
       app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();

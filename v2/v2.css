@@ -543,3 +543,5 @@ select.in option{background:#1b1a18}
 .bar .lang,.ibtn{min-width:44px;height:44px}
 .avatar{width:44px;height:44px}
 .seg button{height:44px}
+.eye{min-height:44px;padding:0 6px}
+.chip{min-width:44px}
