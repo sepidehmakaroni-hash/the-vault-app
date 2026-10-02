@@ -570,3 +570,24 @@ select.in option{background:#1b1a18}
 [dir=rtl] .row b,[dir=rtl] .tx b,[dir=rtl] .kv,[dir=rtl] .check span,[dir=rtl] .chip{font-size:15.5px}
 [dir=rtl] .btn{font-size:16.5px}
 .check input{width:24px;height:24px}
+
+/* ---------- door pass ---------- */
+.pass{position:absolute;inset:0;z-index:90;background:#0B0A08;display:grid;place-items:center;padding:calc(var(--top) + 24px) 24px calc(var(--bot) + 24px);opacity:0;transform:scale(1.02);transition:opacity .45s var(--soft),transform .45s var(--soft);outline:none}
+.pass.on{opacity:1;transform:none}
+.pass-in{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.pass-plate{position:relative;width:min(78vw,280px);aspect-ratio:1;padding:22px;border-radius:14px;background:linear-gradient(160deg,#F3ECDD,#E2D7C0);box-shadow:0 0 0 1px rgba(205,181,126,.6),0 0 0 7px #0B0A08,0 0 0 8px rgba(205,181,126,.35),0 30px 60px rgba(0,0,0,.6);overflow:hidden}
+.pass-qr svg{display:block;width:100%;height:100%}
+.pass-sheen{position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 40%,rgba(226,204,149,.55) 48%,rgba(255,247,223,.7) 50%,rgba(226,204,149,.55) 52%,transparent 60%);mix-blend-mode:multiply;animation:passSheen 4s ease-in-out infinite;pointer-events:none}
+@keyframes passSheen{0%{transform:translateX(-60%)}55%,100%{transform:translateX(60%)}}
+.pass-who{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.pass-who b{font-family:'Awaken','Bodoni Moda',serif;font-weight:400;font-size:22px;letter-spacing:.14em;color:var(--ivory)}
+.pass-who span{font-family:'Archivo',sans-serif;font-size:13px;letter-spacing:.22em;color:var(--gold-l)}
+.pass-g{margin:0;font-size:15px;color:var(--ivory)}
+.pass-clock{margin:0;font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;font-size:30px;font-weight:500;letter-spacing:.06em;color:var(--gold-l)}
+.pass-hint{margin:0;font-size:13px;color:var(--mute)}
+.pass-put{margin:6px 0 0;font-size:13px;color:var(--faint);letter-spacing:.06em}
+@media (prefers-reduced-motion:reduce){.pass-sheen{animation:none;opacity:.4}}
+/* ---------- dock: active tab in foil with a brass dot ---------- */
+.dock button{position:relative}
+.dock button[aria-current=page] .ico{background:var(--foil)}
+.dock button[aria-current=page]::after{content:"";position:absolute;bottom:5px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--brass)}

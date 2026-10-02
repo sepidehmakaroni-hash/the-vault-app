@@ -31,7 +31,7 @@ agree1: 'I have read and accept the house rules and the privacy policy.', agree2
 e: { req: 'This is needed.', phone: 'Use at least 10 digits.', email: 'This email does not look right.', date: 'This date does not look right.', one: 'Choose at least one.', short: 'A few more words, please (at least 20 characters).', agree: 'Please confirm.', code: 'Enter the four digits.', pshort: 'At least 8 characters.', match: 'The two passwords are different.', text: 'Tell us a little more.', time: 'Choose a time.' },
 sentEy: 'Request received', sentTitle: 'Your request is sealed.', sentBody: 'The committee reads every request in person. You will hear from us by message within ten days.', ref: 'Reference', toDoor: 'Back to the door',
 memberNo: 'Member Nº 001', morning: 'Good morning.', afternoon: 'Good afternoon.', evening: 'Good evening.',
-cardHint: 'Tap the card to show it at the door', cardBackT: 'Show at the door', cardBackD: 'The doorman scans this. It changes every visit.',
+cardHint: 'Tap the card to show your pass at the door', passT: 'Door pass', passPut: 'Tap to put away', passBright: 'Turn your screen brightness up', passGuests: 'Tonight · %1 guests with you', passGuest1: 'Tonight · one guest with you', passAlone: 'Tonight · no guests', heldLine: 'Your table in %1 is held for %2.', hostLine: 'Reza, the host, will be waiting for you.', cardBackT: 'Show at the door', cardBackD: 'The doorman scans this. It changes every visit.',
 avail: 'Available to spend', owed: 'Owed', ofLimit: 'of %1 credit',
 nextVisit: 'Your next visit', nothing: 'Nothing reserved yet', chooseRoom: 'choose a room and a time',
 boxes: [['Guest list', 'Name tonight’s guests'], ['Car at the door', 'Ready when you are'], ['Humidor locker', 'Nº 14 · nine cigars'], ['House rules', 'Six short rules']], carT: 'Your car', carB: 'The valet brings it to the door. Tell us when.', carNow: 'Now', carIn: 'In 15 minutes', carLater: 'In 30 minutes', carSend: 'Bring my car', carDone: 'Your car is on its way to the door.', lockerT: 'Humidor locker Nº 14', lockerB: 'Kept at 70% humidity, 18°C. The humidor keeper holds the key.', cigars: [['Cohiba Behike 54', '3'], ['Montecristo Nº 2', '4'], ['Padrón 1964 Anniversary', '2']], ask: 'Ask the keeper', asked: 'The keeper will bring your selection.',
@@ -84,7 +84,7 @@ agree1: 'قوانین خانه و سیاست حریم خصوصی را خواند
 e: { req: 'این مورد لازم است.', phone: 'حداقل ۱۰ رقم.', email: 'این ایمیل درست به نظر نمی‌رسد.', date: 'این تاریخ درست نیست.', one: 'حداقل یکی را انتخاب کنید.', short: 'کمی بیشتر بنویسید (حداقل ۲۰ نویسه).', agree: 'لطفاً تأیید کنید.', code: 'چهار رقم را وارد کنید.', pshort: 'حداقل ۸ نویسه.', match: 'دو رمز یکسان نیستند.', text: 'کمی بیشتر بگویید.', time: 'یک ساعت انتخاب کنید.' },
 sentEy: 'درخواست رسید', sentTitle: 'درخواست شما مهر و موم شد.', sentBody: 'کمیته هر درخواست را شخصاً می‌خواند. تا ده روز دیگر با پیامک خبر می‌گیرید.', ref: 'شمارهٔ پیگیری', toDoor: 'بازگشت به در',
 memberNo: 'عضو شمارهٔ ۰۰۱', morning: 'صبح بخیر.', afternoon: 'عصر بخیر.', evening: 'شب بخیر.',
-cardHint: 'برای نشان دادن در ورودی، روی کارت بزنید', cardBackT: 'نمایش در ورودی', cardBackD: 'دربان این را اسکن می‌کند. هر بار عوض می‌شود.',
+cardHint: 'برای نشان دادن کارت ورود، روی کارت بزنید', passT: 'کارت ورود', passPut: 'برای بستن بزنید', passBright: 'نور صفحه را زیاد کنید', passGuests: 'امشب · %1 مهمان همراه شما', passGuest1: 'امشب · یک مهمان همراه شما', passAlone: 'امشب · بدون مهمان', heldLine: 'میز شما در %1 برای %2 نگه داشته شده.', hostLine: 'رضا، میزبان شما، منتظرتان است.', cardBackT: 'نمایش در ورودی', cardBackD: 'دربان این را اسکن می‌کند. هر بار عوض می‌شود.',
 avail: 'قابل خرج', owed: 'بدهی', ofLimit: 'از %1 اعتبار',
 nextVisit: 'حضور بعدی شما', nothing: 'هنوز رزروی نیست', chooseRoom: 'یک فضا و یک ساعت انتخاب کنید',
 boxes: [['فهرست مهمان', 'مهمان‌های امشب'], ['ماشین دم در', 'هر وقت آماده‌اید'], ['قفسهٔ هیومیدور', 'شمارهٔ ۱۴ · نه سیگار'], ['قوانین خانه', 'شش قانون کوتاه']], carT: 'ماشین شما', carB: 'متصدی پارکینگ آن را دم در می‌آورد. بگویید کی.', carNow: 'همین حالا', carIn: '۱۵ دقیقهٔ دیگر', carLater: '۳۰ دقیقهٔ دیگر', carSend: 'ماشینم را بیاورید', carDone: 'ماشین شما در راه در ورودی است.', lockerT: 'قفسهٔ هیومیدور شمارهٔ ۱۴', lockerB: 'در رطوبت ۷۰٪ و دمای ۱۸ درجه نگه داشته می‌شود. کلید نزد مسئول هیومیدور است.', cigars: [['کوهیبا بهیکه ۵۴', '۳'], ['مونته‌کریستو شمارهٔ ۲', '۴'], ['پادرون ۱۹۶۴ آنیورسری', '۲']], ask: 'درخواست از مسئول', asked: 'مسئول هیومیدور انتخاب شما را می‌آورد.',
@@ -190,12 +190,12 @@ function toast(msg) { var el = $('.toast'); el.textContent = msg; el.classList.a
 
 /* ================= icons ================= */
 var ICON = {};
-function ic(name, body) { ICON[name] = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>') + '")'; }
-ic('home', '<path d="M4 11l8-6.5 8 6.5V20H4z"/><path d="M10 20v-5h4v5"/>');
-ic('reserve', '<rect x="4" y="5.5" width="16" height="14.5" rx="1"/><path d="M4 10h16M8.5 3v4M15.5 3v4"/>');
-ic('events', '<path d="M12 3.5l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.5l-5.2 2.9L8 13.6l-4.4-4 5.9-.7z"/>');
-ic('conc', '<path d="M4.5 17.5c0-4.4 3.3-8 7.5-8s7.5 3.6 7.5 8z"/><path d="M3 17.5h18M12 9.5V7M10 7h4"/>');
-ic('wallet', '<rect x="3.5" y="6" width="17" height="13" rx="1.5"/><path d="M3.5 9.5h17M15.5 14h2"/><path d="M6 6l9-2.5 1 2.5"/>');
+function ic(name, body, sw) { ICON[name] = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="' + (sw || 1.5) + '" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>') + '")'; }
+ic('home', '<path d="M5 20.5V10.5a7 7 0 0 1 14 0v10"/><path d="M3 20.5h18"/><path d="M9 20.5v-5.5a3 3 0 0 1 6 0v5.5"/><path d="M12 6.5v1.2"/>', 1.25);
+ic('reserve', '<circle cx="12" cy="13" r="5.2"/><circle cx="12" cy="13" r="2.6"/><path d="M3.5 6.5v4a1.6 1.6 0 0 0 1.6 1.6V20M5.1 6.5v4.3M20.5 6.5c-1.4.7-2 2.4-2 4.3V13.5h2V20"/>', 1.25);
+ic('events', '<path d="M3.5 7.5h17v3.2a1.9 1.9 0 0 0 0 3.6v3.2h-17v-3.2a1.9 1.9 0 0 0 0-3.6z"/><path d="M15 8.5v1.4M15 11.4v1.2M15 14v1.2M15 16.4v.6"/><path d="M7.5 11.2h4M7.5 13.8h3"/>', 1.25);
+ic('conc', '<path d="M4.5 18c0-4.3 3.4-7.6 7.5-7.6s7.5 3.3 7.5 7.6z"/><path d="M3 18h18"/><path d="M12 10.4V8.6"/><path d="M12 8.6L8.6 5.5M12 8.6l3.4-3.1M12 8.6V4"/>', 1.25);
+ic('wallet', '<rect x="3.5" y="6.5" width="17" height="12.5" rx="1.6"/><path d="M3.5 10h17"/><rect x="13.2" y="13" width="4.6" height="3.4" rx=".5"/><path d="M6.5 6.5l1.2-2.4h8.6l1.2 2.4"/>', 1.25);
 ic('sound', '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>');
 ic('mute', '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>');
 ic('eye', '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>');
@@ -366,6 +366,7 @@ window.addEventListener('popstate', function (e) {
   var i = (e.state && e.state.i) || 0;
   if (ignorePop) { ignorePop = false; depth = i; return; }
   if (busy) { history.pushState({ i: ++depth }, '', '#/' + route.path); return; }
+  if (passEl) { depth = i; closePass(true); return; }
   if (app.classList.contains('sheet-open')) { depth = i; closeSheet(true); return; }
   var to = curPath();
   // Back out of the member area never shows a public page with the vault still open: it locks instead
@@ -649,18 +650,18 @@ function resLine(r) { return L().rooms[r.room][0] + ' · ' + dfmt(dayOf(r.day), 
 function party(k) { return k > 1 ? fill(L().people, digits(k)) : L().person; }
 R('m', { scene: 'in', html: function () {
   var l = L(), w = wallet(), nx = S.res[0], ev = l.events[0], d0 = dayOf(EV[0].off), used = Math.min(100, w.debt / W.limit * 100);
-  return '<div class="head rise"><p class="eyb">' + l.memberNo + '</p><h1 class="h1">' + greeting() + '</h1></div>' +
+  return '<div class="head rise"><p class="eyb">' + l.memberNo + '</p><h1 class="h1">' + greeting() + '</h1>' + (nx ? '<p class="p">' + fill(l.heldLine, l.rooms[nx.room][0].replace(/^The /, 'the '), (nx.day ? dfmt(dayOf(nx.day), { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' : '') + digits(nx.time)) + '</p>' : '') + '</div>' +
     '<div class="rise"><div class="card-stage"><div class="card" id="card" role="button" tabindex="0" aria-label="' + l.cardBackT + '">' +
       '<div class="cside"><div class="cpat"></div><div class="chipm"><span class="mk"></span></div><div class="cword">THE VAULT</div><div class="cmeta" dir="ltr"><span>ARASH FARAHANI</span><span>Nº 001</span></div><div class="glare"></div></div>' +
-      '<div class="cside backside"><div class="cpat"></div><div class="qr">' + qr() + '</div><div class="backtext"><b>' + l.cardBackT + '</b><i>' + l.cardBackD + '</i></div></div>' +
-    '</div></div><p class="fliphint">' + l.cardHint + '</p></div>' +
+          '</div></div><p class="fliphint">' + l.cardHint + '</p></div>' +
+    (nx ? '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' : '') +
     '<div class="sec"><div class="sech"><p class="eyb">' + l.tonight + '</p><span class="small">' + l.swipe + (fa() ? ' ←' : ' →') + '</span></div><div class="reel">' +
       icard('data-act="event" data-v="0"', EVPH[0], ev[0], ev[1] + ' · ' + ev[2], dateTag(d0), S.rsvp[0] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
       icard('data-go="m/reserve/1"', 'dining', l.chefT, l.chefD, '<span class="tag">' + l.today + '</span>', '', 'story') +
       icard('data-go="m/reserve/4"', 'room-terrace', l.terrT, l.terrD, '<span class="tag">' + l.today + '</span>', '', 'story') +
       icard('data-act="event" data-v="2"', EVPH[2], l.events[2][0], l.events[2][1] + ' · ' + l.events[2][2], dateTag(dayOf(EV[2].off)), S.rsvp[2] ? '<span class="pill ok">' + l.going + '</span>' : '', 'story') +
     '</div></div>' +
-    '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>' +
+    (nx ? '' : '<div class="sec"><p class="eyb">' + l.nextVisit + '</p>' + (nx ? '<button type="button" class="panel row" data-go="m/reserve" style="padding:16px 18px"><span class="grow"><b>' + resLine(nx) + '</b><i>' + party(nx.party) + '</i></span><span class="chev"></span></button>' : '<button type="button" class="empty" data-go="m/reserve" style="width:100%">' + l.nothing + ' — ' + l.chooseRoom + '</button>') + '</div>') +
     '<div class="boxes">' + l.boxes.map(function (b, i) { return '<button type="button" class="box" ' + ['data-go="m/account"', 'data-act="car"', 'data-act="locker"', 'data-go="m/rules"'][i] + '><span class="plate">Nº 0' + (i + 1) + '</span>' + KEYHOLE + '<span><b>' + b[0] + '</b><i>' + b[1] + '</i></span></button>'; }).join('') + '</div>' +
     '';
 }, after: function () { cardTilt(); } });
@@ -764,6 +765,33 @@ function askMotion() {
   if (D && typeof D.requestPermission === 'function') D.requestPermission().then(function (r) { if (r === 'granted') { orientOn = true; window.addEventListener('deviceorientation', onOrient); } }).catch(function () {});
 }
 
+/* ================= door pass: the one screen shown to staff ================= */
+var passEl = null, passT = null;
+function guestsTonight() { var r = S.res.filter(function (x) { return x.day === 0; })[0]; var g = r ? r.party - 1 : 0; for (var k in S.bring) if (S.rsvp[k] && EV[k] && EV[k].off === 0) g += S.bring[k]; return g; }
+function openPass() {
+  if (passEl) return; var l = L(), g = guestsTonight();
+  passEl = document.createElement('div'); passEl.className = 'pass'; passEl.setAttribute('role', 'dialog'); passEl.setAttribute('aria-modal', 'true'); passEl.setAttribute('aria-label', l.passT); passEl.tabIndex = -1;
+  passEl.innerHTML = '<div class="pass-in"><p class="eyb">' + l.passT + '</p><div class="pass-plate"><div class="pass-qr">' + qr() + '</div><span class="pass-sheen"></span></div>' +
+    '<div class="pass-who"><b dir="ltr">ARASH FARAHANI</b><span dir="ltr">Nº 001</span></div>' +
+    '<p class="pass-g">' + (g > 1 ? fill(l.passGuests, digits(g)) : (g === 1 ? l.passGuest1 : l.passAlone)) + '</p>' +
+    '<p class="pass-clock" dir="ltr" aria-live="off"></p><p class="pass-hint">☀ ' + l.passBright + '</p><p class="pass-put">' + l.passPut + '</p></div>';
+  app.appendChild(passEl); [view, bar, dock].forEach(function (x) { x.inert = true; });
+  var tick = function () { var d = new Date(), p = function (x) { return (x < 10 ? '0' : '') + x; }; var c = passEl && passEl.querySelector('.pass-clock'); if (c) c.textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds()); };
+  tick(); passT = setInterval(tick, 1000);
+  history.pushState({ i: ++depth, pass: 1 }, '', '#/' + route.path);
+  requestAnimationFrame(function () { passEl.classList.add('on'); passEl.focus({ preventScroll: true }); }); buzz(20); SFX.set();
+  var y0 = null;
+  passEl.addEventListener('pointerdown', function (e) { y0 = e.clientY; });
+  passEl.addEventListener('pointerup', function (e) { if (y0 != null && (e.clientY - y0 > 60 || Math.abs(e.clientY - y0) < 10)) closePass(); y0 = null; });
+}
+function closePass(fromPop) {
+  if (!passEl) return; var el = passEl; passEl = null; clearInterval(passT);
+  el.classList.remove('on'); [view, bar, dock].forEach(function (x) { x.inert = false; });
+  setTimeout(function () { el.remove(); }, calm ? 0 : 450);
+  if (fromPop !== true) { ignorePop = true; history.back(); }
+  var c = $('#card'); if (c) c.focus({ preventScroll: true });
+}
+
 /* ================= sheet ================= */
 var sheetFrom = null;
 var sheetHist = false, ignorePop = false;
@@ -798,7 +826,7 @@ document.addEventListener('pointerdown', function () { audio(); }, { once: true 
 app.addEventListener('pointerdown', function () { if (app.classList.contains('animating')) rush = 4; }, true);
 app.addEventListener('click', function (e) {
   var cardEl = e.target.closest('#card');
-  if (cardEl) { askMotion(); cardEl.classList.toggle('flipped'); buzz(8); return; }
+  if (cardEl) { askMotion(); openPass(); return; }
   var el = e.target.closest('[data-go],[data-act],[data-chip]'); if (!el || busy) return;
   var l = L(), v = el.getAttribute('data-v');
   if (el.hasAttribute('data-go')) {
@@ -861,7 +889,7 @@ app.addEventListener('click', function (e) {
       var r = { room: route.room, day: f.day, time: TIMES[f.time], party: f.party, guests: f.guests, note: f.note };
       S.res.push(r); S.res.sort(function (a, b) { return a.day - b.day || a.time.localeCompare(b.time); }); delete S.rf[route.room]; S.errs = {}; save();
       SFX.set(); buzz(20); rerender();
-      openSheet(l.heldT, '<p class="p">' + l.heldB + '</p><div><div class="kv"><span>' + l.placeT + '</span><span>' + l.rooms[r.room][0] + '</span></div><div class="kv"><span>' + l.dateT + '</span><span>' + dfmt(dayOf(r.day), { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + digits(r.time) + '</span></div><div class="kv"><span>' + l.guestsT + '</span><span>' + party(r.party) + '</span></div></div><div class="grid2"><button type="button" class="btn line" data-act="cal">' + l.addCal + '</button><button type="button" class="btn gold" data-go="m">' + l.done + '</button></div>');
+      openSheet(l.heldT, '<p class="p">' + l.heldB + ' ' + l.hostLine + '</p><div><div class="kv"><span>' + l.placeT + '</span><span>' + l.rooms[r.room][0] + '</span></div><div class="kv"><span>' + l.dateT + '</span><span>' + dfmt(dayOf(r.day), { weekday: 'long', day: 'numeric', month: 'long' }) + ' · ' + digits(r.time) + '</span></div><div class="kv"><span>' + l.guestsT + '</span><span>' + party(r.party) + '</span></div></div><div class="grid2"><button type="button" class="btn line" data-act="cal">' + l.addCal + '</button><button type="button" class="btn gold" data-go="m">' + l.done + '</button></div>');
     },
     cancelRes: function () { var i = Number(v); openSheet(l.cancelQ, '<p class="p">' + resLine(S.res[i]) + '</p><div class="grid2"><button type="button" class="btn line" data-act="close">' + l.keep + '</button><button type="button" class="btn danger" data-act="cancelYes" data-v="' + i + '">' + l.cancelYes + '</button></div>'); },
     cancelYes: function () { S.res.splice(Number(v), 1); save(); closeSheet(); rerender(); toast(l.cancelled); },
@@ -910,7 +938,7 @@ app.addEventListener('click', function (e) {
   if (A[el.getAttribute('data-act')]) A[el.getAttribute('data-act')]();
 });
 app.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.id === 'card') { e.preventDefault(); e.target.click(); } });
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (passEl) closePass(); else closeSheet(); } });
 // amounts are hidden when the app goes to the background (app switcher)
 document.addEventListener('visibilitychange', function () { if (document.hidden && route.key === 'm/wallet' && !S.hide) { S.hide = true; save(); rerender(); } });
 function setLang(x) { P.lang = x === 'fa' ? 'fa' : 'en'; ls.set('vault.lang', P.lang); var top = ($('.page:not(.leave)') || {}).scrollTop; render('same', { fade: true }); var pg = $('.page:not(.leave)'); if (pg && top) pg.scrollTop = top; }
