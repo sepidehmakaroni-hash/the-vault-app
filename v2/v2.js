@@ -124,6 +124,8 @@ var wait = function (ms) { return new Promise(function (r) { setTimeout(r, calm 
 var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
 var ls = { get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 var DAY = 864e5;
+// prototype: nothing has to be filled in to move on. Set to false to switch the checks (and their messages) back on.
+var FREE = true;
 
 var P = { lang: ls.get('vault.lang') || 'en', sound: ls.get('vault.sound') !== 'off' };
 var fa = function () { return P.lang === 'fa'; };
@@ -504,6 +506,7 @@ R('m/rules', { scene: 'in', back: true, html: rulesHTML });
 /* ================= pages: membership request ================= */
 var ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 function validate(step) {
+  if (FREE) return {};
   var f = S.form, e = {}, req = function (k) { if (!String(f[k] || '').trim()) e[k] = 'req'; };
   if (step === 1) {
     req('first'); req('last'); req('country'); req('city');
@@ -757,23 +760,23 @@ app.addEventListener('click', function (e) {
     lmode: function () { S.login.mode = Number(v); S.errs = {}; save(); rerender(); },
     showpw: function () { S.login.show = !S.login.show; save(); rerender(); },
     sendCombo: function () {
-      if (digitsOnly(S.login.phone).length < 10) { S.errs = { lphone: 'phone' }; save(); rerender(); showErrors(); return; }
+      if (!FREE && digitsOnly(S.login.phone).length < 10) { S.errs = { lphone: 'phone' }; save(); rerender(); showErrors(); return; }
       S.errs = {}; S.typing = false; save(); go('combo');
     },
     passLogin: function () {
       var e2 = {}; if (!String(S.login.user || '').trim()) e2.luser = 'req'; if (!S.login.pass) e2.lpass = 'req';
-      if (Object.keys(e2).length) { S.errs = e2; save(); rerender(); showErrors(); return; }
+      if (!FREE && Object.keys(e2).length) { S.errs = e2; save(); rerender(); showErrors(); return; }
       S.errs = {}; S.login.pass = ''; save(); unlock();
     },
     typing: function () { S.typing = !S.typing; save(); rerender(); if (S.typing) setTimeout(function () { var i = $('.page:not(.leave) .in'); if (i) i.focus(); }, 60); },
     typedOpen: function () { slots = [0, 0, 0]; unlock(); },
-    sendReset: function () { if (digitsOnly(S.fp.phone).length < 10) { S.errs = { fphone: 'phone' }; save(); rerender(); showErrors(); return; } S.errs = {}; S.fp.step = 1; S.fp.until = Date.now() + 30000; save(); toast(l.codeSent); rerender(); },
+    sendReset: function () { if (!FREE && digitsOnly(S.fp.phone).length < 10) { S.errs = { fphone: 'phone' }; save(); rerender(); showErrors(); return; } S.errs = {}; S.fp.step = 1; S.fp.until = Date.now() + 30000; save(); toast(l.codeSent); rerender(); },
     resend: function () { S.fp.until = Date.now() + 30000; save(); toast(l.codeSent); rerender(); },
     setPass: function () {
       var f = S.fp, e2 = {};
       if ([0, 1, 2, 3].some(function (i) { return !f['c' + i]; })) e2.fcode = 'code';
       if (String(f.p1 || '').length < 8) e2.fp1 = 'pshort'; else if (f.p1 !== f.p2) e2.fp2 = 'match';
-      if (Object.keys(e2).length) { S.errs = e2; save(); rerender(); showErrors(); return; }
+      if (!FREE && Object.keys(e2).length) { S.errs = e2; save(); rerender(); showErrors(); return; }
       S.errs = {}; S.fp = { step: 0, cc: 0 }; save(); toast(l.passDone); goBack('login');
     },
     stepNext: stepNext,
@@ -790,7 +793,9 @@ app.addEventListener('click', function (e) {
     rtime: function () { rf(route.room).time = Number(v); delete S.errs.rtime; save(); rerender(); },
     party: function () { var f = rf(route.room); f.party = Math.max(1, Math.min(8, f.party + Number(v))); save(); rerender(); },
     hold: function () {
-      var f = rf(route.room); if (f.time == null) { S.errs = { rtime: 'time' }; save(); rerender(); showErrors(); return; }
+      var f = rf(route.room);
+      if (f.time == null && FREE) { for (var ti = 0; ti < TIMES.length; ti++) if (!isFull(f.day, ti, route.room)) { f.time = ti; break; } }
+      if (f.time == null) { S.errs = { rtime: 'time' }; save(); rerender(); showErrors(); return; }
       var r = { room: route.room, day: f.day, time: TIMES[f.time], party: f.party, guests: f.guests, note: f.note };
       S.res.push(r); S.res.sort(function (a, b) { return a.day - b.day || a.time.localeCompare(b.time); }); delete S.rf[route.room]; S.errs = {}; save();
       SFX.set(); buzz(20); rerender();
@@ -799,8 +804,8 @@ app.addEventListener('click', function (e) {
     cancelRes: function () { var i = Number(v); openSheet(l.cancelQ, '<p class="p">' + resLine(S.res[i]) + '</p><div class="grid2"><button type="button" class="btn line" data-act="close">' + l.keep + '</button><button type="button" class="btn danger" data-act="cancelYes" data-v="' + i + '">' + l.cancelYes + '</button></div>'); },
     cancelYes: function () { S.res.splice(Number(v), 1); save(); closeSheet(); rerender(); toast(l.cancelled); },
     sendConc: function () {
-      if (String(S.cf.text || '').trim().length < 6) { S.errs = { ctext: 'text' }; save(); rerender(); showErrors(); return; }
-      concList().unshift({ topicI: S.cf.topic, text: S.cf.text, st: 0 }); S.cf = { topic: 0, when: 0, text: '' }; S.errs = {}; save(); SFX.set(); buzz(12); toast(l.sentC); rerender();
+      if (!FREE && String(S.cf.text || '').trim().length < 6) { S.errs = { ctext: 'text' }; save(); rerender(); showErrors(); return; }
+      concList().unshift({ topicI: S.cf.topic, text: String(S.cf.text || '').trim() || L().whens[S.cf.when || 0], st: 0 }); S.cf = { topic: 0, when: 0, text: '' }; S.errs = {}; save(); SFX.set(); buzz(12); toast(l.sentC); rerender();
     },
     concItem: function () {
       var c = concList()[Number(v)], topic = c.seed != null ? l.seedConc[c.seed][0] : l.topics[c.topicI], text = c.seed != null ? l.seedConc[c.seed][1] : c.text, reply = c.seed != null ? l.seedConc[c.seed][3] : '';
