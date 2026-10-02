@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=6';
+const V = '?v=7';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -387,7 +387,9 @@ const ICONS = {
   call: '<path pathLength="1" d="M15.5 9.5 C11.5 11.5 10 15.5 11.8 20.5 C14.8 28 20.5 33.8 27.8 36.6 C32.6 38.4 36.5 37.2 38.6 33.4 L33.6 28.6 L29.5 31.2 C25.5 29.2 19.2 23 17 19 L19.8 14.8 Z"/><path class="ico-live" pathLength="1" d="M28.5 12.5 A8.5 8.5 0 0 1 35.5 19.5"/><path class="ico-live d2" pathLength="1" d="M29 6 A15 15 0 0 1 42 19"/>'
 };
 /* a card's picture: a photograph, or, for flowers and travel, a still rendered from their own 3D scene */
-const art = (r, lazy) => r.img ? '<img src="' + r.img + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>' : '<img class="still" data-still="' + r.id + '" alt="">';
+/* flowers and travel use stills baked at full quality from their own 3D scenes (img/), never a live low-quality render */
+const BAKED = { flowers: () => 'img/peony.webp', travel: () => 'img/travel-' + lang + '.webp' };
+const art = (r, lazy) => r.img ? '<img src="' + r.img + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>' : '<img class="still on" data-baked="' + r.id + '" src="' + BAKED[r.id]() + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>';
 const STILL = {};
 let stillQ = Promise.resolve();
 function stillFor(id) {
@@ -408,6 +410,7 @@ function stillFor(id) {
   });
   return stillQ.then(() => STILL[k] || null);
 }
+window.__v5bake = id => stillFor(id); /* testing aid: used once to bake img/*.webp */
 function fillStills(root) {
   $$('img[data-still]', root).forEach(img => {
     const id = img.dataset.still;
@@ -444,7 +447,6 @@ function buildMenu(el, prev) {
       '</ul>' +
     '</div>';
   if (fromKey) el.classList.add('from-key');
-  fillStills(el);
   const page = $('.page', el);
   if (S.menuScroll && prev.name === 'detail') page.scrollTop = S.menuScroll;
   const cards = $$('.card', el);
@@ -499,7 +501,6 @@ function buildDetail(el, prev) {
       '<button type="button" class="btn gold" data-act="confirm"><span>' + X(T.arrange) + '</span></button>' +
       '<p class="fine">' + X(T.note) + '</p></div>';
   updSummary(el, r, d);
-  fillStills(el);
   /* the chosen card opens into the hero */
   if (prev.name === 'menu' && lastCardRect && !reduced()) {
     const hero = $('.hero', el), a = app.getBoundingClientRect(), c = lastCardRect;
@@ -2061,9 +2062,10 @@ const GL_SCENES = {
   /* ---------- a car: Tehran at night, in gold ---------- */
   car(TH, C) {
     const q = C.q, scene = new TH.Scene();
-    const FOG = 0x0b0907;
-    scene.background = new TH.Color(FOG);
-    scene.fog = new TH.FogExp2(FOG, 0.02);
+    /* fog matched to the sky's horizon, so the far ground melts into it (no dark band) */
+    const FOGC = new TH.Color().setRGB(0.13, 0.085, 0.05);
+    scene.background = FOGC.clone();
+    scene.fog = new TH.FogExp2(FOGC, 0.024);
     scene.environmentIntensity = 0.28;
     const cam = new TH.PerspectiveCamera(36, C.aspect, 0.1, 400);
     const r = rng(23), cell = 1.6;
@@ -2088,9 +2090,9 @@ const GL_SCENES = {
     }
     mg.computeVertexNormals();
     { const cols = new Float32Array(mp.count * 3);
-      for (let i = 0; i < mp.count; i++) { const y = mp.getY(i), snow = Math.max(0, Math.min(1, (y - 9.5) / 3)) * (0.6 + 0.4 * Math.sin(mp.getX(i) * 0.7) ** 2); cols[i * 3] = 0.09 + snow * 0.55; cols[i * 3 + 1] = 0.075 + snow * 0.52; cols[i * 3 + 2] = 0.06 + snow * 0.5; }
+      for (let i = 0; i < mp.count; i++) { const y = mp.getY(i), snow = Math.max(0, Math.min(1, (y - 9.5) / 3)) * (0.6 + 0.4 * Math.sin(mp.getX(i) * 0.7) ** 2), base = Math.max(0, 1 - y / 4.5); /* foothills melt into the horizon haze */ cols[i * 3] = lerp(0.08 + snow * 0.3, 0.13, base); cols[i * 3 + 1] = lerp(0.066 + snow * 0.28, 0.085, base); cols[i * 3 + 2] = lerp(0.054 + snow * 0.26, 0.05, base); }
       mg.setAttribute('color', new TH.BufferAttribute(cols, 3)); }
-    const mtn = new TH.Mesh(mg, new TH.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 1, fog: false }));
+    const mtn = new TH.Mesh(mg, new TH.MeshBasicMaterial({ color: 0xffffff, vertexColors: true, fog: false }));
     mtn.position.z = -125; scene.add(mtn);
     for (let x = -210; x <= 210; x += 1) crest.push(new TH.Vector3(x, ridge(x) + 0.1, -133));
     const crestL = new TH.Line(new TH.BufferGeometry().setFromPoints(crest), new TH.LineBasicMaterial({ color: new TH.Color(0xffe2b0).multiplyScalar(0.9), transparent: true, opacity: 0.85, fog: false }));
@@ -2177,12 +2179,13 @@ const GL_SCENES = {
     });
     const traffic = new TH.Points(tg, tMat); traffic.frustumCulled = false; scene.add(traffic);
     /* Milad tower */
-    const tw = new TH.Group(); tw.position.set(-6.4, 0, -28.8); tw.scale.setScalar(1.45); scene.add(tw);
+    const tw = new TH.Group(); tw.position.set(-5.8, 0, -24); tw.scale.setScalar(1.05); scene.add(tw);
     const towerPts = [[0.95, 0], [0.55, 0.35], [0.24, 1.1], [0.18, 6.2], [0.5, 6.35], [0.78, 6.7], [0.8, 7.05], [0.6, 7.35], [0.3, 7.55], [0.16, 7.8], [0.07, 10.6], [0, 11.2]].map(p => new TH.Vector2(p[0], p[1]));
     tw.add(new TH.Mesh(new TH.LatheGeometry(towerPts, 40), new TH.MeshStandardMaterial({ color: 0x2a231b, metalness: 0.7, roughness: 0.35 })));
     [6.72, 7.0].forEach(y => { const ring = new TH.Mesh(new TH.TorusGeometry(0.79, 0.03, 8, 60), new TH.MeshBasicMaterial({ color: new TH.Color(0xffcf8a).multiplyScalar(2.2) })); ring.rotation.x = Math.PI / 2; ring.position.y = y; tw.add(ring); });
     const twTip = glowSprite(TH, 0xffb070, 1.2, 1.4); twTip.position.y = 11.3; tw.add(twTip);
-    const twPod = glowSprite(TH, 0xffcf8a, 3.2, 0.9); twPod.position.y = 6.9; tw.add(twPod);
+    const twPod = glowSprite(TH, 0xffcf8a, 2.4, 0.7); twPod.position.y = 6.9; tw.add(twPod);
+    for (let k = 0; k < 18; k++) { const a = k / 18 * Math.PI * 2, wl = glowSprite(TH, 0xffe2b0, 0.22, 2.2); wl.position.set(Math.cos(a) * 0.8, 6.86, Math.sin(a) * 0.8); tw.add(wl); } /* the pod's window lights */
     const twShaft = new TH.Mesh(new TH.CylinderGeometry(0.03, 0.03, 5, 8), new TH.MeshBasicMaterial({ color: new TH.Color(0xffcf8a).multiplyScalar(1.4) })); twShaft.position.set(0, 3.7, 0.2); tw.add(twShaft);
     /* the route */
 
@@ -2224,7 +2227,7 @@ const GL_SCENES = {
     const lbls = {
       club: C.label(X(['The Vault', 'والت']), new TH.Vector3(0, 1.1, 0), 'hi'),
       dest: C.label(X(({ home: ['Niavaran', 'نیاوران'], thr: ['Mehrabad', 'مهرآباد'], ika: ['Imam Khomeini Airport', 'فرودگاه امام'], office: ['Vanak', 'ونک'] })[q.o.to] || ['', '']), new TH.Vector3(dst[0], 1.1, dst[1]), 'hi'),
-      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-6.4, 13.6, -28.8), 'hi'),
+      milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-5.8, 12.4, -24), 'hi'),
       valiasr: C.label(X(['Valiasr', 'ولیعصر']), new TH.Vector3(3.0, 0.6, -14), 'gold'),
       alborz: C.label(X(['Alborz', 'البرز']), new TH.Vector3(30, 17, -133))
     };
@@ -2271,7 +2274,7 @@ const GL_SCENES = {
         camP.lerp(cp2.copy(cp).add(off), f);
         camL.lerp(cp, f);
         cam.position.copy(camP); cam.lookAt(camL);
-        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 0.8, 1.6) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 0.6, 1.4) * 0.85 * (1 - ph(t, 3.0, 3.6)); lbls.valiasr.o = ph(t, 1.6, 2.4) * 0.8 * (1 - ph(t, 4.4, 5));
+        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 0.8, 1.6) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 0.6, 1.4) * 0.85 * (1 - ph(t, 3.0, 3.6)); lbls.valiasr.o = ph(t, 1.0, 1.6) * (1 - ph(t, 4.4, 5));
         show01(card, ph(t, 4.4, 5.2, eout));
         big.textContent = liveLeft(q);
       }
@@ -2560,59 +2563,79 @@ const GL_SCENES = {
     const q = C.q, scene = new TH.Scene();
     scene.background = new TH.Color(0x070605);
     scene.environmentIntensity = 0.32;
-    const cam = new TH.PerspectiveCamera(30, C.aspect, 0.05, 60);
+    const cam = new TH.PerspectiveCamera(24, C.aspect, 0.05, 80);
     const back = new TH.Mesh(new TH.PlaneGeometry(60, 40), new TH.ShaderMaterial({ depthWrite: false, vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vUv;void main(){float d=length((vUv-vec2(.42,.55))*vec2(1.4,1.));gl_FragColor=vec4(mix(vec3(.085,.06,.045),vec3(.016,.013,.011),smoothstep(0.,.5,d)),1.);}' }));
     back.position.set(0, -6, -10); back.lookAt(0, 6, 8); scene.add(back);
     /* light: a warm key from the side, a cool rim behind, a breath of fill */
-    const keyL = new TH.DirectionalLight(0xffd8ac, 2.4); keyL.position.set(-5, 3.5, 2); scene.add(keyL);
-    const rim = new TH.DirectionalLight(0xfff0e0, 2.2); rim.position.set(2.5, 2.2, -5); scene.add(rim);
+    const keyL = new TH.DirectionalLight(0xffdcb6, 1.4); keyL.position.set(4, 3.5, 3); scene.add(keyL);
+    const rim = new TH.DirectionalLight(0xffd9b0, 2.8); rim.position.set(-3, 2.6, -5); scene.add(rim); /* warm backlight, behind-left, 2x the key */
     const fill = new TH.DirectionalLight(0xffeedd, 0.35); fill.position.set(2, 5, 4); scene.add(fill);
-    /* the petal: a smooth oval spoon, 12×24 segments, cupped on a sine profile, its rim ruffled by 2D noise.
-       Three variants so neighbouring petals never share a ruffle. */
-    const vn = (x, y) => Math.sin(x * 1.7 + y * 3.1) * 0.5 + Math.sin(x * 4.3 - y * 2.2) * 0.3 + Math.sin(x * 9.1 + y * 6.7) * 0.2;
-    const petalGeo = seed => {
-      const g = new TH.PlaneGeometry(1, 1, 12, 24); g.translate(0, 0.5, 0);
-      const pa = g.attributes.position;
+    /* the petal: a soft oval, cupped across on a sine profile, creased along its length,
+       and the outer quarter of the rim curled back by 20–35° (a different curl per variant) */
+    const petalGeo = (curlDeg, cup, seed) => {
+      const g = new TH.PlaneGeometry(1, 1, 20, 36); g.translate(0, 0.5, 0);
+      const pa = g.attributes.position, curl = curlDeg * Math.PI / 180;
       for (let i = 0; i < pa.count; i++) {
-        const u = pa.getX(i) * 2, y = pa.getY(i);                         /* u: -1..1 across, y: 0..1 along */
-        const e = y < 0.58 ? (y - 0.58) / 0.58 : (y - 0.58) / 0.42;
-        let w = 0.5 * Math.sqrt(Math.max(0, 1 - e * e)) * (0.35 + 0.65 * Math.min(1, y * 1.6 + 0.1));
-        const edge = Math.abs(u);
-        w *= 1 + 0.06 * Math.sin(y * 5 + seed * 2.3) * edge;              /* ruffled outline */
+        const u = pa.getX(i) * 2, y = pa.getY(i);
+        /* obovate: narrow claw at the base, widest high up, a full round top */
+        let w = 0.5 * (0.22 + 0.78 * Math.sin(Math.PI * 0.5 * Math.min(1, y / 0.68)));
+        if (y > 0.68) { const q2 = (y - 0.68) / 0.32; w *= Math.sqrt(Math.max(0, 1 - q2 * q2 * q2)); }
+        w *= 1 + 0.04 * Math.sin(y * 6 + seed * 2.1) * Math.abs(u);
         const X = u * w;
-        let z = -0.62 * w * (1 - Math.cos(Math.PI * u)) / 2 * (0.6 + 0.4 * y); /* sine cup across */
-        z += -0.18 * y * y;                                                   /* gentle curl inward */
-        z += 0.035 * Math.sin(u * 4 + seed * 7 + y * 2) * edge * edge * y * y; /* soft rim ruffle */
-        pa.setXYZ(i, X, y, z);
+        let z = -cup * w * (1 - Math.cos(Math.PI * u)) / 2;     /* cup across */
+        z += 0.12 * X * X;                                          /* lengthwise crease */
+        const Y = y;
+        if (y > 0.75) {                                             /* the rim curls back, outward */
+          const s2 = (y - 0.75) / 0.25;
+          z += Math.tan(curl) * 0.25 * s2 * s2 * 0.7;
+        }
+        z += 0.04 * Math.sin(u * 7 + seed * 3) * Math.sin(y * 3 + seed) * y * y;   /* soft ruffle */
+        pa.setXYZ(i, X, Y, z);
       }
       g.computeVertexNormals();
       return g;
     };
     const tint = cTex(TH, 128, 256, (g, W, H) => {
-      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#dcae9e'); gr.addColorStop(0.28, '#f0d9cc'); gr.addColorStop(0.65, '#fbf2e8'); gr.addColorStop(1, '#fffaf3');
+      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#e6d2bc'); gr.addColorStop(0.25, '#efe2cf'); gr.addColorStop(0.75, '#fbf2e9'); gr.addColorStop(1, '#fff7f0');
       g.fillStyle = gr; g.fillRect(0, 0, W, H);
-      g.strokeStyle = 'rgba(170,120,100,.07)'; g.lineWidth = 1;
-      for (let k = 0; k < 11; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 5) * 5, H * 0.5, W / 2 + (k - 5) * 12, 6); g.stroke(); }
+      g.strokeStyle = 'rgba(170,120,100,.06)'; g.lineWidth = 1;
+      for (let k = 0; k < 13; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 6) * 4, H * 0.5, W / 2 + (k - 6) * 10, 4); g.stroke(); }
     });
     const petalM = new TH.MeshPhysicalMaterial({
-      color: 0xffffff, map: tint.tx, side: TH.DoubleSide, roughness: 0.55,
-      sheen: 1, sheenRoughness: 0.4, sheenColor: new TH.Color(0xfff4ea),
-      transmission: Q.level >= 1 ? 0.2 : 0, thickness: 0.3, emissive: 0x2a1610, emissiveIntensity: 0.1
+      color: 0xffffff, map: tint.tx, side: TH.DoubleSide, roughness: 0.5, envMapIntensity: 0.35,
+      sheen: 1, sheenRoughness: 0.45, sheenColor: new TH.Color(0xfff4ea),
+      transmission: Q.level >= 1 ? 0.25 : 0, thickness: 0.4, attenuationColor: new TH.Color(0xf4d9c4), attenuationDistance: 0.6
     });
-    /* phyllotaxis, wide petals so neighbours overlap 20–30°; outer petals open first */
-    const NP = 42, VAR = 3, meshes = [], info = [];
-    const rr = rng(31), col = new TH.Color();
-    for (let v = 0; v < VAR; v++) { const m = new TH.InstancedMesh(petalGeo(v + 1), petalM, Math.ceil(NP / VAR)); m.count = 0; meshes.push(m); scene.add(m); }
-    for (let i = 0; i < NP; i++) {
-      const r = Math.sqrt((i + 0.5) / NP), a = i * 2.39996, mesh = meshes[i % VAR], slot = mesh.count++;
-      info.push({ r, a, mesh, slot, roll: (rr() - 0.5) * 0.25, s: lerp(0.55, 1.45, Math.pow(r, 0.9)) * (0.94 + rr() * 0.1), wide: lerp(1.25, 1.7, r), start: 0.35 + (1 - r) * 2.5 + rr() * 0.25 });
-      col.setRGB(1, lerp(0.95, 1, rr()), lerp(0.9, 1, rr())); mesh.setColorAt(slot, col);
-    }
-    /* a cluster of small, tightly curled petals closing the centre */
-    const centre = new TH.InstancedMesh(petalGeo(7), petalM, 14);
+    /* rims glow warm against the dark */
+    petalM.onBeforeCompile = sh => {
+      sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\nfloat fr = pow(1.0 - abs(dot(normal, normalize(vViewPosition))), 3.0);\ntotalEmissiveRadiance += vec3(1.0, 0.76, 0.56) * fr * 0.32;');
+    };
+    /* rings, each a little further out than the last (by more than a petal's thickness) so nothing
+       intersects; inner rings smaller and more tightly cupped. Outer rings open first. */
+    const RINGS = [
+      { n: 8, r0: 0.06, r1: 0.08, t0: -0.1, t1: 0.05, s: 0.5, cup: 0.3, start: 2.6 },
+      { n: 9, r0: 0.09, r1: 0.12, t0: -0.04, t1: 0.16, s: 0.62, cup: 0.28, start: 2.1 },
+      { n: 10, r0: 0.12, r1: 0.16, t0: 0.02, t1: 0.3, s: 0.74, cup: 0.26, start: 1.6 },
+      { n: 11, r0: 0.15, r1: 0.21, t0: 0.08, t1: 0.45, s: 0.86, cup: 0.24, start: 1.1 },
+      { n: 12, r0: 0.18, r1: 0.26, t0: 0.14, t1: 0.62, s: 0.96, cup: 0.22, start: 0.6 },
+      { n: 12, r0: 0.21, r1: 0.32, t0: 0.22, t1: 0.95, s: 1.04, cup: 0.2, start: 0.3 }
+    ];
+    const meshes = [], info = [], rr = rng(31), col = new TH.Color();
+    RINGS.forEach((R, ri) => {
+      const m = new TH.InstancedMesh(petalGeo(20 + ri * 3.5, R.cup, ri + 1), petalM, R.n); scene.add(m); meshes.push(m);
+      for (let k = 0; k < R.n; k++) {
+        const a = k / R.n * Math.PI * 2 + ri * 0.53;
+        info.push({ R, a, mesh: m, slot: k, stag: (k % 2) * 0.012, roll: (rr() - 0.5) * 0.18, sz: R.s * (0.95 + rr() * 0.1), wide: 1.05 + rr() * 0.2 });   /* petals nearly as wide as long, overlapping their neighbours */
+        const v = (0.86 + 0.14 * ri / (RINGS.length - 1)) * (1 + (rr() - 0.5) * 0.08); col.setRGB(v, v * (1 + (rr() - 0.5) * 0.04), v * (1 + (rr() - 0.5) * 0.06)); m.setColorAt(k, col);
+      }
+    });
+    /* the closed soft dome at the heart: 12 small, tightly cupped petals curving over the centre */
+    const domeG = petalGeo(6, 0.55, 9);
+    const NC = 22, centre = new TH.InstancedMesh(domeG, petalM, NC);
     { const o2 = new TH.Object3D(); o2.rotation.order = 'YXZ';
-      for (let i = 0; i < 14; i++) { const a = i * 2.39996, r = Math.sqrt(i / 14) * 0.06; o2.rotation.set(0.12 + i * 0.012, a, 0); o2.position.set(Math.sin(a) * r, 0.14, Math.cos(a) * r); o2.scale.set(0.3, 0.26, 0.38); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); } }
+      for (let i = 0; i < NC; i++) { const layer = i < 9 ? 0 : i < 16 ? 1 : 2, a = i * 2.39996, rad = 0.025 + layer * 0.025; o2.rotation.set(-0.42 + layer * 0.2, a, 0); o2.position.set(Math.sin(a) * rad, 0.06 - layer * 0.01, Math.cos(a) * rad); const sc = 0.34 + layer * 0.08; o2.scale.set(sc * 1.2, sc, sc * 1.2); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); const v = 0.78 + layer * 0.06; col.setRGB(v, v * 0.97, v * 0.93); centre.setColorAt(i, col); } }
     scene.add(centre);
+    const core = new TH.Mesh(new TH.SphereGeometry(0.11, 24, 16), new TH.MeshStandardMaterial({ color: 0x3a2a1c, roughness: 0.9 })); core.position.y = 0.05; scene.add(core);
     /* contact shadow under the bloom */
     const ao = new TH.Mesh(new TH.PlaneGeometry(3.4, 3.4), new TH.MeshBasicMaterial({ map: spriteTex(TH), color: 0x000000, transparent: true, opacity: 0.7, depthWrite: false }));
     ao.rotation.x = -Math.PI / 2; ao.position.y = -0.2; scene.add(ao);
@@ -2639,23 +2662,21 @@ const GL_SCENES = {
     const o = new TH.Object3D(), look = new TH.Vector3();
     o.rotation.order = 'YXZ';
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.42, thresh: 0.9, tilt: 1.0, focus: 0.5,
+      scene, camera: cam, dur: 7.4, bloom: 0.36, thresh: 0.92, tilt: 1.25, focus: 0.5,
       frame(t) {
         info.forEach(p => {
-          const k = ph(t, p.start, p.start + 2.7, eio);
-          const r = p.r;
-          const tilt = lerp(lerp(0.03, 0.3, r), lerp(0.3, 1.5, Math.pow(r, 1.4)), k);
-          const rad = lerp(lerp(0.01, 0.1, r), lerp(0.02, 0.34, r), k);
-          const sz = p.s * lerp(lerp(0.72, 1, r), 1, k);
-          o.rotation.set(tilt, p.a + (1 - k) * 0.25, p.roll * k);
-          o.position.set(Math.sin(p.a) * rad, lerp(lerp(0.14, 0.0, r), lerp(0.12, -0.08, r), k), Math.cos(p.a) * rad);
-          o.scale.set(sz * p.wide, sz, sz);
+          const R = p.R, k = ph(t, R.start + p.stag * 20, R.start + 2.6, eio) * (0.65 + 0.35 * Math.pow((RINGS.indexOf(R) + 1) / RINGS.length, 1.6));
+          const rad = lerp(R.r0, R.r1, k) + p.stag;
+          o.rotation.set(lerp(R.t0, R.t1, k), p.a + (1 - k) * 0.2, p.roll * k);
+          o.position.set(Math.sin(p.a) * rad, 0.04 - lerp(0, 0.03, k) * (R.n - 5), Math.cos(p.a) * rad);
+          const sz = p.sz * lerp(0.82, 1, k);
+          o.scale.set(sz * Math.min(2.3, p.wide), sz, sz);
           o.updateMatrix(); p.mesh.setMatrixAt(p.slot, o.matrix);
         });
         meshes.forEach(m => { m.instanceMatrix.needsUpdate = true; });
         st.visible = t > 2.2;
         pollen.uniforms.uTime.value = t; bm.uniforms.uTime.value = t;
-        const m = ph(t, 0, 7.4, eio), a = lerp(-0.35, 0.2, m), el = lerp(0.82, 0.66, m), d = lerp(13.8, 14.2, m) * fitK(C, 0.5, 1.3) * (C.still ? 1.35 : 1);
+        const m = ph(t, 0, 7.4, eio), a = lerp(-0.6, -0.4, m), el = lerp(0.66, 0.56, m), d = lerp(14.6, 12.8, m) * fitK(C, 0.5, 1.3) * (C.still ? 0.72 : 1);
         look.set(0, lerp(0.15, 0.05, m), 0);
         cam.position.set(Math.sin(a) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(a) * Math.cos(el) * d);
         cam.lookAt(look);
