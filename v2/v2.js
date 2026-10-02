@@ -227,7 +227,7 @@ var EVPH = ['gallery', 'member-events', 'bar', 'events'];
   var bolts = $('.bolts');
   for (var i = 0; i < 12; i++) { var b = document.createElement('span'); b.className = 'bolt'; b.style.setProperty('--a', (i * 30 + 15) + 'deg'); b.style.setProperty('--i', i); bolts.appendChild(b); }
   var dep = $('.depth');
-  for (var k = 1; k <= 9; k++) { var l = document.createElement('i'); l.style.transform = 'translateZ(' + (-k * 3.2) + 'px)'; dep.appendChild(l); }
+  for (var k = 1; k <= 16; k++) { var l = document.createElement('i'), c = Math.round(44 - k * 1.8); l.style.transform = 'translateZ(' + (-k * 2.2) + 'px)'; l.style.background = 'rgb(' + c + ',' + (c - 1) + ',' + (c - 4) + ')'; if (k === 1 || k === 16) l.style.boxShadow = 'inset 0 0 0 2px rgba(205,181,126,.35)'; dep.appendChild(l); }
   var svg = '';
   for (var x = 0; x < 100; x++) {
     var cls = x % 10 === 0 ? 'm10' : (x % 5 === 0 ? 'm5' : ''), len = x % 10 === 0 ? 11 : (x % 5 === 0 ? 8 : 5);
@@ -285,33 +285,62 @@ function setNumber() {
   if (slots.length < 3) { el[slots.length].className = 'slot cur'; el[slots.length].textContent = pad(v); } else unlock();
 }
 
-/* open: the bolts draw back, the seal breaks, the door swings, and we walk through into the pattern */
+/* ================= opening and closing: one continuous, unhurried timeline =================
+   Every part (bolts, handle, the door's swing, the light, the logo inside, the camera) is a CSS variable
+   driven frame by frame, so movements overlap and nothing starts or stops abruptly. */
+var E = {
+  io: function (t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; },          // ease in-out cubic
+  sine: function (t) { return -(Math.cos(Math.PI * t) - 1) / 2; },                                   // ease in-out sine
+  out: function (t) { return 1 - Math.pow(1 - t, 3); },
+  back: function (t) { var c = 1.25, d = c + 1; return 1 + d * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+};
+function seg(t, a, b, ease) { var x = Math.max(0, Math.min(1, (t - a) / (b - a))); return (ease || E.io)(x); }
+var VARS = ['--bolt', '--hrot', '--pop', '--swing', '--shade', '--glow', '--logo', '--halo', '--cam', '--fade', '--frame'];
+function setVars(v) { for (var k in v) app.style.setProperty(k, v[k]); }
+function clearVars() { VARS.forEach(function (k) { app.style.removeProperty(k); }); }
+function timeline(total, frame, cues, done) {
+  var t0 = performance.now(), fired = {};
+  if (calm) { frame(total); done(); return; }
+  (function tick(now) {
+    var t = now - t0;
+    cues.forEach(function (c, i) { if (!fired[i] && t >= c[0]) { fired[i] = 1; c[1](); } });
+    frame(Math.min(t, total));
+    if (t < total) requestAnimationFrame(tick); else done();
+  })(t0);
+}
+function doorFrame(t) {   // t in ms, opening direction
+  var swing = seg(t, 2000, 6200, E.sine), cam = seg(t, 5300, 8300, E.io);
+  return {
+    '--bolt': seg(t, 0, 1100), '--hrot': (-80 * seg(t, 200, 1800, E.back)) + 'deg', '--pop': (10 * seg(t, 1600, 2300, E.out)) + 'px',
+    '--swing': (-112 * swing) + 'deg', '--shade': .62 * swing, '--glow': seg(t, 2200, 5200, E.sine),
+    '--logo': seg(t, 2800, 5000, E.sine) * (1 - seg(t, 7000, 7900, E.sine)), '--halo': 1 - seg(t, 2000, 3200),
+    '--cam': 1 + 5.5 * cam, '--frame': 1 - seg(t, 6600, 7800), '--fade': 1 - seg(t, 7500, 8400, E.sine)
+  };
+}
+var OPEN_T = 8400;
 function unlock() {
   busy = true; S.authed = true; S.typing = false; save();
-  app.classList.add('scene-combo'); app.classList.remove('scene-login');
-  view.style.transition = 'opacity .5s'; view.style.opacity = '0';
-  wait(380).then(function () { SFX.bolts(); buzz(30); app.classList.add('unbolted'); return wait(1150); })
-  .then(function () { SFX.seal(); app.classList.add('cracked'); return wait(420); })
-  .then(function () { SFX.swing(); app.classList.add('opening'); return wait(1550); })
-  .then(function () { app.classList.add('through', 'inside'); return wait(1350); })
-  .then(function () { view.style.opacity = ''; go('m', { replace: true, fade: true }); return wait(900); })
-  .then(function () {
-    app.classList.add('instant'); app.classList.remove('unbolted', 'cracked', 'opening', 'through'); slots = [];
-    void app.offsetWidth; app.classList.remove('instant'); view.style.transition = ''; busy = false;
-  });
+  app.classList.add('scene-combo', 'animating'); app.classList.remove('scene-login');
+  view.style.transition = 'opacity .6s'; view.style.opacity = '0';
+  var entered = false;
+  timeline(OPEN_T, function (t) { setVars(doorFrame(t)); if (!entered && t >= 7300) { entered = true; app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
+    [[0, function () { SFX.bolts(); buzz(30); }], [1600, SFX.seal], [2000, SFX.swing]],
+    function () {
+      if (!entered) { app.classList.add('inside'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
+      app.classList.remove('animating'); clearVars(); view.style.transition = ''; slots = []; busy = false;
+    });
 }
-/* close: step back out of the pattern, the door swings shut, the bolts go home */
 function lockVault() {
   if (busy) return; closeSheet(); S.authed = false; save();
-  app.classList.add('instant', 'unbolted', 'cracked', 'opening', 'through');
+  busy = true; app.classList.add('animating');
+  setVars(doorFrame(OPEN_T));
   go('', { replace: true, fade: true });
-  busy = true;
-  void app.offsetWidth; app.classList.remove('instant');
-  requestAnimationFrame(function () { requestAnimationFrame(function () { app.classList.remove('through', 'inside'); }); });
-  wait(1500).then(function () { app.classList.remove('opening'); SFX.swing(); return wait(2750); })
-  .then(function () { app.classList.remove('cracked'); SFX.shut(); buzz(40); return wait(300); })
-  .then(function () { app.classList.remove('unbolted'); return wait(700); })
-  .then(function () { busy = false; toast(L().locked); });
+  app.classList.remove('inside');
+  // the same timeline, played backwards and a little quicker
+  var T = 7000, map = function (t) { return OPEN_T - t * (OPEN_T / T); };
+  timeline(T, function (t) { setVars(doorFrame(map(t))); },
+    [[2300, SFX.swing], [T - 1500, function () { SFX.shut(); buzz(40); }], [T - 900, SFX.bolts]],
+    function () { app.classList.remove('animating'); clearVars(); busy = false; toast(L().locked); });
 }
 
 /* ================= router ================= */
@@ -357,7 +386,7 @@ function render(dir, o) {
   var first = route.key == null;
   r.path = path; route = r;
 
-  app.classList.toggle('inside', def.scene === 'in' || app.classList.contains('through'));
+  if (!app.classList.contains('animating')) app.classList.toggle('inside', def.scene === 'in');
   ['door', 'login', 'combo'].forEach(function (s) { app.classList.toggle('scene-' + s, def.scene === s); });
   app.classList.toggle('has-dock', def.scene === 'in');
   app.setAttribute('dir', fa() ? 'rtl' : 'ltr'); document.documentElement.lang = fa() ? 'fa' : 'en';

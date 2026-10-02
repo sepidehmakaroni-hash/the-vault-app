@@ -51,35 +51,30 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 
 /* ---------- door scene ---------- */
 .scene{position:absolute;inset:0;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .7s var(--soft),visibility 0s .7s}
-.app.scene-door .scene,.app.scene-login .scene,.app.scene-combo .scene,.app.opening .scene{opacity:1;visibility:visible;transition-delay:0s}
-.app.through .scene{opacity:0;visibility:visible;transition:opacity .9s var(--soft) .75s}
+.app.scene-door .scene,.app.scene-login .scene,.app.scene-combo .scene,.app.animating .scene{opacity:1;visibility:visible;transition-delay:0s}
 .stage{position:absolute;left:50%;top:calc(var(--top) + 84px);width:var(--d);height:var(--d);margin-left:calc(var(--d) / -2);perspective:1500px;perspective-origin:20% 50%;
-  transform-origin:50% 50%;transition:transform 1s var(--soft)}
+  transform-origin:50% 50%;transform:translateY(var(--ty,0%)) scale(calc(var(--s,1) * var(--cam,1)));opacity:var(--fade,1);transition:transform 1s var(--soft)}
+.app.animating .stage{transition:none}
 .app.scene-door .stage,.app.scene-combo .stage{pointer-events:auto}
-.app.scene-login .stage{transform:translateY(-12%) scale(.5)}
-.halo{position:absolute;inset:-60%;border-radius:50%;background:radial-gradient(circle,rgba(205,181,126,.12) 0%,rgba(205,181,126,.035) 40%,transparent 66%);transition:opacity 1.4s;pointer-events:none}
+.app.scene-login{--ty:-12%;--s:.5}
+.halo{position:absolute;inset:-60%;border-radius:50%;background:radial-gradient(circle,rgba(205,181,126,.12) 0%,rgba(205,181,126,.035) 40%,transparent 66%);opacity:var(--halo,1);pointer-events:none}
 
-.frame{position:absolute;inset:-7%;border-radius:50%;pointer-events:none;
+.frame{position:absolute;inset:-7%;border-radius:50%;pointer-events:none;opacity:var(--frame,1);
   background:radial-gradient(circle,#030303 0 87.6%,#050505 87.6% 89.6%,#5a4b2c 89.8%,#b39a63 90.4%,#4a3e24 91.2%,#1c1b1a 92%,#2a2927 95%,#131211 100%);
   box-shadow:inset 0 0 0 1px rgba(205,181,126,.22),0 40px 80px rgba(0,0,0,.6)}
 /* behind the door: the card's pattern, lit from inside — the same world the member pages live in */
 .within{position:absolute;inset:7%;border-radius:50%;overflow:hidden;background:var(--ink)}
-.within::before{content:"";position:absolute;inset:0;background:var(--pat) center/131px auto;opacity:.075}
-.within::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(205,181,126,.22) 0%,rgba(205,181,126,.05) 45%,rgba(0,0,0,.35) 100%);opacity:0;transition:opacity 2.6s var(--soft)}
-.app.opening .within::after{opacity:1}
-.recess{position:absolute;inset:7%;border-radius:50%;box-shadow:inset 0 0 22px 6px rgba(0,0,0,.95);pointer-events:none;transition:opacity 1.2s}
-.app.through .recess,.app.through .frame{opacity:0;transition:opacity .9s var(--soft) .3s}
+.within::before{content:"";position:absolute;inset:0;background:var(--pat) center/113px auto;opacity:calc(.05 + .07 * var(--glow,0))}
+.within::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 30%,rgba(205,181,126,.22) 0%,rgba(205,181,126,.05) 45%,rgba(0,0,0,.35) 100%);opacity:var(--glow,0)}
+.recess{position:absolute;inset:7%;border-radius:50%;box-shadow:inset 0 0 22px 6px rgba(0,0,0,.95);pointer-events:none;opacity:var(--frame,1)}
 
-.door{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:-3.5% 50%;transition:transform 2.9s var(--heavy)}
-.app.cracked .door{transform:translateZ(9px);transition-duration:.45s}
-.app.opening .door{transform:translateZ(9px) rotateY(-110deg)}
+.door{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:-3.5% 50%;transform:translateZ(var(--pop,0px)) rotateY(var(--swing,0deg))}
 .depth{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
 .depth i{position:absolute;inset:0;border-radius:50%;background:#141412;box-shadow:inset 0 0 0 2px #2e2b24}
 .bolts{position:absolute;inset:0;transform:translateZ(-1px);pointer-events:none}
 .bolt{position:absolute;left:50%;top:50%;width:9%;height:3.4%;margin-top:-1.7%;border-radius:2px 6px 6px 2px;transform-origin:0 50%;
   background:linear-gradient(180deg,#EED9A3,#B99C62 45%,#7D663A 80%,#4f3f1f);box-shadow:0 2px 4px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.4);
-  transform:rotate(var(--a)) translateX(calc(var(--d) * .445));transition:transform .75s cubic-bezier(.5,0,.2,1) calc(var(--i) * 30ms)}
-.app.unbolted .bolt{transform:rotate(var(--a)) translateX(calc(var(--d) * .375))}
+  transform:rotate(var(--a)) translateX(calc(var(--d) * (.445 - .07 * var(--bolt,0))))}
 
 .face{position:absolute;inset:0;border-radius:50%;transform:translateZ(0);
   background:
@@ -91,15 +86,13 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .face::before{inset:20.5%;box-shadow:0 0 0 1px rgba(205,181,126,.45),0 0 0 4px rgba(0,0,0,.35)}
 .face::after{inset:11.5%;box-shadow:0 0 0 1px rgba(205,181,126,.2)}
 .face>*{position:absolute}
-.shade{inset:0;border-radius:50%;background:#000;opacity:0;pointer-events:none;transition:opacity 2.9s var(--heavy);z-index:5}
-.app.opening .shade{opacity:.62}
+.shade{inset:0;border-radius:50%;background:#000;opacity:var(--shade,0);pointer-events:none;z-index:5}
 .sheen{inset:0;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
   background:linear-gradient(115deg,transparent 30%,rgba(255,240,210,.09) 46%,rgba(255,240,210,.02) 54%,transparent 64%);background-size:260% 100%;animation:sheen 8s ease-in-out infinite}
 @keyframes sheen{0%,20%{background-position:120% 0}80%,100%{background-position:-60% 0}}
 .engrave{inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .engrave text{fill:rgba(205,181,126,.48);font-family:'Archivo',sans-serif;font-size:10.5px;letter-spacing:3.4px;font-weight:500}
-.handle{left:50%;top:50%;width:0;height:0;transition:transform 1.3s cubic-bezier(.4,0,.2,1.12)}
-.app.unbolted .handle{transform:rotate(-72deg)}
+.handle{left:50%;top:50%;width:0;height:0;transform:rotate(var(--hrot,0deg))}
 .handle i{position:absolute;left:0;top:0;width:calc(var(--d) * .042);height:calc(var(--d) * .335);margin-left:calc(var(--d) * -.021);border-radius:3px;transform-origin:50% 0;
   background:linear-gradient(90deg,#5e4c26,#c9ae72 40%,#efd9a1 55%,#9a8150 80%,#4f3f1f);box-shadow:0 4px 8px rgba(0,0,0,.55)}
 .handle i::after{content:"";position:absolute;left:50%;bottom:calc(var(--d) * -.035);width:calc(var(--d) * .07);height:calc(var(--d) * .07);transform:translateX(-50%);border-radius:50%;
@@ -116,9 +109,6 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .cap .mk{width:58%;height:60%}
 .index{left:50%;top:19.5%;width:0;height:0;margin-left:-7px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--gold-l);filter:drop-shadow(0 1px 1px rgba(0,0,0,.8));z-index:3}
 .app.scene-combo .dial{box-shadow:0 0 0 3px #0d0d0d,0 0 0 4px var(--gold-l),0 0 0 9px #222224,0 0 0 10px rgba(205,181,126,.45),0 18px 30px rgba(0,0,0,.7),0 0 46px rgba(205,181,126,.2)}
-/* the walk through: one continuous dolly into the pattern */
-.app.through .stage{transform:scale(5.2)!important;transition:transform 1.7s cubic-bezier(.55,0,.2,1)}
-.app.through .halo,.app.opening .halo{opacity:0}
 
 /* ---------- pages ---------- */
 .view{position:absolute;inset:0;z-index:10;pointer-events:none}
@@ -420,3 +410,24 @@ select.in option{background:#1b1a18}
 
 .instant,.instant *{transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}}
+
+/* what waits behind the door: the monogram and the name, lit, on the card's pattern */
+.vlogo{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--d) * .028);
+  opacity:var(--logo,0);transform:scale(calc(.9 + .1 * var(--logo,0)));pointer-events:none}
+.vlogo .vm{width:calc(var(--d) * .26);height:calc(var(--d) * .267);-webkit-mask:url(../assets/img/mark.png) center/contain no-repeat;mask:url(../assets/img/mark.png) center/contain no-repeat;
+  background:linear-gradient(160deg,#F6E3B0 0%,#D9BE82 35%,#A88E58 65%,#7A6334 100%);filter:drop-shadow(0 0 calc(var(--d) * .05) rgba(241,215,156,.45))}
+.vlogo .vw{font-family:'Awaken','Bodoni Moda',serif;font-size:calc(var(--d) * .085);letter-spacing:.12em;line-height:1;
+  background:linear-gradient(180deg,#F6E3B0,#C2A86E 60%,#8A7142);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vlogo .vt{font-size:calc(var(--d) * .028);letter-spacing:.32em;color:rgba(236,229,214,.6)}
+.within .rays{position:absolute;inset:-20%;background:conic-gradient(from 0deg,transparent 0 8%,rgba(241,215,156,.05) 10%,transparent 13% 30%,rgba(241,215,156,.04) 33%,transparent 36% 58%,rgba(241,215,156,.05) 61%,transparent 64% 80%,rgba(241,215,156,.04) 83%,transparent 86%);
+  opacity:var(--glow,0);animation:rays 30s linear infinite}
+@keyframes rays{to{transform:rotate(360deg)}}
+/* hinges on the left of the frame */
+.hinge{position:absolute;left:-6.5%;width:5%;height:11%;border-radius:3px;opacity:var(--frame,1);
+  background:linear-gradient(90deg,#4f3f1f,#9a8150 25%,#efd9a1 50%,#b39a63 70%,#5e4c26);box-shadow:0 4px 10px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.3)}
+.hinge.h1{top:24%}.hinge.h2{top:65%}
+.hinge::before,.hinge::after{content:"";position:absolute;left:0;right:0;height:1px;background:rgba(0,0,0,.45)}
+.hinge::before{top:33%}.hinge::after{top:66%}
+/* while the door moves, the chrome steps aside */
+.bar,.dock{transition:opacity .6s var(--soft),transform .6s var(--soft)}
+.app.animating .bar{opacity:0;pointer-events:none}
