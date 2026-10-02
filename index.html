@@ -33,7 +33,7 @@
 <div class="hov" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / .85) 0%, rgb(var(--ground-rgb) / .25) 22%, rgb(var(--ground-rgb) / .3) 40%, rgb(var(--ground-rgb) / .92) 68%, var(--ground) 100%)"></div>
 </div>
 <div class="hnav" style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px 0">
-<div class="mk hmark" role="img" aria-label="The Vault" style="width: 42px; height: 43px; flex-shrink: 0; background: var(--accent-l)"></div>
+<div class="mk hmark logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 42px; height: 43px; flex-shrink: 0; background: var(--accent-l)"></div>
 <div class="hword" dir="ltr" style="display: none">THE VAULT</div>
 <nav style="display: flex; align-items: center; gap: 11px; font-size: {{navSize}}; letter-spacing: {{track2}}">
 <a href="#membership" onClick="{{x.pMembership}}" style="color: var(--text); text-decoration: none; padding: 12px 0">{{t.navMem}}</a>
@@ -204,7 +204,7 @@
 <span>{{t.prev}}</span>
 </button>
 <div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .4)"></div>
-<div class="mk" role="img" aria-label="The Vault" style="width: 40px; height: 41px; flex-shrink: 0; background: var(--accent)"></div>
+<div class="mk logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 40px; height: 41px; flex-shrink: 0; background: var(--accent)"></div>
 <div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .4)"></div>
 <button type="button" class="vb" onClick="{{toggleLang}}" aria-label="{{t.langAria}}" style="min-width: 44px; height: 40px; flex-shrink: 0; background: transparent; border: 1px solid rgb(var(--accent-rgb) / .6); border-radius: var(--radius); color: var(--accent-l); font-size: 13px; letter-spacing: 0.06em">{{t.langBtn}}</button>
 </div>
@@ -622,7 +622,7 @@
 
 <sc-if value="{{x.menu}}" hint-placeholder-val="{{false}}">
 <div class="menu">
-<div class="menuhd"><div class="mk" role="img" aria-label="The Vault" style="width: 42px; height: 43px; background: var(--accent-l)"></div><button type="button" class="vb menux" onClick="{{x.closeMenu}}">{{x.t.close}}</button></div>
+<div class="menuhd"><div class="mk logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 42px; height: 43px; background: var(--accent-l)"></div><button type="button" class="vb menux" onClick="{{x.closeMenu}}">{{x.t.close}}</button></div>
 <sc-for list="{{x.menuItems}}" as="m" hint-placeholder-count="6">
 <button type="button" class="mi" onClick="{{m.go}}" style="font-family: {{titleFont}}"><span class="mik" dir="ltr">{{m.k}}</span>{{m.t}}</button>
 </sc-for>

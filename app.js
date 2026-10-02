@@ -248,7 +248,15 @@ var IC = function (d) { return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.o
 var ICONS = [IC("%3Cpath d='M5 20V11a7 7 0 0 1 14 0v9zM3 20h18M12 14v6'/%3E"), IC("%3Crect x='4' y='5.5' width='16' height='14'/%3E%3Cpath d='M4 10h16M8.5 3v4M15.5 3v4'/%3E"), IC("%3Cpath d='M12 3.5l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.5 6.8 19.4 8 13.6l-4.4-4 5.9-.7z'/%3E"), IC("%3Cpath d='M4.5 17.5c0-4.4 3.3-8 7.5-8s7.5 3.6 7.5 8zM3 17.5h18M12 9.5V7M10 7h4'/%3E"), IC("%3Ccircle cx='12' cy='8.5' r='3.8'/%3E%3Cpath d='M4.5 20.5c.8-4 3.7-6 7.5-6s6.7 2 7.5 6'/%3E")];
 var TABK = ['home', 'reserve', 'events', 'concierge', 'account'];
 var accGo = [mGo('account', 'guests'), mGo('account', 'done', { done: 'top' }), mGo('account', 'done', { done: 'st' }), pgGo('terms'), function () { self.setState({ screen: 'home', hist: [], tab: 'home', sub: '', menu: false }); }];
+var toTop = function () { var sc = document.querySelector('.vscroll'); if (sc) sc.scrollTop = 0; };
+var logoHome = function () {
+// members go to their own home tab; everyone else to the landing page
+if (isM) { if (tab === 'home' && sub === '') { toTop(); } self.setState({ screen: 'm', tab: 'home', sub: '', hist: [], menu: false }); return; }
+if (screen === 'home') { toTop(); }
+self.setState({ screen: 'home', hist: [], menu: false });
+};
 var X = {
+logoHome: logoHome,
 t: xt,
 isPg: screen === 'pg', pg: PG[s.pg || (self.props || {}).pg || 'membership'],
 isOtp: screen === 'otp', enter: function () { self.setState({ screen: 'm', tab: 'home', sub: '', hist: [], menu: false }); }, noop: function () {},
@@ -331,3 +339,8 @@ loginCta: mode === 'code' ? t.sendCode : t.login
 }
 
 mount(VaultApp, document.getElementById("app-template"), document.getElementById("app"));
+
+// Enter / Space on non-button elements marked role="button" (logo, dial)
+document.addEventListener('keydown', function (e) {
+if ((e.key === 'Enter' || e.key === ' ') && e.target.getAttribute && e.target.getAttribute('role') === 'button' && e.target.tagName !== 'BUTTON') { e.preventDefault(); e.target.click(); }
+});
