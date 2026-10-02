@@ -468,7 +468,7 @@ R('combo', { scene: 'combo', back: true, cls: 'door-page', html: function () {
   var l = L();
   return '<div class="head center"><p class="eyb">' + l.comboEy + '</p></div>' +
     (S.typing ? '<div class="grid3" dir="ltr">' + [1, 2, 3].map(function (i) { return '<input class="in" data-digits inputmode="numeric" maxlength="2"' + (i === 1 ? ' autocomplete="one-time-code"' : '') + ' aria-label="' + i + '" style="text-align:center;font-size:22px;height:58px">'; }).join('') + '</div><button type="button" class="btn gold" data-act="typedOpen">' + l.open + '</button>'
-      : '<div class="slots" dir="ltr" aria-live="polite"><span class="slot cur">' + pad(valueAt(rot)) + '</span><span class="slot"></span><span class="slot"></span></div><p class="p center">' + l.comboBody + '</p>') +
+      : '<div class="slots" dir="ltr" aria-live="polite"><span class="slot cur">' + pad(valueAt(rot)) + '</span><span class="slot"></span><span class="slot"></span></div><p class="p center">' + l.comboBody + '</p>' + (FREE ? '<button type="button" class="btn gold" data-act="typedOpen">' + l.open + '</button>' : '')) +
     '<div class="links"><button type="button" class="link" data-act="typing">' + (S.typing ? l.useDial : l.typeInstead) + '</button><button type="button" class="link" data-act="back">' + l.changeNum + '</button></div>';
 }, after: function () { if (!S.typing) setTimeout(function () { dial.focus({ preventScroll: true }); }, 350); } });
 

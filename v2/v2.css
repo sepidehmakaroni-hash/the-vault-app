@@ -121,7 +121,9 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .app.through .halo,.app.opening .halo{opacity:0}
 
 /* ---------- pages ---------- */
-.view{position:absolute;inset:0;z-index:10}
+.view{position:absolute;inset:0;z-index:10;pointer-events:none}
+.view .page{pointer-events:auto}
+.view .page.door-page{pointer-events:none}
 .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   padding:calc(var(--top) + 72px) 22px calc(var(--bot) + 32px)}
 .page::-webkit-scrollbar{width:0}
