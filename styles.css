@@ -289,3 +289,6 @@ button.stat{cursor:pointer}
 .rv.in{opacity:1;translate:none}
 .rv.now{transition:none}
 .still .shead>*,.still .step .vscroll>div>*,.still .seg,.still .hbody>*,.still .hnav,.still .htype span,.still .sprog i,.still .hmedia img{animation:none!important}
+
+/* iPhone notch / status bar: keep content below it when opened from the home screen */
+.sk-combo{padding-top:env(safe-area-inset-top,0px)}

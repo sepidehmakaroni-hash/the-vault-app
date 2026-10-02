@@ -1,5 +1,5 @@
 /* Offline support: on first visit every file of the app is saved on the device; after that it opens with no internet. */
-const CACHE = 'the-vault-app-0-the-combination-v2';
+const CACHE = 'the-vault-app-0-the-combination-v3';
 const FILES = [
  "./",
  "index.html",
