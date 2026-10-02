@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=3';
+const V = '?v=5';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -23,7 +23,7 @@ const X = a => (Array.isArray(a) ? a[fa() ? 1 : 0] : a);
 const FD = '۰۱۲۳۴۵۶۷۸۹';
 const N = s => (fa() ? String(s).replace(/\d/g, d => FD[d]) : String(s));
 const pad = n => String(n).padStart(2, '0');
-const hm = d => N(pad(d.getHours()) + ':' + pad(d.getMinutes()));
+const hm = d => N((fa() ? d.getHours() : pad(d.getHours())) + ':' + pad(d.getMinutes()));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const dayFmt = (d, long) => {
   const o = long ? { weekday: 'long', day: 'numeric', month: 'long' } : { weekday: 'short', day: 'numeric', month: 'short' };
@@ -96,14 +96,14 @@ const REQS = [
         { k: 'when', l: ['When', 'کی'], o: ['thisweek', 'weekend', 'pick'], pick: 'day' },
         { k: 'n', l: ['Seats', 'چند صندلی'], step: [1, 6, 2], u: [['seat', 'seats'], 'صندلی'] },
         { k: 'seat', l: ['Where', 'کجای سالن'], o: ['best', 'aisle'] }] },
-  { id: 'flowers', img: '../v2/img/room-garden.webp', fit: 'p-garden',
+  { id: 'flowers', img: null, fit: 'p-still',
     t: ['Flowers or a gift', 'گل یا هدیه'], d: ['Chosen, wrapped and delivered.', 'انتخاب، بسته‌بندی و تحویل.'],
     short: ['Flowers', 'گل'],
     g: [{ k: 'what', l: ['What', 'چه چیزی'], o: ['flowers', 'gift', 'both'] },
         { k: 'for', l: ['The occasion', 'به چه مناسبتی'], o: ['bday', 'thanks', 'just'] },
         { k: 'budget', l: ['Around', 'حدود هزینه'], o: ['b2', 'b5', 'yours'] },
         { k: 'when', l: ['When', 'کی'], o: ['today', 'tomorrow', 'pick'], pick: 'day' }] },
-  { id: 'travel', img: '../v2/img/room-terrace.webp', fit: 'p-terrace',
+  { id: 'travel', img: null, fit: 'p-still',
     t: ['Travel', 'سفر'], d: ['Hotel and flight, arranged end to end.', 'هتل و پرواز، از اول تا آخر.'],
     short: ['Travel', 'سفر'],
     g: [{ k: 'to', l: ['Where', 'مقصد'], o: ['ist', 'dxb', 'kih', 'cdg'] },
@@ -126,7 +126,7 @@ const PEOPLE = {
   hall: { concert: ['Roudaki Hall', 'تالار رودکی'], theatre: ['Iranshahr Theatre', 'تماشاخانهٔ ایرانشهر'] },
   show: { concert: ['Tehran Symphony — Shostakovich', 'ارکستر سمفونیک تهران — شوستاکوویچ'], theatre: ['The Cherry Orchard', 'باغ آلبالو'] },
   code: { ist: 'IST', dxb: 'DXB', kih: 'KIH', cdg: 'CDG' },
-  hotelName: { ist: ['Pera House', 'پرا هاوس'], dxb: ['The Creek House', 'کریک هاوس'], kih: ['Marjan Residence', 'اقامتگاه مرجان'], cdg: ['Hôtel Rivoli', 'هتل ریوولی'] },
+  hotelName: { ist: ['Casa Lumen', 'کازا لومن'], dxb: ['Maison Sable', 'مزون سابل'], kih: ['Villa Nilou', 'ویلا نیلو'], cdg: ['Hôtel Ombrelle', 'هتل اومبرل'] },
   flight: { ist: 'TK 879', dxb: 'EK 972', kih: 'IR 342', cdg: 'IR 735' },
   mins: { home: 25, thr: 35, ika: 55, office: 15 }
 };
@@ -216,7 +216,7 @@ const LIVE = {
   flowers: { cd: ['Delivered in', 'تا تحویل'], after: ['Delivered', 'تحویل شد'], onCd: true,
     head: [['Your flowers are being arranged.', 'گل‌هایتان آماده می‌شود.'], ['Delivered, by hand.', 'با دست تحویل داده شد.']],
     sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['White peonies, in linen', 'صدتومانی سفید، در کتان'], ['With Sina, the courier', 'همراه سینا، پیک خانه'], ['Delivered', 'تحویل شد']],
-    caps: [[0, ['The florist is choosing.', 'گل‌فروش در حال انتخاب است.']], [2.6, ['White peonies, opening.', 'صدتومانی‌های سفید، شکفته.']], [4.6, ['Wrapped in linen.', 'در کتان پیچیده شد.']]] },
+    caps: [[0, ['The florist is choosing.', 'گل‌فروش در حال انتخاب است.']], [2.6, ['White peonies, opening.', 'صدتومانی‌های سفید، شکفته.']], [4.6, ['On its way to you.', 'در راه شماست.']]] },
   travel: { cd: ['Departure in', 'تا پرواز'], after: ['Bon voyage', 'سفر بخیر'],
     head: [['Your journey is being arranged.', 'سفرتان آماده می‌شود.'], ['Everything is ready.', 'همه‌چیز آماده است.']],
     sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['Seats and room held', 'صندلی و اتاق نگه داشته شد'], ['Tickets issued', 'بلیت‌ها صادر شد'], ['Ready to go', 'آمادهٔ رفتن']],
@@ -244,13 +244,20 @@ function reqState(req) {
   let k = 0; st.forEach((s, i) => { if (el >= s) k = i; });
   return { el, st, k, left: Math.max(0, Math.round((req.at - Date.now()) / 1000)) };
 }
+/* the one source for every countdown on screen */
+const liveLeft = q => { const s = reqState(q); return s.left > 0 ? fmtLeft(s.left) : X(LIVE[q.id].after); };
 function fmtLeft(s) {
   if (s >= 86400) {
+    /* more than a day reads as words: «۳ روز و ۴ ساعت», "3 days, 4 h" */
     const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
-    return (d === 1 ? X(T.day1) : X(T.days).replace('%1', N(d))) + (fa() ? ' و ' : ' ') + N(pad(h) + ':' + pad(m));
+    const dd = d === 1 ? X(T.day1) : X(T.days).replace('%1', N(d));
+    const rest = h ? (fa() ? N(h) + ' ساعت' : h + ' h') : m ? (fa() ? N(m) + ' دقیقه' : m + ' min') : '';
+    return rest ? dd + (fa() ? ' و ' : ', ') + rest : dd;
   }
+  /* no leading zero: «۲:۲۵», never «۰۲:۲۵», whose zero reads as a dot */
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
-  return N(h ? h + ':' + pad(m) + ':' + pad(x) : pad(m) + ':' + pad(x));
+  if (!h && !m && fa()) return N(x) + ' ثانیه';
+  return N(h ? h + ':' + pad(m) + ':' + pad(x) : m + ':' + pad(x));
 }
 
 /* ================= DOM shell ================= */
@@ -352,6 +359,7 @@ function pill(el) {
   const slot = $('.pill-slot', el || view);
   if (!slot) return;
   const q = S.req;
+  app.classList.toggle('has-pill', !!q);
   if (!q) { slot.innerHTML = ''; return; }
   const fresh = !$('.pill', slot);
   const r = REQ(q.id), L = LIVE[q.id], s = reqState(q);
@@ -378,6 +386,40 @@ const ICONS = {
   travel: '<path class="ico-dots" d="M5 38 Q20 24 41 32"/><path pathLength="1" d="M41 11.5 L28.5 17.5 L15.5 12.5 L12.5 14 L23 20.5 L16.5 24 L11.5 22.8 L9.6 24 L15 27.4 L17.8 32 L19.4 30.7 L19.6 26.4 L26.4 22.6 L28.4 34.2 L31.2 32.6 L31 20.2 L43.2 14.2 Q45 12.6 43.4 11.3 Q42.4 10.9 41 11.5 Z"/>',
   call: '<path pathLength="1" d="M15.5 9.5 C11.5 11.5 10 15.5 11.8 20.5 C14.8 28 20.5 33.8 27.8 36.6 C32.6 38.4 36.5 37.2 38.6 33.4 L33.6 28.6 L29.5 31.2 C25.5 29.2 19.2 23 17 19 L19.8 14.8 Z"/><path class="ico-live" pathLength="1" d="M28.5 12.5 A8.5 8.5 0 0 1 35.5 19.5"/><path class="ico-live d2" pathLength="1" d="M29 6 A15 15 0 0 1 42 19"/>'
 };
+/* a card's picture: a photograph, or, for flowers and travel, a still rendered from their own 3D scene */
+const art = (r, lazy) => r.img ? '<img src="' + r.img + V + '" alt="" decoding="async"' + (lazy ? ' loading="lazy"' : '') + '>' : '<img class="still" data-still="' + r.id + '" alt="">';
+const STILL = {};
+let stillQ = Promise.resolve();
+function stillFor(id) {
+  const k = id + lang;
+  if (STILL[k]) return Promise.resolve(STILL[k]);
+  stillQ = stillQ.then(async () => {
+    if (STILL[k] || !glOK()) return;
+    const st = document.createElement('div'); st.style.cssText = 'position:fixed;left:-3000px;top:0;width:400px;height:680px;pointer-events:none';
+    document.body.appendChild(st);
+    const r = REQ(id), o = {}; r.g.forEach(g => { o[g.k] = g.step ? g.step[2] : (g.def || g.o[0]); });
+    try {
+      const ctl = await makeSeqGL(st, document.createElement('div'), { id, o, t0: Date.now(), at: Date.now() + 864e5 * 3 });
+      ctl.frame(ctl.dur, true);
+      STILL[k] = SG.canvas.toDataURL('image/jpeg', 0.84);
+      ctl.dispose();
+    } catch (e) { /* the drawn still below takes over */ }
+    st.remove();
+  });
+  return stillQ.then(() => STILL[k] || null);
+}
+function fillStills(root) {
+  $$('img[data-still]', root).forEach(img => {
+    const id = img.dataset.still;
+    stillFor(id).then(url => {
+      if (url) { img.src = url; img.classList.add('on'); return; }
+      /* no WebGL: the drawn SVG still of the same scene */
+      const box = document.createElement('span'); box.className = 'still-svg'; img.replaceWith(box);
+      const r = REQ(id), o = {}; r.g.forEach(g => { o[g.k] = g.step ? g.step[2] : (g.def || g.o[0]); });
+      try { SCENES[id](box, document.createElement('div'), { id, o, t0: Date.now(), at: Date.now() + 864e5 * 3 }).frame(99); } catch (e) { /* leave it dark */ }
+    });
+  });
+}
 let lastCardRect = null;
 function buildMenu(el, prev) {
   const fromKey = prev.name === 'land';
@@ -390,11 +432,11 @@ function buildMenu(el, prev) {
       '</header>' +
       '<ul class="cards" role="list">' + REQS.map((r, i) =>
         '<li style="--i:' + i + '"><button type="button" class="card ' + r.fit + '" data-act="pick" data-id="' + r.id + '">' +
-          '<span class="card-img" aria-hidden="true"><img src="' + r.img + V + '" alt="" decoding="async"' + (i > 1 ? ' loading="lazy"' : '') + '></span>' +
+          '<span class="card-img" aria-hidden="true">' + art(r, i > 1) + '</span>' +
           '<span class="veil" aria-hidden="true"></span>' +
           '<span class="card-sheen" aria-hidden="true"></span>' +
           '<span class="card-frame" aria-hidden="true"><i></i><i></i><i></i><i></i></span>' +
-          '<span class="card-top" aria-hidden="true"><span class="card-n">' + (fa() ? 'شمارهٔ ' + N(i + 1) : 'Nº ' + pad(i + 1)) + '</span>' +
+          '<span class="card-top" aria-hidden="true"><span class="card-n">' + (fa() ? 'شمارهٔ ' + N(i + 1) : 'No. ' + pad(i + 1)) + '</span>' +
             '<svg class="ico" viewBox="0 0 48 48" aria-hidden="true">' + ICONS[r.id] + '</svg></span>' +
           '<span class="card-txt"><span class="card-t">' + X(r.t) + '</span><span class="card-d">' + X(r.d) + '</span>' +
           '<span class="card-cta" aria-hidden="true"><span>' + X(['Arrange', 'ترتیب بدهید']) + '</span><span class="card-go"></span></span></span>' +
@@ -402,6 +444,7 @@ function buildMenu(el, prev) {
       '</ul>' +
     '</div>';
   if (fromKey) el.classList.add('from-key');
+  fillStills(el);
   const page = $('.page', el);
   if (S.menuScroll && prev.name === 'detail') page.scrollTop = S.menuScroll;
   const cards = $$('.card', el);
@@ -448,7 +491,7 @@ function buildDetail(el, prev) {
   save();
   el.innerHTML =
     '<div class="page detail-page">' +
-      '<div class="hero ' + r.fit + '"><span class="card-img"><img src="' + r.img + V + '" alt="" decoding="async"></span><span class="veil"></span>' +
+      '<div class="hero ' + r.fit + '"><span class="card-img">' + art(r) + '</span><span class="veil"></span>' +
         '<div class="hero-txt"><p class="eyebrow">' + X(T.menuEy) + '</p><h1 class="h1">' + X(r.t) + '</h1><p class="lede">' + X(r.d) + '</p></div></div>' +
       '<div class="opts">' + r.g.map((g, gi) => group(r, g, gi, d)).join('') + '</div>' +
     '</div>' +
@@ -456,6 +499,7 @@ function buildDetail(el, prev) {
       '<button type="button" class="btn gold" data-act="confirm"><span>' + X(T.arrange) + '</span></button>' +
       '<p class="fine">' + X(T.note) + '</p></div>';
   updSummary(el, r, d);
+  fillStills(el);
   /* the chosen card opens into the hero */
   if (prev.name === 'menu' && lastCardRect && !reduced()) {
     const hero = $('.hero', el), a = app.getBoundingClientRect(), c = lastCardRect;
@@ -476,19 +520,20 @@ function group(r, g, gi, d) {
       '<output class="st-v" aria-live="polite">' + N(v) + '</output>' +
       '<button type="button" class="st-b" data-act="step" data-k="' + g.k + '" data-d="1" aria-label="' + X(T.more) + '"' + (v >= g.step[1] ? ' disabled' : '') + '><span class="st-plus" aria-hidden="true"></span></button></div></div>';
   }
-  let h = '<div class="grp" role="group" aria-labelledby="' + id + '"><p class="grp-l" id="' + id + '">' + X(g.l) + '</p><div class="chips">' +
-    g.o.map(o => '<button type="button" class="chip" data-act="opt" data-k="' + g.k + '" data-v="' + o + '" aria-pressed="' + (d[g.k] === o) + '">' + X(O[o]) + '</button>').join('') + '</div>';
+  const radio = (cls, act, k, v, on, lab) => '<button type="button" role="radio" class="chip' + cls + '" data-act="' + act + '" data-k="' + k + '" data-v="' + v + '" aria-checked="' + on + '" tabindex="' + (on ? 0 : -1) + '">' + lab + '</button>';
+  let h = '<div class="grp"><p class="grp-l" id="' + id + '">' + X(g.l) + '</p><div class="chips" role="radiogroup" aria-labelledby="' + id + '">' +
+    g.o.map(o => radio('', 'opt', g.k, o, d[g.k] === o, X(O[o]))).join('') + '</div>';
   if (g.pick) {
     const key = g.k + (g.pick === 'day' ? 'D' : 'T');
     const list = g.pick === 'day' ? daySlots() : timeSlots();
     if (!d[key] || list.indexOf(d[key]) < 0) d[key] = list[0];
     const open = d[g.k] === (g.pick === 'day' ? 'pick' : 'later');
-    h += '<div class="more' + (open ? ' open' : '') + '" data-for="' + g.k + '"' + (open ? '' : ' hidden') + '><div class="more-in"><div class="chips row" role="group" aria-label="' + X(g.pick === 'day' ? T.pickDay : T.pickTime) + '">' +
+    h += '<div class="more' + (open ? ' open' : '') + '" data-for="' + g.k + '"' + (open ? '' : ' hidden') + '><div class="more-in"><div class="chips row" role="radiogroup" aria-label="' + X(g.pick === 'day' ? T.pickDay : T.pickTime) + '">' +
       list.map(v => {
         const lab = g.pick === 'day'
           ? '<span class="dd-w">' + new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', { weekday: 'short' }).format(isoDate(v)) + '</span><span class="dd-d">' + N(new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', { day: 'numeric', month: 'short' }).format(isoDate(v))) + '</span>'
-          : N(v);
-        return '<button type="button" class="chip ' + (g.pick === 'day' ? 'dd' : 'tt') + '" data-act="sub" data-k="' + key + '" data-v="' + v + '" aria-pressed="' + (d[key] === v) + '">' + lab + '</button>';
+          : N(fa() ? v.replace(/^0/, '') : v);
+        return radio(' ' + (g.pick === 'day' ? 'dd' : 'tt'), 'sub', key, v, d[key] === v, lab);
       }).join('') + '</div></div></div>';
   }
   return h + '</div>';
@@ -501,7 +546,8 @@ function buildLive(el) {
   el.innerHTML =
     '<div class="stage" aria-hidden="true"></div>' +
     '<div class="seq-ui">' +
-      '<p class="eyebrow">' + X(T.liveEy) + '</p>' +
+      '<h1 class="sr" tabindex="-1">' + X(T.liveEy) + ' — ' + X(REQ(q.id).short) + '</h1>' +
+      '<p class="eyebrow" aria-hidden="true">' + X(T.liveEy) + '</p>' +
       '<p class="cap" aria-live="polite"></p>' +
     '</div>' +
     '<div class="ovl" aria-hidden="true"></div>' +
@@ -549,7 +595,7 @@ function buildLive(el) {
     raf = requestAnimationFrame(loop);
   };
   onLeave(() => { dead = true; cancelAnimationFrame(raf); const s = sc; if (s && s.dispose) setTimeout(() => s.dispose(), 650); });
-  if (glOK()) makeSeqGL(stage, ov, q).then(start).catch(e => { console.warn('The Vault: sequence falls back to the still drawing.', e && e.message); stage.innerHTML = ''; ov.innerHTML = ''; start(svgCtl(stage, ov, q)); });
+  if (glOK()) stillQ.then(() => makeSeqGL(stage, ov, q)).then(start).catch(e => { console.warn('The Vault: sequence falls back to the still drawing.', e && e.message); stage.innerHTML = ''; ov.innerHTML = ''; start(svgCtl(stage, ov, q)); });
   else start(svgCtl(stage, ov, q));
 }
 function svgCtl(stage, ov, q) { const s = SCENES[q.id](stage, ov, q); return { dur: s.dur, frame: t => s.frame(t) }; }
@@ -676,7 +722,7 @@ document.addEventListener('click', e => {
       if (b.disabled) (b === bs[0] ? bs[1] : bs[0]).focus();
     } else {
       d[b.dataset.k] = b.dataset.v;
-      $$('[data-k="' + b.dataset.k + '"]', b.parentNode).forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+      $$('[data-k="' + b.dataset.k + '"]', b.parentNode).forEach(c => { c.setAttribute('aria-checked', String(c === b)); c.tabIndex = c === b ? 0 : -1; });
       if (a === 'opt') {
         const g = r.g.find(x => x.k === b.dataset.k), more = $('.more[data-for="' + g.k + '"]', scr);
         if (more) {
@@ -693,7 +739,7 @@ document.addEventListener('click', e => {
     const now = Date.now();
     S.req = { id: r.id, o: Object.assign({}, d), t0: now, at: targetTime(r, d), played: 0 };
     save();
-    const goLive = () => { history.replaceState({ i: idx }, '', '#/ask'); go('#/live'); };
+    const goLive = () => { history.replaceState({ i: idx }, '', '#/live'); show(1); };
     if (reduced()) goLive(); else wipe(b, goLive);
   }
   else if (a === 'skip') { const sc = b.closest('.scr'); if (sc && sc._finish) sc._finish(false); }
@@ -711,6 +757,16 @@ document.addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
+  /* radio groups: arrows move and choose, mirrored in RTL */
+  const rb = e.target.closest && e.target.closest('[role=radio]');
+  if (rb && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+    const all = $$('[role=radio]', rb.parentNode), i = all.indexOf(rb);
+    let d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && fa()) d = -d;
+    const nx = e.key === 'Home' ? all[0] : e.key === 'End' ? all[all.length - 1] : all[(i + d + all.length) % all.length];
+    e.preventDefault(); nx.focus(); nx.click();
+    return;
+  }
   if (e.key === 'Escape' && route.name !== 'land') {
     const sc = $('.scr-live:not(.leave):not(.ended)');
     if (sc && sc._finish) { sc._finish(false); return; }
@@ -1349,6 +1405,8 @@ function E(tag, at, parent, text) {
   const e = document.createElementNS(NS, tag);
   for (const k in at) e.setAttribute(k, at[k]);
   if (text != null) e.textContent = text;
+  /* Persian runs keep their order: centred text is laid out right-to-left */
+  if (tag === 'text' && fa() && at['text-anchor'] === 'middle') { e.setAttribute('direction', 'rtl'); e.style.unicodeBidi = 'plaintext'; }
   if (parent) parent.appendChild(e);
   return e;
 }
@@ -1478,7 +1536,7 @@ const SCENES = {
         cam.setAttribute('transform', 'translate(195,' + (360).toFixed(0) + ') scale(' + s.toFixed(3) + ') translate(' + (-fx).toFixed(1) + ',' + (-fy).toFixed(1) + ')');
         show01(card, ph(t, 4.2, 5.0, eout));
         const e = ph(t, 4.4, 7.0, eout);
-        big.textContent = fmtLeft(Math.round(lerp(target + mins * 12, target, e)));
+        big.textContent = liveLeft(q);
       }
     };
   },
@@ -1775,6 +1833,12 @@ const SCENES = {
     const line = E('path', { d: '', class: 'wave' }, svg);
     const base = E('path', { d: 'M' + (xa + 24) + ',' + y0 + ' L' + (xb - 24) + ',' + y0, class: 'ln faint' }, svg);
     add(base, 0.4, 1.4);
+    if (fa()) { /* mirror: the house on the right, «شما» on the left; the words themselves stay readable */
+      const mg = E('g', { transform: 'translate(390,0) scale(-1,1)' }, null);
+      Array.from(svg.childNodes).forEach(n => { if (n !== lab && n.tagName !== 'defs') mg.appendChild(n); });
+      svg.insertBefore(mg, lab);
+      $$('text', lab).forEach(tx => tx.setAttribute('x', 390 - Number(tx.getAttribute('x'))));
+    }
     const vis = q.o.how === 'visit';
     const card = ovCard(ov,
       '<div class="ov-row"><span class="ov-av" aria-hidden="true">' + (fa() ? 'ل' : 'L') + '</span><span class="ov-who"><span class="ov-n">' + X(PEOPLE.concierge) + '</span><span class="ov-m">' + X(['Your concierge tonight', 'کانسیرژ امشب شما']) + ' — ' + X(HOW[q.o.how]) + '</span></span></div>' +
@@ -1806,11 +1870,11 @@ const SCENES = {
         rings.forEach((rg, i) => {
           let best = 1;
           for (let k = 0; k < 6; k++) { const at = 1.4 + k * per + travel; const u = (t - at - i * 0.18) / 1.3; if (u >= 0 && u < 1) best = Math.min(best, u); }
-          rg.setAttribute('r', (22 + best * 70).toFixed(1));
+          rg.setAttribute('r', (22 + best * 36).toFixed(1));
           rg.style.opacity = best < 1 ? (1 - best) * 0.8 : 0;
         });
         show01(card, ph(t, 3.6, 4.4, eout));
-        big.textContent = fmtLeft(Math.round(lerp(target + 40, target, ph(t, 3.8, 6.6, eout))));
+        big.textContent = liveLeft(q);
       }
     };
   }
@@ -1871,6 +1935,8 @@ async function makeSeqGL(stage, ov, q) {
     SG.r = new TH.WebGLRenderer({ canvas: SG.canvas, antialias: false, powerPreference: 'high-performance', stencil: false });
     SG.r.toneMapping = TH.NeutralToneMapping; SG.r.toneMappingExposure = 1;
     SG.r.outputColorSpace = TH.SRGBColorSpace;
+    SG.r.localClippingEnabled = true;
+    SG.r.shadowMap.enabled = true; SG.r.shadowMap.type = TH.PCFShadowMap;
     SG.env = studioEnv(TH, SG.r);
     SG.pipe = makePipe(TH, SG.r, new TH.Scene(), new TH.PerspectiveCamera(), { bloom: 0.7, radius: 0.6, thresh: 0.82 });
     SG.guard = perfGuard(() => { SG.pipe.size(SG.pipe.w, SG.pipe.h); });
@@ -2047,14 +2113,23 @@ const GL_SCENES = {
     for (let gx = -18; gx <= 18; gx++) (gx % 5 === 0 ? major : minor).push([gx * cell - (gx % 5 === 0 ? 0.07 : 0.03), -44, gx * cell + (gx % 5 === 0 ? 0.07 : 0.03), 34]);
     for (let gz = -27; gz <= 20; gz++) (gz % 5 === 0 ? major : minor).push([-30, gz * cell - (gz % 5 === 0 ? 0.07 : 0.03), 30, gz * cell + (gz % 5 === 0 ? 0.07 : 0.03)]);
     const stMinor = new TH.Mesh(quadsGeo(TH, minor, 0.012), addMat(TH, 0xd9a35a, 0.42, 0));
-    const stMajor = new TH.Mesh(quadsGeo(TH, major, 0.014), addMat(TH, 0xffc77a, 1.0, 0));
+    const stMajor = new TH.Mesh(quadsGeo(TH, major, 0.014), addMat(TH, 0xffc77a, 0.55, 0));
     scene.add(stMinor, stMajor);
-    /* two curving highways */
-    const hw = [[[-30, 10], [-14, 6.5], [-2, 7.4], [12, 4.8], [30, 6]], [[-9, -40], [-6.5, -20], [-3.8, -6], [-5.4, 8], [-4, 30]]].map(p => {
-      const c = new TH.CatmullRomCurve3(p.map(v => new TH.Vector3(v[0], 0, v[1])));
-      return new TH.Mesh(ribbonGeo(TH, c.getPoints(120).map(v => [v.x, v.z]), 0.12, 0.016), addMat(TH, 0xffd08a, 0.95, 0));
-    });
+    /* Valiasr: the long, gently curving artery from Tajrish down through the city; and Hemmat across it */
+    const valiasr = new TH.CatmullRomCurve3([[7.5, -46], [6.2, -32], [3.4, -20], [2.6, -9], [1.1, 0.8], [-1.6, 10], [-3.2, 20], [-6.4, 32]].map(v => new TH.Vector3(v[0], 0, v[1])));
+    const hemmat = new TH.CatmullRomCurve3([[-30, -6], [-16, -7.8], [-4, -6.4], [8, -8.6], [30, -7]].map(v => new TH.Vector3(v[0], 0, v[1])));
+    const hw = [[valiasr, 0.16, 1.25], [hemmat, 0.1, 0.6]].map(([c, wdt, k]) => new TH.Mesh(ribbonGeo(TH, c.getPoints(200).map(v => [v.x, v.z]), wdt, 0.018), addMat(TH, 0xffd08a, k, 0)));
     hw.forEach(m => scene.add(m));
+    /* exponential height fog, layered close to the ground */
+    const fogs = [0.35, 0.8, 1.4].map((y, i) => {
+      const m = new TH.Mesh(new TH.PlaneGeometry(140, 140), new TH.ShaderMaterial({
+        transparent: true, depthWrite: false, fog: false,
+        uniforms: { uA: { value: 0 } },
+        vertexShader: 'varying vec3 vW;void main(){vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
+        fragmentShader: 'uniform float uA;varying vec3 vW;void main(){float d=length(vW.xz);float a=uA*smoothstep(4.,40.,d)*(1.-smoothstep(55.,70.,d));gl_FragColor=vec4(.11,.085,.06,a);}'
+      }));
+      m.rotation.x = -Math.PI / 2; m.position.y = y; m.renderOrder = 4 + i; scene.add(m); return m;
+    });
     /* traffic: tiny lights running along the bright streets */
     const NT = 360, tp = new Float32Array(NT * 3), td = new Float32Array(NT * 4);
     for (let i = 0; i < NT; i++) {
@@ -2102,8 +2177,14 @@ const GL_SCENES = {
     mDest.s.material.opacity = 0; mDest.ring.material.opacity = 0;
     /* the car: a warm glowing marker carrying its own light */
     const car = new TH.Group(); scene.add(car);
-    car.add(new TH.Mesh(new TH.SphereGeometry(0.12, 20, 12), new TH.MeshBasicMaterial({ color: new TH.Color(0xffe0a8).multiplyScalar(3) })));
-    const halo = glowSprite(TH, 0xffc77a, 1.2, 1.1); car.add(halo);
+    const capsule = new TH.Mesh(new TH.CapsuleGeometry(0.075, 0.24, 6, 16), new TH.MeshPhysicalMaterial({ color: 0x15100b, metalness: 0.8, roughness: 0.25, clearcoat: 1, emissive: 0xffc27a, emissiveIntensity: 0.35 }));
+    capsule.rotation.x = Math.PI / 2; car.add(capsule);
+    const coneG = new TH.ConeGeometry(0.32, 1.3, 24, 1, true); coneG.translate(0, -0.65, 0);
+    const coneM = new TH.ShaderMaterial({ transparent: true, depthWrite: false, blending: TH.AdditiveBlending, side: TH.DoubleSide,
+      vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+      fragmentShader: 'varying vec2 vUv;void main(){gl_FragColor=vec4(vec3(1.4,1.15,.75),pow(vUv.y,1.6)*.35);}' });
+    [-0.05, 0.05].forEach(x => { const c = new TH.Mesh(coneG, coneM); c.rotation.x = -Math.PI / 2; c.position.set(x, 0, 0.16); car.add(c); });
+    const halo = glowSprite(TH, 0xffc77a, 0.7, 0.8); car.add(halo);
     const carL = new TH.PointLight(0xffc27a, 0, 0, 2); carL.position.y = 0.7; car.add(carL);
     car.visible = false;
     /* labels */
@@ -2112,6 +2193,7 @@ const GL_SCENES = {
       club: C.label(X(['The Vault', 'والت']), new TH.Vector3(0, 1.1, 0), 'hi'),
       dest: C.label(X(({ home: ['Niavaran', 'نیاوران'], thr: ['Mehrabad', 'مهرآباد'], ika: ['Imam Khomeini Airport', 'فرودگاه امام'], office: ['Vanak', 'ونک'] })[q.o.to] || ['', '']), new TH.Vector3(dst[0], 1.1, dst[1]), 'hi'),
       milad: C.label(X(['Milad Tower', 'برج میلاد']), new TH.Vector3(-14.4, 12.4, -4.8)),
+      valiasr: C.label(X(['Valiasr', 'ولیعصر']), new TH.Vector3(3.0, 0.6, -14)),
       alborz: C.label(X(['Alborz', 'البرز']), new TH.Vector3(-30, 16, -133))
     };
     /* the driver card */
@@ -2138,9 +2220,11 @@ const GL_SCENES = {
         rMat.uniforms.uP.value = k * (t > 3.2 ? 1 : 0);
         curve.getPointAt(Math.min(0.999, k), cp); curve.getPointAt(Math.min(1, k + 0.001), cp2);
         car.visible = t > 3.05;
-        car.position.set(cp.x, 0.22, cp.z);
+        car.position.set(cp.x, 0.12, cp.z);
+        car.lookAt(cp2.x + (cp2.x - cp.x) * 50, 0.12, cp2.z + (cp2.z - cp.z) * 50);
         carL.intensity = 9 * ph(t, 3.0, 3.6);
-        halo.scale.setScalar(1.2 + Math.sin(t * 6) * 0.08);
+        halo.scale.setScalar(0.7 + Math.sin(t * 6) * 0.05);
+        fogs.forEach((m, i) => { m.material.uniforms.uA.value = ph(t, 0.2, 1.5) * (0.22 - i * 0.05); });
         const pulse = (t * 0.7) % 1;
         mClub.ring.scale.setScalar(1 + pulse * 2.4); mClub.ring.material.opacity = (1 - pulse) * ph(t, 0.6, 1.2);
         mClub.b.material.uniforms.uI.value = ph(t, 0.5, 1.5) * 0.22;
@@ -2155,9 +2239,9 @@ const GL_SCENES = {
         camP.lerp(cp2.copy(cp).add(off), f);
         camL.lerp(cp, f);
         cam.position.copy(camP); cam.lookAt(camL);
-        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 1.4, 2.2) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 1.2, 2.0) * 0.8 * (1 - ph(t, 4.2, 4.8));
+        lbls.club.o = ph(t, 0.7, 1.4); lbls.dest.o = ph(t, 2.8, 3.4); lbls.milad.o = ph(t, 1.4, 2.2) * (1 - ph(t, 4.4, 5)); lbls.alborz.o = ph(t, 1.2, 2.0) * 0.8 * (1 - ph(t, 4.2, 4.8)); lbls.valiasr.o = ph(t, 1.6, 2.4) * 0.85 * (1 - ph(t, 4.4, 5));
         show01(card, ph(t, 4.4, 5.2, eout));
-        big.textContent = fmtLeft(Math.round(lerp(target + mins * 12, target, ph(t, 4.6, 7.2, eout))));
+        big.textContent = liveLeft(q);
       }
     };
   },
@@ -2169,10 +2253,21 @@ const GL_SCENES = {
     scene.environmentIntensity = 0.16;
     const cam = new TH.PerspectiveCamera(34, C.aspect, 0.05, 60);
     /* the cloth */
-    const cloth = new TH.Mesh(new TH.PlaneGeometry(16, 12), new TH.MeshPhysicalMaterial({ color: 0x1b1612, roughness: 0.92, sheen: 1, sheenRoughness: 0.55, sheenColor: new TH.Color(0x7a6448) }));
-    cloth.rotation.x = -Math.PI / 2; scene.add(cloth);
+    /* linen: a woven normal map drawn in code */
+    const weave = cTex(TH, 256, 256, (g, W, H) => {
+      const img = g.createImageData(W, H), d = img.data, hgt = (x, y) => { const u = x / W * 48 * Math.PI, v = y / H * 48 * Math.PI, warp = (Math.floor(x / W * 24) + Math.floor(y / H * 24)) % 2; return warp ? Math.abs(Math.sin(v)) * 0.6 + 0.4 * Math.abs(Math.sin(u * 0.5)) : Math.abs(Math.sin(u)) * 0.6 + 0.4 * Math.abs(Math.sin(v * 0.5)); };
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const dx = hgt(x + 1, y) - hgt(x - 1, y), dy = hgt(x, y + 1) - hgt(x, y - 1), k = 1.6;
+        let nx = -dx * k, ny = -dy * k, nz = 1; const l = Math.hypot(nx, ny, nz); nx /= l; ny /= l; nz /= l;
+        const i = (y * W + x) * 4; d[i] = (nx * 0.5 + 0.5) * 255; d[i + 1] = (ny * 0.5 + 0.5) * 255; d[i + 2] = (nz * 0.5 + 0.5) * 255; d[i + 3] = 255;
+      }
+      g.putImageData(img, 0, 0);
+    });
+    weave.tx.colorSpace = TH.LinearSRGBColorSpace; weave.tx.wrapS = weave.tx.wrapT = TH.RepeatWrapping; weave.tx.repeat.set(10, 7.5);
+    const cloth = new TH.Mesh(new TH.PlaneGeometry(16, 12), new TH.MeshPhysicalMaterial({ color: 0x1d1813, roughness: 0.9, sheen: 1, sheenRoughness: 0.5, sheenColor: new TH.Color(0x7a6448), normalMap: weave.tx, normalScale: new TH.Vector2(0.6, 0.6) }));
+    cloth.rotation.x = -Math.PI / 2; cloth.receiveShadow = true; scene.add(cloth);
     const runner = new TH.Mesh(new TH.PlaneGeometry(16, 1.5), new TH.MeshPhysicalMaterial({ color: 0x2a2219, roughness: 0.7, sheen: 1, sheenRoughness: 0.35, sheenColor: new TH.Color(0xd9a95e), metalness: 0.1 }));
-    runner.rotation.x = -Math.PI / 2; runner.position.set(0, 0.004, -1.25); scene.add(runner);
+    runner.rotation.x = -Math.PI / 2; runner.position.set(0, 0.004, -1.25); runner.receiveShadow = true; scene.add(runner);
     const goldM = new TH.MeshPhysicalMaterial({ color: GOLD, metalness: 1, roughness: 0.26, clearcoat: 0.4 });
     const porcelain = new TH.MeshPhysicalMaterial({ color: 0xece4d4, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.06 });
     const v2 = a => a.map(p => new TH.Vector2(p[0], p[1]));
@@ -2194,12 +2289,15 @@ const GL_SCENES = {
       const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#f4ecdb'); gr.addColorStop(1, '#e4d8c0'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
       g.strokeStyle = '#b48a43'; g.lineWidth = 4; g.strokeRect(26, 26, W - 52, H - 52); g.lineWidth = 1.5; g.strokeRect(40, 40, W - 80, H - 80);
       g.fillStyle = '#b48a43'; [[26, 26], [W - 26, 26], [26, H - 26], [W - 26, H - 26]].forEach(([x, y]) => { g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.fillRect(-7, -7, 14, 14); g.restore(); });
-      g.save(); g.beginPath();
-      if (fa()) g.rect(W * (1 - w), 0, W * w, H); else g.rect(0, 0, W * w, H);
-      g.clip();
-      g.fillStyle = '#1d1711'; g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.font = CF.disp(fa() ? 104 : 116, true); g.fillText(nameTxt, W / 2, H * 0.43);
-      g.restore();
+      /* the name inks in word by word, each word whole: never clipped mid-glyph */
+      g.fillStyle = '#1d1711'; g.textBaseline = 'middle'; g.textAlign = 'left'; g.direction = 'ltr';
+      g.font = CF.disp(fa() ? 104 : 116, true);
+      const words = nameTxt.split(' '), sp = g.measureText(' ').width, ws = words.map(x => g.measureText(x).width);
+      const tot = ws.reduce((a, b) => a + b, 0) + sp * (words.length - 1);
+      const order = fa() ? words.map((x, i) => i).reverse() : words.map((x, i) => i);
+      let xx = W / 2 - tot / 2;
+      order.forEach(i => { g.globalAlpha = cl(w * words.length * 1.15 - i); g.fillText(words[i], xx, H * 0.43); xx += ws[i] + sp; });
+      g.globalAlpha = 1; g.direction = fa() ? 'rtl' : 'ltr';
       g.globalAlpha = cl((w - 0.85) / 0.15); g.fillStyle = '#9a7434'; g.textAlign = 'center'; g.font = CF.txt(fa() ? 38 : 30, fa() ? 600 : 400);
       if (fa()) g.fillText(sub, W / 2, H * 0.76); else spaced(g, sub.toUpperCase(), W / 2, H * 0.76, 4);
       g.globalAlpha = 1;
@@ -2234,6 +2332,11 @@ const GL_SCENES = {
     const flame = new TH.Mesh(new TH.PlaneGeometry(0.14, 0.38), flameM); flame.position.set(cx, 2.23, cz); scene.add(flame);
     const halo = glowSprite(TH, 0xffb15e, 1.5, 0.7); halo.position.set(cx, 2.22, cz); halo.material.opacity = 0; scene.add(halo);
     const candleL = new TH.PointLight(0xffa860, 0, 0, 2); candleL.position.set(cx, 2.25, cz); scene.add(candleL);
+    /* the candle casts soft shadows (one point-light shadow, skipped on the lightest quality) */
+    if (Q.level >= 1) {
+      candleL.castShadow = true; candleL.shadow.mapSize.set(512, 512); candleL.shadow.radius = 6; candleL.shadow.bias = -0.003; candleL.shadow.camera.near = 0.05;
+      [set, pc, holder].forEach(o => o.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } }));
+    }
     const moon = new TH.DirectionalLight(0x8396bb, 0.35); moon.position.set(-4, 5, -3); scene.add(moon);
     const fill = new TH.DirectionalLight(0xffcf9a, 0.25); fill.position.set(2, 4, 6); scene.add(fill);
     /* a spark when the wick takes */
@@ -2247,11 +2350,14 @@ const GL_SCENES = {
     let wrote = -1;
     const look = new TH.Vector3();
     return {
-      scene, camera: cam, dur: 7.2, bloom: 0.9, thresh: 0.8, tilt: 0.75, focus: 0.5,
+      scene, camera: cam, dur: 7.2, bloom: 0.9, thresh: 0.8, tilt: 1.05, focus: 0.5,
       frame(t, dt) {
-        const drop = ph(t, 1.2, 2.3, eback);
-        pc.position.y = (1 - drop) * 1.6; pc.rotation.y = (1 - drop) * 0.5; pc.rotation.z = (1 - drop) * 0.15;
-        pcShadow.material.opacity = drop * 0.55;
+        /* the card falls, lands, and settles with a small damped rock */
+        const f = cl((t - 1.2) / 0.5), fall = f * f;
+        const u = cl((t - 1.7) / 0.9), rock = Math.sin(u * Math.PI * 3) * Math.pow(1 - u, 2) * (t > 1.7 ? 1 : 0);
+        pc.position.y = (1 - fall) * 1.4;
+        pc.rotation.set(rock * 0.06, (1 - fall) * 0.35, (1 - fall) * 0.08 + rock * 0.02);
+        pcShadow.material.opacity = fall * 0.55;
         const w = ph(t, 2.5, 4.0, x => x);
         if (Math.abs(w - wrote) > 0.004 || (w === 1 && wrote !== 1)) { drawCard(w); wrote = w; }
         const on = ph(t, 4.1, 4.7, eback);
@@ -2286,10 +2392,21 @@ const GL_SCENES = {
     const rim = new TH.DirectionalLight(0xa6c4ff, 2.2); rim.position.set(4, 2, -3); scene.add(rim);
     /* the printer */
     const printer = new TH.Group(); printer.position.set(0, 3.05, 0); scene.add(printer);
-    const pBody = new TH.Mesh(new TH.BoxGeometry(2.7, 0.8, 1.1), new TH.MeshPhysicalMaterial({ color: 0x15110d, roughness: 0.42, metalness: 0.5, clearcoat: 0.6 }));
+    /* a bevelled, rounded body in dark lacquer, a gold top edge and a slot that glows */
+    const ps = new TH.Shape(); { const w = 1.35, h = 0.4, r = 0.12; ps.moveTo(-w + r, -h); ps.lineTo(w - r, -h); ps.quadraticCurveTo(w, -h, w, -h + r); ps.lineTo(w, h - r); ps.quadraticCurveTo(w, h, w - r, h); ps.lineTo(-w + r, h); ps.quadraticCurveTo(-w, h, -w, h - r); ps.lineTo(-w, -h + r); ps.quadraticCurveTo(-w, -h, -w + r, -h); }
+    const pg2 = new TH.ExtrudeGeometry(ps, { depth: 0.9, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.05, bevelSegments: 4, curveSegments: 10 }); pg2.translate(0, 0, -0.45);
+    const pBody = new TH.Mesh(pg2, new TH.MeshPhysicalMaterial({ color: 0x17120d, roughness: 0.32, metalness: 0.45, clearcoat: 1, clearcoatRoughness: 0.12 }));
     printer.add(pBody);
-    const gm = new TH.MeshPhysicalMaterial({ color: GOLD, metalness: 1, roughness: 0.25 });
-    [0.41, -0.41].forEach(y => { const tr = new TH.Mesh(new TH.BoxGeometry(2.72, 0.03, 1.12), gm); tr.position.y = y; printer.add(tr); });
+    const gm = new TH.MeshPhysicalMaterial({ color: GOLD, metalness: 1, roughness: 0.22 });
+    const topEdge = new TH.Mesh(new TH.BoxGeometry(2.4, 0.018, 0.02), gm); topEdge.position.set(0, 0.44, 0.52); printer.add(topEdge);
+    const sheen = new TH.Mesh(new TH.PlaneGeometry(2.3, 0.05), new TH.MeshBasicMaterial({ color: new TH.Color(0xfff0d0).multiplyScalar(0.5), transparent: true, opacity: 0.6, blending: TH.AdditiveBlending, depthWrite: false }));
+    sheen.position.set(0, 0.36, 0.515); printer.add(sheen);
+    const slotGlow = new TH.Mesh(new TH.BoxGeometry(2.05, 0.022, 0.05), new TH.MeshBasicMaterial({ color: new TH.Color(0xffd29a).multiplyScalar(1.4) }));
+    slotGlow.position.set(0, -0.455, 0.3); printer.add(slotGlow);
+    const slotL = new TH.PointLight(0xffc98a, 1.2, 0, 2); slotL.position.set(0, -0.75, 0.6); printer.add(slotL);
+    /* everything above the slot is inside the printer */
+    const slotPlane = new TH.Plane(new TH.Vector3(0, -1, 0), 2.62);
+    const clipMats = [];
     const led = new TH.Mesh(new TH.SphereGeometry(0.025, 10, 8), new TH.MeshBasicMaterial({ color: new TH.Color(0xffc27a).multiplyScalar(3) })); led.position.set(1.1, 0.12, 0.56); printer.add(led);
     /* the ticket: paper with ink, and a foil layer that really is metal */
     const W = 1.9, H = 3.6, cut = 0.72;
@@ -2355,6 +2472,7 @@ const GL_SCENES = {
       g.add(new TH.Mesh(bgeo, new TH.MeshStandardMaterial({ map: backInk.tx, roughness: 0.7 })));
       const bf = new TH.Mesh(bgeo, new TH.MeshPhysicalMaterial({ color: 0xe8bf6e, metalness: 1, roughness: 0.25, alphaMap: backFoil.tx, transparent: true, alphaTest: 0.35 }));
       bf.position.z = -0.002; g.add(bf);
+      g.children.forEach(m => { m.material.clippingPlanes = [slotPlane]; clipMats.push(m.material); });
       return g;
     };
     const ticket = new TH.Group(); scene.add(ticket);           /* origin at the top edge */
@@ -2379,6 +2497,9 @@ const GL_SCENES = {
         ticket.position.set(lerp(0, 0.05, fly), lerp(slot + H * (1 - pr), 1.55, fly), lerp(0, 1.4, fly));
         ticket.rotation.set(lerp(0, -0.08, fly), fly * Math.PI * 2, lerp(0, -0.05, fly));
         printer.position.y = 3.05 + ph(t, 3.0, 4.2) * 1.6;
+        slotPlane.constant = t < 2.95 ? 2.62 : 1e4;
+        slotGlow.material.color.setScalar(t > 0.3 && t < 3.0 ? 1.5 + Math.sin(t * 20) * 0.25 : 0.8).multiply(new TH.Color(1, 0.82, 0.6));
+        slotL.intensity = t > 0.3 && t < 3.1 ? 1.2 : 0.4;
         led.material.color.setScalar(t > 0.4 && t < 2.9 ? (Math.sin(t * 16) > 0 ? 3 : 0.4) : 0.4).multiply(new TH.Color(1, 0.75, 0.45));
         const tear = ph(t, 4.4, 5.5, eout);
         stubPivot.rotation.z = -tear * 0.42;
@@ -2398,101 +2519,99 @@ const GL_SCENES = {
     };
   },
 
-  /* ---------- flowers: petals assembling into a bouquet ---------- */
+  /* ---------- flowers: one white peony, opening from the bud outward ---------- */
   flowers(TH, C) {
     const q = C.q, scene = new TH.Scene();
     scene.background = new TH.Color(0x070605);
-    scene.environmentIntensity = 0.38;
-    const cam = new TH.PerspectiveCamera(34, C.aspect, 0.05, 60);
-    const back = new TH.Mesh(new TH.PlaneGeometry(40, 30), new TH.ShaderMaterial({ depthWrite: false, vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vUv;void main(){float d=length((vUv-vec2(.5,.56))*vec2(1.33,1.));gl_FragColor=vec4(mix(vec3(.075,.054,.038),vec3(.018,.015,.012),smoothstep(0.,.42,d)),1.);}' }));
-    back.position.z = -8; scene.add(back);
-    const keyL = new TH.DirectionalLight(0xffe0bd, 1.1); keyL.position.set(-3, 6, 4); scene.add(keyL);
-    const rim = new TH.DirectionalLight(0xa9c2ff, 2.0); rim.position.set(4, 3, -4); scene.add(rim);
-    const warm = new TH.PointLight(0xffb36b, 3, 0, 2); warm.position.set(1.5, 1.2, 2.5); scene.add(warm);
-    const top = new TH.SpotLight(0xfff0dc, 55, 0, 0.42, 0.85, 2); top.position.set(0.4, 7.5, 2.6); top.target.position.set(0, 1.6, 0); scene.add(top, top.target);
-    /* a cupped petal */
-    const pg = new TH.PlaneGeometry(1, 1, 8, 10); pg.translate(0, 0.5, 0);
-    const pp = pg.attributes.position, col = new Float32Array(pp.count * 3);
+    scene.environmentIntensity = 0.32;
+    const cam = new TH.PerspectiveCamera(30, C.aspect, 0.05, 60);
+    const back = new TH.Mesh(new TH.PlaneGeometry(60, 40), new TH.ShaderMaterial({ depthWrite: false, vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vUv;void main(){float d=length((vUv-vec2(.42,.55))*vec2(1.4,1.));gl_FragColor=vec4(mix(vec3(.085,.06,.045),vec3(.016,.013,.011),smoothstep(0.,.5,d)),1.);}' }));
+    back.position.set(0, -6, -10); back.lookAt(0, 6, 8); scene.add(back);
+    /* light: a warm key from the side, a cool rim behind, a breath of fill */
+    const keyL = new TH.DirectionalLight(0xffd8ac, 2.4); keyL.position.set(-5, 3.5, 2); scene.add(keyL);
+    const rim = new TH.DirectionalLight(0xbfd0ff, 1.6); rim.position.set(3.5, 2.5, -4.5); scene.add(rim);
+    const fill = new TH.DirectionalLight(0xffeedd, 0.35); fill.position.set(2, 5, 4); scene.add(fill);
+    /* the petal: a cupped spoon with a ruffled lip; soft edges come from its alpha */
+    const pg = new TH.PlaneGeometry(1, 1, 12, 16); pg.translate(0, 0.5, 0);
+    const pp = pg.attributes.position;
     for (let i = 0; i < pp.count; i++) {
       const x = pp.getX(i), y = pp.getY(i);
-      const w = (0.22 + 0.78 * Math.pow(Math.sin(Math.PI * Math.min(1, y * 0.6 + 0.1)), 0.6)) * (y > 0.9 ? Math.sqrt(Math.max(0, 1 - Math.pow((y - 0.9) / 0.1, 2))) * 0.6 + 0.4 : 1);
-      const X2 = x * w;
-      pp.setXYZ(i, X2, y * 0.9, -1.0 * X2 * X2 - 0.16 * y * y + 0.02 * Math.sin(x * 18) * y);
-      const k = 0.55 + 0.45 * y;
-      col[i * 3] = lerp(0.82, 1.0, k); col[i * 3 + 1] = lerp(0.72, 0.96, k); col[i * 3 + 2] = lerp(0.52, 0.9, k);
+      const w = 0.5 * (0.16 + 0.84 * Math.sin(Math.PI * Math.min(1, y * 0.6 + 0.13)));
+      const X2 = x * 2 * w;
+      pp.setXYZ(i, X2, y, -1.25 * X2 * X2 - 0.12 * y * y + 0.014 * Math.sin(x * 14) * y * y * y);
     }
-    pg.setAttribute('color', new TH.BufferAttribute(col, 3));
     pg.computeVertexNormals();
-    const petalM = new TH.MeshPhysicalMaterial({ color: 0xf6ece0, vertexColors: true, roughness: 0.72, sheen: 1, sheenRoughness: 0.35, sheenColor: new TH.Color(0xf1cdb4), side: TH.DoubleSide, emissive: 0x3a2414, emissiveIntensity: 0.12 });
-    const blooms = [[0, 2.05, 0, 0, 0, 1], [-0.62, 1.8, 0.3, -0.42, 0.14, 0.86], [0.62, 1.76, -0.24, 0.4, -0.12, 0.84]];
-    const rings = [[5, 0.03, 0.05, 0.26], [7, 0.06, 0.16, 0.31], [9, 0.09, 0.28, 0.36], [11, 0.12, 0.42, 0.41], [13, 0.15, 0.56, 0.45], [15, 0.18, 0.7, 0.48], [17, 0.2, 0.84, 0.5]];
-    const targets = [];
-    const qa = new TH.Quaternion(), qb = new TH.Quaternion(), eu = new TH.Euler(), v = new TH.Vector3(), sc = new TH.Vector3(), m4 = new TH.Matrix4();
-    const rr = rng(42);
-    blooms.forEach(([bx, by, bz, rx, rz, s], bi) => {
-      const bq = new TH.Quaternion().setFromEuler(new TH.Euler(rx * 0.6, 0, rz + rx * 0.5));
-      rings.forEach(([cnt, rad, tilt, size], ri) => {
-        for (let k = 0; k < cnt; k++) {
-          const a = k / cnt * Math.PI * 2 + ri * 0.37 + bi;
-          const o = new TH.Object3D();
-          o.rotation.order = 'YXZ'; o.rotation.set(tilt, a, 0);
-          o.position.set(Math.sin(a) * rad * s, -ri * 0.045 * s, Math.cos(a) * rad * s);
-          o.scale.setScalar(size * s * (0.92 + rr() * 0.12));
-          o.updateMatrix();
-          const mm = new TH.Matrix4().makeRotationFromQuaternion(bq).setPosition(bx, by, bz).multiply(o.matrix);
-          const P = new TH.Vector3(), Qt = new TH.Quaternion(), S = new TH.Vector3(); mm.decompose(P, Qt, S);
-          const ang = rr() * Math.PI * 2, rad2 = 3 + rr() * 4;
-          targets.push({ P, Qt, S, P0: new TH.Vector3(Math.cos(ang) * rad2, 2.2 + (rr() - 0.5) * 6, Math.sin(ang) * rad2 - 1), Q0: new TH.Quaternion().setFromEuler(new TH.Euler(rr() * 6, rr() * 6, rr() * 6)), d: (rings.length - 1 - ri) * 0.32 + bi * 0.25 + rr() * 0.4 });
-        }
-      });
+    const alpha = cTex(TH, 256, 256, (g, W, H) => {
+      g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+      const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(0.07, '#fff'); gr.addColorStop(0.93, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = gr; g.beginPath(); g.moveTo(0, H);
+      for (let k = 0; k <= 5; k++) { const x0 = k / 5 * W; g.quadraticCurveTo(x0 - W / 10, 2, x0, 12 + (k % 2) * 6); }
+      g.lineTo(W, H); g.closePath(); g.fill();
     });
-    const petals = new TH.InstancedMesh(pg, petalM, targets.length); scene.add(petals);
-    /* centres */
-    blooms.forEach(([bx, by, bz, , , s]) => { const c = new TH.Mesh(new TH.SphereGeometry(0.09 * s, 16, 10), new TH.MeshStandardMaterial({ color: 0xe7c36e, emissive: 0x6b4a14, roughness: 0.6 })); c.position.set(bx, by + 0.05, bz); scene.add(c); });
-    /* stems, wrap, ribbon */
-    const stemM = new TH.MeshStandardMaterial({ color: 0x3e3a22, roughness: 0.6, metalness: 0.2 });
-    blooms.forEach(([bx, by, bz]) => { const c = new TH.CatmullRomCurve3([new TH.Vector3(bx, by - 0.1, bz), new TH.Vector3(bx * 0.5, by - 0.9, bz * 0.5), new TH.Vector3(0, 0.5, 0), new TH.Vector3(bx * -0.1, -0.4, bz * -0.1)]); scene.add(new TH.Mesh(new TH.TubeGeometry(c, 40, 0.035, 8), stemM)); });
-    const wrapG = new TH.CylinderGeometry(0.78, 0.22, 1.45, 48, 1, true); wrapG.translate(0, 0.7, 0);
-    const wrap = new TH.Mesh(wrapG, new TH.MeshPhysicalMaterial({ color: 0x2b241c, roughness: 0.85, sheen: 1, sheenRoughness: 0.4, sheenColor: new TH.Color(0xc9a46a), side: TH.DoubleSide }));
-    scene.add(wrap);
-    const satin = new TH.MeshPhysicalMaterial({ color: 0xd2a35a, metalness: 0.75, roughness: 0.3, sheen: 0.6, sheenColor: new TH.Color(0xffe0a0) });
-    const band = new TH.Mesh(new TH.TorusGeometry(0.4, 0.035, 12, 64), satin); band.rotation.x = Math.PI / 2; band.position.y = 0.55; scene.add(band);
-    [-1, 1].forEach(sx => { const loop = new TH.Mesh(new TH.TorusGeometry(0.14, 0.028, 10, 40), satin); loop.position.set(sx * 0.15, 0.56, 0.42); loop.rotation.set(0.2, sx * 0.6, 0); loop.scale.set(1.3, 0.8, 1); scene.add(loop); });
-    let gift = null;
-    if (q.o.what !== 'flowers') {
-      gift = new TH.Group(); gift.position.set(1.55, 0.42, 0.9); gift.rotation.y = -0.5; scene.add(gift);
-      gift.add(new TH.Mesh(new TH.BoxGeometry(0.84, 0.84, 0.84), new TH.MeshPhysicalMaterial({ color: 0x14100c, roughness: 0.5, clearcoat: 0.6 })));
-      gift.add(new TH.Mesh(new TH.BoxGeometry(0.12, 0.87, 0.87), satin), new TH.Mesh(new TH.BoxGeometry(0.87, 0.87, 0.12), satin));
-      [-1, 1].forEach(sx => { const l = new TH.Mesh(new TH.TorusGeometry(0.15, 0.035, 10, 40), satin); l.position.set(sx * 0.14, 0.5, 0); l.rotation.set(0, 0, sx * 0.5); l.scale.set(1.2, 0.75, 0.6); gift.add(l); });
+    alpha.tx.colorSpace = TH.LinearSRGBColorSpace;
+    const tint = cTex(TH, 128, 256, (g, W, H) => {
+      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#d9a99a'); gr.addColorStop(0.3, '#efd6c8'); gr.addColorStop(0.7, '#fbf1e6'); gr.addColorStop(1, '#fffaf2');
+      g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.strokeStyle = 'rgba(170,120,100,.10)'; g.lineWidth = 1;
+      for (let k = 0; k < 9; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 4) * 6, H * 0.5, W / 2 + (k - 4) * 15, 10); g.stroke(); }
+    });
+    const petalM = new TH.MeshPhysicalMaterial({
+      color: 0xffffff, map: tint.tx, alphaMap: alpha.tx, alphaTest: 0.45, alphaToCoverage: Q.level >= 2, side: TH.DoubleSide,
+      roughness: 0.6, sheen: 1, sheenRoughness: 0.38, sheenColor: new TH.Color(0xffe2d6),
+      transmission: Q.level >= 2 ? 0.12 : 0, thickness: 0.05, emissive: 0x2c1810, emissiveIntensity: 0.18
+    });
+    /* phyllotaxis: inner petals tight, outer petals open first */
+    const NP = 56, petals = new TH.InstancedMesh(pg, petalM, NP), info = [];
+    const rr = rng(31), col = new TH.Color();
+    for (let i = 0; i < NP; i++) {
+      const r = Math.sqrt((i + 0.5) / NP), a = i * 2.39996;
+      info.push({ r, a, roll: (rr() - 0.5) * 0.3, s: lerp(0.42, 1.15, Math.pow(r, 0.8)) * (0.92 + rr() * 0.14), start: 0.35 + (1 - r) * 2.5 + rr() * 0.25 });
+      col.setRGB(1, lerp(0.95, 1, rr()), lerp(0.9, 1, rr())); petals.setColorAt(i, col);
     }
-    const pollen = dustMaterial(TH, { size: 1.1, alpha: 0.8, beamR: 2.6, span: 6, rise: 0.06 });
-    pollen.uniforms.uBeam.value.set(0, 2.2, 0);
-    scene.add(dustPoints(TH, 240, [-2.6, 2.6, 0, 5, -2, 2], 21, pollen));
-    const floor = new TH.Mesh(new TH.CircleGeometry(6, 48), new TH.ShaderMaterial({ transparent: true, depthWrite: false, vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'varying vec2 vUv;void main(){float d=length(vUv-.5)*2.;gl_FragColor=vec4(.0,.0,.0,smoothstep(1.,.0,d)*.8);}' }));
-    floor.rotation.x = -Math.PI / 2; floor.position.y = -0.45; scene.add(floor);
+    scene.add(petals);
+    /* the heart: gold stamens */
+    const st = new TH.InstancedMesh(new TH.SphereGeometry(0.018, 8, 6), new TH.MeshStandardMaterial({ color: 0xe9bf5c, roughness: 0.5, emissive: 0x4a3008, emissiveIntensity: 0.4 }), 70);
+    for (let i = 0; i < 70; i++) { const rad = Math.sqrt(i / 70) * 0.13, a = i * 2.39996; const m4 = new TH.Matrix4().setPosition(Math.cos(a) * rad, 0.1 + (0.13 - rad) * 0.5, Math.sin(a) * rad); st.setMatrixAt(i, m4); }
+    scene.add(st);
+    /* leaves and a short stem */
+    const lg = new TH.PlaneGeometry(0.5, 1.5, 6, 10); lg.translate(0, 0.75, 0);
+    const lp = lg.attributes.position;
+    for (let i = 0; i < lp.count; i++) { const x = lp.getX(i), y = lp.getY(i) / 1.5; const w = Math.sin(Math.PI * Math.min(1, y * 0.95 + 0.03)); lp.setXYZ(i, x * w, y * 1.5, -0.25 * x * x * 4 + 0.15 * y * y); }
+    lg.computeVertexNormals();
+    const leafM = new TH.MeshPhysicalMaterial({ color: 0x26321b, roughness: 0.7, sheen: 0.5, sheenColor: new TH.Color(0x7d8d5a), side: TH.DoubleSide });
+    [[0.5, 1.35], [2.6, 1.25], [4.4, 1.3]].forEach(([a, tl]) => { const l = new TH.Mesh(lg, leafM); l.rotation.order = 'YXZ'; l.rotation.set(tl, a, 0); l.position.y = -0.12; scene.add(l); });
+    const stem = new TH.Mesh(new TH.CylinderGeometry(0.05, 0.06, 2, 12), leafM); stem.position.y = -1.1; scene.add(stem);
+    /* bokeh and a few drifting motes */
+    const bm = dustMaterial(TH, { size: 14, alpha: 0.12, ring: 0.7, beamR: 20, span: 10, rise: 0.01 });
+    scene.add(dustPoints(TH, 22, [-6, 6, -4, 2, -9, -3], 7, bm));
+    const pollen = dustMaterial(TH, { size: 0.9, alpha: 0.7, beamR: 2, span: 3, rise: 0.05 });
+    pollen.uniforms.uBeam.value.set(0, 0.4, 0);
+    scene.add(dustPoints(TH, 120, [-1.6, 1.6, -0.2, 2, -1.6, 1.6], 21, pollen));
     const card = ovCard(C.ov, '<div class="ov-row"><span class="ov-who"><span class="ov-n">' + X(q.o.what === 'gift' ? ['A gift, chosen and wrapped', 'هدیه‌ای انتخاب‌شده و بسته‌بندی‌شده'] : ['White peonies, in linen', 'صدتومانی سفید، در کتان']) + '</span><span class="ov-m">' + X(O[q.o.for]) + ' — ' + X(O[q.o.budget]) + '</span></span></div>');
     show01(card, 0);
-    const look = new TH.Vector3();
+    const o = new TH.Object3D(), look = new TH.Vector3();
+    o.rotation.order = 'YXZ';
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.45, thresh: 0.92, tilt: 0.65, focus: 0.5,
+      scene, camera: cam, dur: 7.4, bloom: 0.42, thresh: 0.9, tilt: 1.0, focus: 0.5,
       frame(t) {
-        targets.forEach((p, i) => {
-          const k = ph(t, 0.2 + p.d, 1.7 + p.d, eout);
-          v.lerpVectors(p.P0, p.P, k);
-          const swirl = (1 - k) * 1.6; v.x += Math.sin(t * 2 + i) * swirl * 0.2; v.z += Math.cos(t * 2 + i) * swirl * 0.2;
-          qa.copy(p.Q0).slerp(p.Qt, k);
-          sc.copy(p.S).multiplyScalar(lerp(0.5, 1, k) * (1 + 0.03 * ph(t, 4, 7.4)));
-          m4.compose(v, qa, sc); petals.setMatrixAt(i, m4);
+        info.forEach((p, i) => {
+          const k = ph(t, p.start, p.start + 2.7, eio);
+          const r = p.r;
+          const tilt = lerp(lerp(0.03, 0.3, r), lerp(0.2, 1.42, Math.pow(r, 1.1)), k);
+          const rad = lerp(lerp(0.02, 0.15, r), lerp(0.04, 0.4, r), k);
+          const sz = p.s * lerp(lerp(0.7, 1, r), 1, k);
+          o.rotation.set(tilt, p.a + (1 - k) * 0.25, p.roll * k);
+          o.position.set(Math.sin(p.a) * rad, lerp(lerp(0.14, 0.0, r), lerp(0.12, -0.1, r), k), Math.cos(p.a) * rad);
+          o.scale.set(sz * 0.95, sz, sz);
+          o.updateMatrix(); petals.setMatrixAt(i, o.matrix);
         });
         petals.instanceMatrix.needsUpdate = true;
-        const wr = ph(t, 3.4, 4.8, eout);
-        wrap.scale.set(1, wr, 1); wrap.visible = wr > 0.01; band.scale.set(wr, wr, 1.6 * wr); band.visible = wr > 0.01;
-        if (gift) { const g2 = ph(t, 4.4, 5.4, eback); gift.scale.setScalar(Math.max(0.001, g2)); }
-        pollen.uniforms.uTime.value = t;
-        const a = lerp(-0.55, 0.25, ph(t, 0, 7.4, eio)), d = lerp(8.2, 6.0, ph(t, 0, 7.4, eio));
-        cam.position.set(Math.sin(a) * d, lerp(5.4, 4.3, ph(t, 0, 7.4, eio)), Math.cos(a) * d);
-        look.set(0.05, lerp(1.75, 1.45, ph(t, 0, 7.4)), 0);
-        aim(cam, look, fitK(C, 0.62));
+        st.visible = t > 2.2;
+        pollen.uniforms.uTime.value = t; bm.uniforms.uTime.value = t;
+        const m = ph(t, 0, 7.4, eio), a = lerp(-0.35, 0.2, m), el = lerp(1.0, 0.86, m), d = lerp(12.5, 13.8, m) * fitK(C, 0.5, 1.3);
+        look.set(0, lerp(0.15, 0.05, m), 0);
+        cam.position.set(Math.sin(a) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(a) * Math.cos(el) * d);
+        cam.lookAt(look);
         show01(card, ph(t, 5.3, 6.1, eout));
       }
     };
@@ -2509,7 +2628,14 @@ const GL_SCENES = {
     /* the globe */
     const globe = new TH.Group(); globe.position.set(0, 1.55, -1.5); scene.add(globe);
     const GR = 2.1;
-    globe.add(new TH.Mesh(new TH.SphereGeometry(GR, 64, 40), new TH.MeshPhysicalMaterial({ color: 0x0d0b09, roughness: 0.5, metalness: 0.4, clearcoat: 0.6 })));
+    globe.add(new TH.Mesh(new TH.SphereGeometry(GR, 64, 40), new TH.MeshStandardMaterial({ color: 0x0e0c0a, roughness: 0.85, metalness: 0.1, envMapIntensity: 0.15 })));
+    /* a fresnel rim and one thin specular, instead of studio reflections */
+    globe.add(new TH.Mesh(new TH.SphereGeometry(GR * 1.002, 64, 40), new TH.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: TH.AdditiveBlending,
+      uniforms: { uL: { value: new TH.Vector3(-0.5, 0.6, 0.62).normalize() } },
+      vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+      fragmentShader: 'uniform vec3 uL;varying vec3 vN,vV;void main(){float f=pow(1.-max(dot(vN,vV),0.),4.);vec3 h=normalize(uL+vV);float sp=pow(max(dot(vN,h),0.),900.);gl_FragColor=vec4(vec3(1.,.8,.5)*f*.24+vec3(1.,.95,.85)*sp*.18,1.);}'
+    })));
     const grat = [];
     for (let la = -60; la <= 60; la += 20) for (let lo = 0; lo < 360; lo += 4) { const a = THEO(la, lo, GR * 1.003), b = THEO(la, lo + 4, GR * 1.003); grat.push(a, b); }
     for (let lo = 0; lo < 360; lo += 20) for (let la = -80; la < 80; la += 4) { grat.push(THEO(la, lo, GR * 1.003), THEO(la + 4, lo, GR * 1.003)); }
@@ -2529,7 +2655,7 @@ const GL_SCENES = {
     const atm = new TH.Mesh(new TH.SphereGeometry(GR * 1.12, 48, 32), new TH.ShaderMaterial({
       transparent: true, depthWrite: false, blending: TH.AdditiveBlending, side: TH.BackSide,
       vertexShader: 'varying vec3 vN,vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-      fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),3.);gl_FragColor=vec4(vec3(1.,.78,.45)*.9,f*.28);}'
+      fragmentShader: 'varying vec3 vN,vV;void main(){float f=pow(1.-abs(dot(vN,vV)),5.);gl_FragColor=vec4(vec3(1.,.78,.45)*.6,f*.12);}'
     }));
     globe.add(atm);
     const city = { thr: [35.7, 51.4], ist: [41.0, 29.0], dxb: [25.2, 55.3], kih: [26.5, 54.0], cdg: [48.9, 2.35] };
@@ -2595,7 +2721,7 @@ const GL_SCENES = {
     const ko = showPass ? 0 : -1.4;
     const look = new TH.Vector3(), segs = arcG.index.count;
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.45, thresh: 0.88, tilt: 0.5, focus: 0.45,
+      scene, camera: cam, dur: 7.4, bloom: 0.32, thresh: 0.92, tilt: 0.5, focus: 0.45,
       frame(t) {
         globe.quaternion.copy(baseQ).premultiply(new TH.Quaternion().setFromAxisAngle(new TH.Vector3(0, 1, 0), (t - 3.5) * 0.05));
         const k = ph(t, 0.5, 2.9);
@@ -2624,30 +2750,30 @@ const GL_SCENES = {
     const q = C.q, scene = new TH.Scene();
     scene.background = new TH.Color(0x060505);
     const cam = new TH.PerspectiveCamera(34, C.aspect, 0.05, 80);
-    const xa = -1.9, xb = 1.9;
+    const X0 = 1.6, xa = fa() ? X0 : -X0, xb = -xa; /* the house sits where the reader starts: right in FA */
     const ribbons = [];
     for (let i = 0; i < 6; i++) {
-      const g = new TH.PlaneGeometry(xb - xa, 0.012 + i * 0.006, 360, 1);
+      const g = new TH.PlaneGeometry(X0 * 2, 0.012 + i * 0.006, 360, 1);
       const m = new TH.ShaderMaterial({
         transparent: true, depthWrite: false, blending: TH.AdditiveBlending, side: TH.DoubleSide,
         uniforms: { uT: { value: 0 }, uA: { value: 0 }, uI: { value: i } },
         vertexShader: 'uniform float uT,uI;varying float vX,vP;' +
           'float pulse(float x,float c){float d=(x-c)/.26;return exp(-d*d)*sin(d*3.2);}' +
-          'void main(){vec3 p=position;float x=(p.x+1.9)/3.8;vX=x;float env=sin(3.1416*x);' +
+          'void main(){vec3 p=position;float x=(p.x+1.6)/3.2;vX=x;float env=sin(3.1416*x);' +
           'float y=sin(x*9.+uT*1.3+uI*.8)*.06+sin(x*23.-uT*2.1+uI)*.025;float P=0.;' +
-          'for(int k=0;k<6;k++){float b=1.3+float(k)*1.15;float c=-1.9+(uT-b)/1.05*3.8;if(uT>b&&uT<b+1.3)P+=pulse(p.x,c);}' +
+          'for(int k=0;k<6;k++){float b=1.3+float(k)*1.15;float c=-1.6+(uT-b)/1.05*3.2;if(uT>b&&uT<b+1.3)P+=pulse(p.x,c);}' +
           'vP=abs(P);y+=P*(.55-uI*.06);p.y+=y*env*(1.-uI*.09);p.z+=uI*.09-.25+sin(x*5.+uT)*.05*uI;' +
           'gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1.);}',
         fragmentShader: 'uniform float uA,uI;varying float vX,vP;void main(){float e=smoothstep(0.,.08,vX)*smoothstep(1.,.92,vX);vec3 c=vec3(1.,.76,.4)*(1.3+vP*4.);gl_FragColor=vec4(c,e*uA*(1.-uI*.13));}'
       });
-      const mesh = new TH.Mesh(g, m); scene.add(mesh); ribbons.push(m);
+      const mesh = new TH.Mesh(g, m); if (fa()) mesh.rotation.y = Math.PI; scene.add(mesh); ribbons.push(m);
     }
     const node = (x, label) => {
       const g = new TH.Group(); g.position.x = x; scene.add(g);
       const ring = new TH.Mesh(new TH.TorusGeometry(0.34, 0.016, 12, 80), new TH.MeshBasicMaterial({ color: new TH.Color(0xffcf8a).multiplyScalar(2.2) })); g.add(ring);
       const core = glowSprite(TH, 0xffd9a0, 1.4, 1.1); g.add(core);
       const waves = [0, 1, 2].map(() => { const w = new TH.Mesh(new TH.RingGeometry(0.33, 0.35, 80), addMat(TH, 0xffd08a, 1.6, 0)); g.add(w); return w; });
-      return { g, ring, core, waves, lab: C.label(label, new TH.Vector3(x, -0.75, 0), 'hi') };
+      return { g, ring, core, waves, lab: C.label(label, new TH.Vector3(x, -0.98, 0), 'hi') };
     };
     const A = node(xa, X(['The house', 'خانه'])), B = node(xb, X(['You', 'شما']));
     /* the V and the handset, as glowing marks inside the rings */
@@ -2678,15 +2804,17 @@ const GL_SCENES = {
         B.waves.forEach((w, i) => {
           let best = 1;
           for (let k = 0; k < 6; k++) { const at = 1.3 + k * 1.15 + 1.05; const u = (t - at - i * 0.16) / 1.2; if (u >= 0 && u < 1) best = Math.min(best, u); }
-          w.scale.setScalar(1 + best * 3.2); w.material.opacity = best < 1 ? (1 - best) * 0.9 : 0;
+          w.scale.setScalar(1 + best * 1.5); w.material.opacity = best < 1 ? (1 - best) * 0.9 : 0;
         });
         sparks.uniforms.uTime.value = t;
         const m = ph(t, 0, 7, eio);
-        cam.position.set(lerp(-0.9, 0.4, m), lerp(0.9, 0.35, m), lerp(6.4, 5.4, m));
-        look.set(lerp(-0.1, 0.1, m), 0.05, 0);
-        aim(cam, look, fitK(C, 1.3, 3));
+        /* frame both ends with room for their labels: about 24px inside each edge */
+        const half = X0 + 1.2, dist = half / (Math.tan(cam.fov * Math.PI / 360) * cam.aspect);
+        cam.position.set(lerp(-0.25, 0.25, m), lerp(0.7, 0.35, m), dist * lerp(1.06, 1, m));
+        look.set(0, 0.05, 0);
+        cam.lookAt(look);
         show01(card, ph(t, 3.6, 4.4, eout));
-        big.textContent = fmtLeft(Math.round(lerp(target + 40, target, ph(t, 3.8, 6.6, eout))));
+        big.textContent = liveLeft(q);
       }
     };
   }
