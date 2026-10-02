@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B1C1E">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="icon" href="../assets/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Vault">
+<title>The Vault — Members' Club</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app"></div>
+
+<!-- All screens live in this template. {{name}} = value from VaultApp.renderVals() in app.js.
+     <sc-if value> shows a block when true, <sc-for list as> repeats a block. See runtime.js. -->
+<template id="app-template">
+<div dir="{{dir}}" class="sk sk-combo" style="position: relative; width: 100%; max-width: 480px; margin: 0 auto; height: 100dvh; box-sizing: border-box; background: var(--ground); color: var(--text); display: flex; flex-direction: column; overflow: hidden; font-family: {{font}}; font-size: 15px; line-height: 26px">
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
+<div class="vscroll home" style="position: relative; flex-grow: 1; min-height: 0; overflow-y: auto; background: var(--ground)">
+
+<div class="hero on-photo" style="position: relative; height: 800px; overflow: hidden; display: flex; flex-direction: column">
+<div class="hmedia" style="position: absolute; inset: 0">
+<img class="orig" src="../assets/photos/hero-1.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: {{o0}}; transition: opacity .5s">
+<img class="orig" src="../assets/photos/hero-2.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: {{o1}}; transition: opacity .5s">
+<img class="orig" src="../assets/photos/dining.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: {{o2}}; transition: opacity .5s">
+<div class="hov" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / .85) 0%, rgb(var(--ground-rgb) / .25) 22%, rgb(var(--ground-rgb) / .3) 40%, rgb(var(--ground-rgb) / .92) 68%, var(--ground) 100%)"></div>
+</div>
+<div class="hnav" style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 20px 0">
+<div class="mk hmark logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 42px; height: 43px; flex-shrink: 0; background: var(--accent-l)"></div>
+<div class="hword" dir="ltr" style="display: none">THE VAULT</div>
+<nav style="display: flex; align-items: center; gap: 11px; font-size: {{navSize}}; letter-spacing: {{track2}}">
+<a href="#membership" onClick="{{x.pMembership}}" style="color: var(--text); text-decoration: none; padding: 12px 0">{{t.navMem}}</a>
+<a href="#events" onClick="{{x.pEvents}}" style="color: var(--text); text-decoration: none; padding: 12px 0">{{t.navEve}}</a>
+<a href="#experiences" onClick="{{x.pExperiences}}" style="color: var(--text); text-decoration: none; padding: 12px 0">{{t.navExp}}</a>
+</nav>
+<button type="button" class="vb menubtn" onClick="{{x.openMenu}}"><i></i><span>{{x.t.menu}}</span></button>
+<button type="button" class="vb" onClick="{{toggleLang}}" aria-label="{{t.langAria}}" style="min-width: 44px; height: 40px; flex-shrink: 0; background: rgb(var(--ground-rgb) / .55); border: 1px solid rgb(var(--accent-rgb) / .8); border-radius: var(--radius); color: var(--accent-l); font-size: 13px; letter-spacing: 0.06em">{{t.langBtn}}</button>
+</div>
+<div class="meta" dir="ltr"><span>THE VAULT</span><span>TEHRAN</span><span>WHERE VALUE IS KEPT</span></div>
+<div class="dial dial-hero" role="button" tabindex="0" aria-label="{{t.nextAria}}" onClick="{{nextSlide}}"><div class="dialspin" style="--a0: {{sPrev}}; --a1: {{sDeg}}"><img src="../assets/img/dial-hero.png" alt=""></div><div class="mk dialmk"></div><div class="dialptr"></div></div>
+<div class="htype" dir="ltr" style="display: none"><span>T</span><span>H</span><span>E</span><span></span><span></span><span>V</span><span>A</span><span>U</span><span>L</span><span>T</span></div>
+<div class="hbody" style="position: relative; margin-top: auto; box-sizing: border-box; padding: 0 20px 26px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 10px">
+<div class="orn" style="width: 12px; height: 12px; background: var(--accent-l)"></div>
+<div dir="ltr" style="font-family: 'Archivo', sans-serif; font-size: 11px; line-height: 16px; letter-spacing: 0.2em; color: var(--accent-l)">{{slide.eyebrow}}</div>
+</div>
+<h1 class="htitle ttl" dir="ltr" style="margin: 0; font-family: var(--display); font-weight: 400; font-size: 43px; line-height: 50px; text-align: {{startAlign}}"><span style="display: block; color: var(--text)">{{slide.a}}</span><span class="h2nd" style="display: block; color: var(--accent-l)">{{slide.b}}</span></h1>
+<p style="margin: 0; min-height: 84px; font-size: 15.5px; line-height: 28px; color: rgb(var(--text-rgb) / .9)">{{slide.body}}</p>
+<div class="hcta" style="display: flex; flex-direction: column; gap: 12px">
+<button type="button" class="vb gold" onClick="{{goRequest}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{t.ctaRequest}}</button>
+<button type="button" class="vb line" onClick="{{goLogin}}" style="height: 54px; background: rgb(var(--ground-rgb) / .6); border: 1px solid var(--accent); border-radius: var(--radius); color: var(--accent-l); font-size: 15px; font-weight: 500">{{t.memberLogin}}</button>
+</div>
+<div class="hslider" dir="ltr" style="align-self: center; display: flex; align-items: center; gap: 14px; padding-top: 4px">
+<button type="button" class="vb" onClick="{{prevSlide}}" aria-label="{{t.prevAria}}" style="width: 44px; height: 44px; border-radius: 50%; background: rgb(var(--ground-rgb) / .6); border: 1px solid rgb(var(--accent-rgb) / .7); display: flex; align-items: center; justify-content: center"><span style="display: block; width: 8px; height: 8px; margin-left: 3px; border-top: 1.5px solid var(--accent-l); border-left: 1.5px solid var(--accent-l); transform: rotate(-45deg)"></span></button>
+<sc-for list="{{dots}}" as="d" hint-placeholder-count="3">
+<div style="width: {{d.w}}; height: 4px; border-radius: var(--radius); background: {{d.bg}}"></div>
+</sc-for>
+<button type="button" class="vb" onClick="{{nextSlide}}" aria-label="{{t.nextAria}}" style="width: 44px; height: 44px; border-radius: 50%; background: rgb(var(--ground-rgb) / .6); border: 1px solid rgb(var(--accent-rgb) / .7); display: flex; align-items: center; justify-content: center"><span style="display: block; width: 8px; height: 8px; margin-right: 3px; border-top: 1.5px solid var(--accent-l); border-left: 1.5px solid var(--accent-l); transform: rotate(135deg)"></span></button>
+</div>
+</div>
+</div>
+
+<div class="mev" style="position: relative; padding: 28px 20px 0; box-sizing: border-box">
+<div class="photo" style="position: relative; height: 330px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/member-events.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .6)"></div>
+</div>
+<div role="button" tabindex="0" onClick="{{x.pEvents}}" class="mevcard paper" style="position: relative; margin: -70px 0 0 0; margin-inline-start: 44px; background: var(--text); color: var(--ground); border-top: 3px solid var(--accent); padding: 18px 20px 20px; box-shadow: 0 14px 28px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 6px">
+<div dir="ltr" style="font-family: var(--display); font-size: 22px; line-height: 30px; color: var(--panel); text-align: {{startAlign}}">{{t.c3}}</div>
+<p style="margin: 0; font-size: 14px; line-height: 24px; color: var(--ground)">{{t.meBody}}</p>
+</div>
+</div>
+
+<div class="panel on-panel statement" style="position: relative; margin-top: 44px; background: var(--panel); padding: 52px 26px 52px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.85"></div>
+<div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgb(var(--panel-rgb) / .92) 34%, rgb(var(--panel-rgb) / .15) 100%)"></div>
+<div class="mk" style="position: relative; width: 56px; height: 58px; background: var(--accent-l)"></div>
+<p style="position: relative; margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: {{introSize}}; line-height: {{introLh}}; color: var(--text)">{{t.statement}}</p>
+<button type="button" class="vb gold" onClick="{{goRequest}}" style="position: relative; height: 50px; padding: 0 30px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 15px; font-weight: 600">{{t.ctaRequest}}</button>
+</div>
+
+<div id="experiences" class="sec exp" style="position: relative; padding: 52px 20px 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.16; pointer-events: none"></div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 10px">
+<div dir="ltr" style="font-family: 'Archivo', sans-serif; font-size: 11px; line-height: 16px; letter-spacing: 0.2em; color: var(--accent-l); text-align: {{startAlign}}">RESTAURANTS &amp; LOUNGES</div>
+<h2 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 29px; line-height: 40px">{{t.expTitle}}</h2>
+<p style="margin: 0; font-size: 15px; line-height: 26px; color: rgb(var(--text-rgb) / .84)">{{t.expBody}}</p>
+<a href="#benefits" onClick="{{x.pExperiences}}" style="align-self: flex-start; display: inline-flex; align-items: center; height: 46px; padding: 0 22px; border: 1px solid var(--accent); border-radius: var(--radius); color: var(--accent-l); text-decoration: none; font-size: 14px; background: rgb(var(--ground-rgb) / .6)">{{t.seeBenefits}}</a>
+</div>
+<div class="photo" style="position: relative; height: 380px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/dining.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .6)"></div>
+</div>
+<div class="photo" style="position: relative; height: 380px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/bar.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .6)"></div>
+</div>
+</div>
+
+<div id="events" class="panel on-panel events" style="position: relative; margin-top: 40px; background: var(--panel); padding: 48px 20px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.7"></div>
+<div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / .2), rgb(var(--ground-rgb) / .7))"></div>
+<div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<div dir="ltr" style="font-family: 'Archivo', sans-serif; font-size: 11px; line-height: 16px; letter-spacing: 0.2em; color: var(--accent-l)">THE VAULT CALENDAR</div>
+<h2 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 29px; line-height: 40px">{{t.calTitle}}</h2>
+</div>
+<div style="position: relative; border: 1px solid var(--accent); padding: 5px; background: var(--ground); box-shadow: 0 16px 32px rgba(0,0,0,.5)">
+<div style="border: 1px solid rgb(var(--accent-rgb) / .45); padding: 4px 18px; display: flex; flex-direction: column">
+<sc-for list="{{events}}" as="e" hint-placeholder-count="3">
+<div role="button" tabindex="0" onClick="{{e.go}}" style="display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid {{e.line}}; cursor: pointer">
+<div style="width: 62px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; border-inline-end: 1px solid rgb(var(--accent-rgb) / .45); padding-inline-end: 14px">
+<span style="font-family: {{numFont}}; font-size: 28px; line-height: 32px; color: var(--accent-l)">{{e.day}}</span>
+<span style="font-size: 12px; line-height: 16px; color: rgb(var(--text-rgb) / .8)">{{e.month}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; line-height: 26px">{{e.title}}</span>
+<span style="font-size: 13px; line-height: 20px; color: rgb(var(--text-rgb) / .72)">{{e.place}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div id="benefits" class="sec ben" style="position: relative; padding: 48px 20px 8px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.16; pointer-events: none"></div>
+
+<div class="card on-photo" role="button" tabindex="0" onClick="{{x.pGallery}}" style="position: relative; height: 400px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/gallery.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="ov" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / 0) 36%, rgb(var(--ground-rgb) / .94) 100%)"></div>
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .7)"></div>
+<div class="txt" style="position: absolute; left: 24px; right: 24px; bottom: 22px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Bodoni Moda', serif; font-size: 14px; line-height: 18px; color: var(--accent-l)">I</span>
+<h3 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 24px; line-height: 34px">{{t.c1}}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 23px; color: rgb(var(--text-rgb) / .88)">{{t.c1d}}</p>
+</div>
+</div>
+
+<div class="card on-photo" role="button" tabindex="0" onClick="{{x.pRestaurant}}" style="position: relative; height: 400px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/lounge.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="ov" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / 0) 36%, rgb(var(--ground-rgb) / .94) 100%)"></div>
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .7)"></div>
+<div class="txt" style="position: absolute; left: 24px; right: 24px; bottom: 22px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Bodoni Moda', serif; font-size: 14px; line-height: 18px; color: var(--accent-l)">II</span>
+<h3 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 24px; line-height: 34px">{{t.c2}}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 23px; color: rgb(var(--text-rgb) / .88)">{{t.c2d}}</p>
+</div>
+</div>
+
+<div class="card on-photo" role="button" tabindex="0" onClick="{{x.pMevents}}" style="position: relative; height: 400px; overflow: hidden; box-shadow: 0 14px 30px rgba(0,0,0,.5)">
+<img loading="lazy" decoding="async" class="orig" src="../assets/photos/events.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+<div class="ov" style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / 0) 36%, rgb(var(--ground-rgb) / .94) 100%)"></div>
+<div class="cardframe" style="position: absolute; inset: 8px; border: 1px solid rgb(var(--accent-rgb) / .7)"></div>
+<div class="txt" style="position: absolute; left: 24px; right: 24px; bottom: 22px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Bodoni Moda', serif; font-size: 14px; line-height: 18px; color: var(--accent-l)">III</span>
+<h3 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 24px; line-height: 34px">{{t.c3}}</h3>
+<p style="margin: 0; font-size: 14px; line-height: 23px; color: rgb(var(--text-rgb) / .88)">{{t.c3d}}</p>
+</div>
+</div>
+</div>
+
+<div id="membership" class="panel on-panel membership" style="position: relative; margin-top: 64px; background: var(--panel); padding: 0 20px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.55"></div>
+<div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgb(var(--ground-rgb) / .1) 0%, rgb(var(--ground-rgb) / .82) 100%)"></div>
+<div class="mcard" style="position: relative; margin-top: -28px; height: 244px; overflow: hidden; border: 1px solid var(--accent); box-shadow: 0 18px 36px rgba(0,0,0,.55)">
+<img src="../assets/photos/membership-card.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+</div>
+<div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<div dir="ltr" style="font-family: 'Archivo', sans-serif; font-size: 11px; line-height: 16px; letter-spacing: 0.2em; color: var(--accent-l)">INVITATION ONLY</div>
+<h2 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 29px; line-height: 40px">{{t.readyTitle}}</h2>
+<p style="margin: 0; font-size: 15px; line-height: 26px; color: rgb(var(--text-rgb) / .9)">{{t.readyBody}}</p>
+</div>
+<button type="button" class="vb gold" onClick="{{goRequest}}" style="position: relative; height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{t.submitRequest}}</button>
+</div>
+
+<div class="foot" style="background: var(--ground); padding: 40px 24px 36px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; border-top: 1px solid var(--accent)">
+<img class="lk-l" src="../assets/img/lockup.png" alt="The Vault. Where value is kept." style="display: block; width: 190px; height: auto">
+<img class="lk-d" src="../assets/img/lockup-dark.png" alt="The Vault. Where value is kept." style="display: none; width: 190px; height: auto">
+<div class="flinks"><a href="#membership" onClick="{{x.pMembership}}">{{t.flMem}}</a><a href="#events" onClick="{{x.pEvents}}">{{t.flEve}}</a><a href="#experiences" onClick="{{x.pExperiences}}">{{t.flExp}}</a><a href="#login" onClick="{{goLogin}}">{{t.memberLogin}}</a></div>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
+<button type="button" class="vb sticky" onClick="{{goRequest}}" style="display: none">{{t.ctaRequest}}</button>
+</sc-if>
+
+<sc-if value="{{showBar}}" hint-placeholder-val="{{false}}">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.16; pointer-events: none"></div>
+</sc-if>
+
+<sc-if value="{{showBar}}" hint-placeholder-val="{{false}}">
+<div class="bar" style="position: relative; height: 66px; flex-shrink: 0; box-sizing: border-box; padding: 0 14px; display: flex; align-items: center; gap: 12px; background: var(--ground); border-bottom: 1px solid rgb(var(--accent-rgb) / .55)">
+<button type="button" class="vb" onClick="{{back}}" style="visibility: {{x.backVis}}; height: 44px; flex-shrink: 0; padding: 0 6px; background: transparent; border: 0; display: flex; align-items: center; gap: 10px; color: var(--accent-l); font-size: 14px">
+<span style="display: block; width: 9px; height: 9px; border-top: 1.5px solid var(--accent-l); border-left: 1.5px solid var(--accent-l); transform: rotate({{backRot}})"></span>
+<span>{{t.prev}}</span>
+</button>
+<div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .4)"></div>
+<div class="mk logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 40px; height: 41px; flex-shrink: 0; background: var(--accent)"></div>
+<div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .4)"></div>
+<button type="button" class="vb" onClick="{{toggleLang}}" aria-label="{{t.langAria}}" style="min-width: 44px; height: 40px; flex-shrink: 0; background: transparent; border: 1px solid rgb(var(--accent-rgb) / .6); border-radius: var(--radius); color: var(--accent-l); font-size: 13px; letter-spacing: 0.06em">{{t.langBtn}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isStep}}" hint-placeholder-val="{{false}}">
+<div class="step" style="position: relative; flex-grow: 1; min-height: 0; display: flex; flex-direction: column">
+<div class="band on-panel" style="position: relative; height: 50px; flex-shrink: 0; background: var(--panel); border-bottom: 1px solid var(--accent)">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.9"></div>
+</div>
+<div dir="{{dir}}" class="stepper" style="position: relative; flex-shrink: 0; margin-top: -21px; display: flex; justify-content: center; gap: 10px">
+<sc-for list="{{segs}}" as="sg" hint-placeholder-count="5">
+<div class="seg {{sg.cls}}" style="width: 42px; height: 42px; box-sizing: border-box; border-radius: 50%; background: {{sg.bg}}; border: 1px solid var(--accent); box-shadow: 0 0 0 3px var(--ground); display: flex; align-items: center; justify-content: center; font-family: 'Bodoni Moda', serif; font-size: 15px; line-height: 16px; color: {{sg.fg}}">{{sg.num}}</div>
+</sc-for>
+</div>
+<div class="shead" style="flex-shrink: 0; box-sizing: border-box; padding: 14px 24px 0; display: flex; flex-direction: column; gap: 4px">
+<div class="sprog"><i style="width: {{stepPct}}"></i></div>
+<div class="scount" dir="ltr">{{stepCount}}</div>
+<div class="dial dial-step" style="--a0: {{dialPrev}}; --a1: {{dialDeg}}"><img src="../assets/img/dial-step.png" alt=""><div class="mk dialmk"></div><div class="dialptr"></div></div>
+<div class="scount2">{{stepOf}}</div>
+<div style="font-size: 12px; line-height: 18px; letter-spacing: {{track}}; color: var(--accent-l)">{{t.formEyebrow}}</div>
+<h1 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-size: 26px; line-height: 36px; font-weight: {{titleW}}">{{stepTitle}}</h1>
+<p style="margin: 0; font-size: 13px; line-height: 21px; color: rgb(var(--text-rgb) / .74)">{{t.formSub}}</p>
+</div>
+
+<div class="vscroll" style="flex-grow: 1; min-height: 0; overflow-y: auto; box-sizing: border-box; padding: 14px 24px 10px">
+
+<sc-if value="{{isS1}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 11px">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.first}} *</span>
+<input data-field="first" class="vf" type="text" autocomplete="given-name" placeholder="{{t.first}}">
+</label>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.last}} *</span>
+<input data-field="last" class="vf" type="text" autocomplete="family-name" placeholder="{{t.last}}">
+</label>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.mobile}} *</span>
+<div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
+<input data-field="mobile" class="vf" type="tel" inputmode="tel" autocomplete="tel" aria-label="{{t.mobile}}" placeholder="09123456789">
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.email}}</span>
+<input data-field="email" class="vf" type="email" dir="ltr" autocomplete="email" placeholder="email@example.com">
+</label>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.gender}} *</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{titles}}" as="c" hint-placeholder-count="2">
+<button type="button" class="vb chip" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="height: 46px; border-radius: var(--radius); font-size: 15px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.country}} *</span>
+<input data-field="country" class="vf" type="text" autocomplete="country-name" placeholder="{{t.iran}}">
+</label>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.city}} *</span>
+<input data-field="city" class="vf" type="text" autocomplete="address-level2" placeholder="{{t.tehran}}">
+</label>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.birth}} · {{x.birthCalendarLabel}}</span>
+<div class="dob" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<input data-field="birthDay" class="vf" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-day" aria-label="{{t.day}}" placeholder="{{t.day}}" style="text-align: center">
+<input data-field="birthMonth" class="vf" type="text" inputmode="numeric" maxlength="2" autocomplete="bday-month" aria-label="{{t.month}}" placeholder="{{t.month}}" style="text-align: center">
+<input data-field="birthYear" class="vf" type="text" inputmode="numeric" maxlength="4" autocomplete="bday-year" aria-label="{{t.year}}" placeholder="{{t.year}}" style="text-align: center">
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isS2}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.web}}</span>
+<input data-field="website" class="vf" type="url" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="https://example.com">
+</label>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.insta}}</span>
+<input data-field="instagram" class="vf" type="text" dir="ltr" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="{{t.instaPh}}">
+</label>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.linkedin}}</span>
+<input data-field="linkedin" class="vf" type="url" dir="ltr" autocapitalize="off" spellcheck="false" placeholder="{{t.linkedinPh}}">
+</label>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.field}} *</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{fields}}" as="c" hint-placeholder-count="8">
+<button type="button" class="vb chip" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 13px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.role}} *</span>
+<input data-field="role" class="vf" type="text" autocomplete="organization-title" placeholder="{{t.rolePh}}">
+</label>
+</div>
+</sc-if>
+
+<sc-if value="{{isS3}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<label style="display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; line-height: 19px; color: var(--accent-l)"><span>{{t.bio}} *</span><span data-counter="bio" dir="ltr" style="color: rgb(var(--text-rgb) / .8)">{{bioCount}}</span></span>
+<textarea data-field="bio" class="vt" rows="3" maxlength="600" placeholder="{{t.bioPh}}" ></textarea>
+</label>
+<label style="display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; justify-content: space-between; font-size: 13px; line-height: 19px; color: var(--accent-l)"><span>{{t.why}} *</span><span data-counter="why" dir="ltr" style="color: rgb(var(--text-rgb) / .8)">{{whyCount}}</span></span>
+<textarea data-field="why" class="vt" rows="3" maxlength="600" placeholder="{{t.whyPh}}" ></textarea>
+</label>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.interests}} *</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{interests}}" as="c" hint-placeholder-count="7">
+<button type="button" class="vb chip" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 13px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isS4}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="border: 1px solid rgb(var(--accent-rgb) / .5); padding: 4px; background: rgb(var(--panel-rgb) / .45)">
+<p style="margin: 0; border: 1px solid rgb(var(--accent-rgb) / .28); padding: 12px 14px; font-size: 14px; line-height: 24px; color: rgb(var(--text-rgb) / .9)">{{t.refNote}}</p>
+</div>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.refName}}</span>
+<input data-field="refName" class="vf" type="text" placeholder="{{t.refNamePh}}">
+</label>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.refPhone}}</span>
+<div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
+<input data-field="refPhone" class="vf" type="tel" inputmode="tel" aria-label="{{t.refPhone}}" placeholder="09123456789">
+</div>
+</div>
+<label style="display: flex; flex-direction: column; gap: 4px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.refRel}}</span>
+<textarea data-field="refRelation" class="vt" rows="4" maxlength="600" placeholder="{{t.refRelPh}}"></textarea>
+</label>
+</div>
+</sc-if>
+
+<sc-if value="{{isS5}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<label style="display: flex; align-items: flex-start; gap: 12px; background: rgb(var(--panel-rgb) / .5); border: 1px solid rgb(var(--accent-rgb) / .5); border-radius: var(--radius); padding: 14px">
+<input data-field="agreeTerms" type="checkbox" class="ck">
+<span style="display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 24px"><span>{{t.agree1}} *</span><a href="#rules" onClick="{{x.pTerms}}" style="color: var(--accent-l); text-underline-offset: 4px">{{t.readRules}}</a></span>
+</label>
+<label style="display: flex; align-items: flex-start; gap: 12px; background: rgb(var(--panel-rgb) / .5); border: 1px solid rgb(var(--accent-rgb) / .5); border-radius: var(--radius); padding: 14px">
+<input data-field="agreeInfo" type="checkbox" class="ck">
+<span style="font-size: 14px; line-height: 24px">{{t.agree2}} *</span>
+</label>
+</div>
+</sc-if>
+
+</div>
+
+<div class="sfoot" style="position: relative; flex-shrink: 0; box-sizing: border-box; padding: 12px 24px 22px; background: var(--ground); border-top: 1px solid rgb(var(--accent-rgb) / .4); display: flex; flex-direction: column">
+<button type="button" class="vb gold" onClick="{{next}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{stepCta}}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isSent}}" hint-placeholder-val="{{false}}">
+<div class="obj-dark sent" style="position: relative; flex-grow: 1; background: var(--panel); box-sizing: border-box; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.6"></div>
+<div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgb(var(--ground-rgb) / .1) 20%, rgb(var(--ground-rgb) / .84) 100%)"></div>
+<div style="position: relative; flex-grow: 1; display: flex; align-items: center; justify-content: center">
+<div class="plq" style="position: relative; width: 100%; box-sizing: border-box; background: var(--ground); border: 1px solid var(--accent); padding: 5px; box-shadow: 0 18px 40px rgba(0,0,0,.55)">
+<div style="border: 1px solid rgb(var(--accent-rgb) / .5); padding: 66px 22px 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center">
+<div dir="ltr" style="font-family: 'Archivo', sans-serif; font-size: 11px; line-height: 16px; letter-spacing: 0.2em; color: var(--accent-l)">CHAMBER APPLICATION</div>
+<div style="align-self: stretch; display: flex; align-items: center; gap: 12px">
+<div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .55)"></div>
+<div class="orn" style="width: 14px; height: 14px; background: var(--accent)"></div>
+<div style="flex-grow: 1; height: 1px; background: rgb(var(--accent-rgb) / .55)"></div>
+</div>
+<p style="margin: 0; font-size: 16px; line-height: 30px; color: var(--text)">{{t.sentBody}}</p>
+</div>
+<div class="seal" style="position: absolute; left: 50%; top: -52px; margin-left: -52px; width: 104px; height: 104px; display: flex; align-items: center; justify-content: center">
+<div style="width: 80px; height: 80px; border-radius: 50%; box-shadow: inset 0 2px 4px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.14); display: flex; align-items: center; justify-content: center">
+<div class="mk" style="width: 50px; height: 51px; background: #330C11; filter: drop-shadow(0 1px 0 rgba(255,255,255,.2))"></div>
+</div>
+</div>
+</div>
+</div>
+<button type="button" class="vb" onClick="{{goHome}}" style="position: relative; height: 54px; background: rgb(var(--ground-rgb) / .82); border: 1px solid var(--accent); border-radius: var(--radius); color: var(--accent-l); font-size: 15px; font-weight: 500">{{t.backHome}}</button>
+<button type="button" class="vb gold" onClick="{{goLogin}}" style="position: relative; height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{t.toLogin}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isLogin}}" hint-placeholder-val="{{false}}">
+<div style="position: relative; flex-grow: 1; min-height: 0; display: flex; flex-direction: column">
+<div style="position: relative; height: 224px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 60%, rgb(var(--panel-rgb) / .75) 0%, rgb(var(--ground-rgb) / 0) 70%)" class="cardstage">
+<div dir="ltr" class="obj-dark" style="position: relative; width: 270px; height: 170px; border-radius: 12px; background: var(--ground); border: 1px solid var(--accent); overflow: hidden; transform: rotate(-4deg); box-shadow: 0 22px 44px rgba(0,0,0,.65)">
+<div class="pat" style="position: absolute; inset: 0; opacity: 0.95"></div>
+<div style="position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,.1) 0%, rgba(255,255,255,0) 38%, rgba(0,0,0,.25) 100%)"></div>
+<div class="gold" style="position: absolute; left: 16px; top: 16px; width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center">
+<div class="mk" style="width: 32px; height: 33px; background: var(--ground)"></div>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; bottom: 12px; display: flex; justify-content: space-between; align-items: baseline; background: var(--ground); padding: 4px 8px; border: 1px solid rgb(var(--accent-rgb) / .6)">
+<span style="font-family: var(--display); font-size: 14px; letter-spacing: 0.12em; color: var(--accent-l)">THE VAULT</span>
+<span style="font-family: 'Archivo', sans-serif; font-size: 9px; letter-spacing: 0.24em; color: rgb(var(--text-rgb) / .8)">MEMBER</span>
+</div>
+</div>
+</div>
+<div style="flex-grow: 1; box-sizing: border-box; padding: 0 24px 22px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px; text-align: center">
+<h1 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-size: 26px; line-height: 38px; font-weight: {{titleW}}">{{t.loginTitle}}</h1>
+<p style="margin: 0; font-size: 13.5px; line-height: 23px; color: rgb(var(--text-rgb) / .78)">{{t.loginBody}}</p>
+</div>
+<div role="tablist" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; border: 1px solid var(--accent); padding: 4px; background: rgb(var(--ground-rgb) / .7)">
+<sc-for list="{{tabs}}" as="c" hint-placeholder-count="2">
+<button type="button" role="tab" class="vb tab" onClick="{{c.pick}}" aria-selected="{{c.on}}" style="height: 44px; border: 0; border-radius: 1px; font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}">{{c.label}}</button>
+</sc-for>
+</div>
+<sc-if value="{{byCode}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.mobile}} *</span>
+<div dir="ltr" style="display: grid; grid-template-columns: 124px minmax(0, 1fr); gap: 8px">
+<select class="vf vsel" aria-label="{{t.countryCode}}" onChange="{{x.pickCountry}}"><sc-for list="{{x.countries}}" as="c" hint-placeholder-count="8"><option value="{{c.val}}" selected="{{c.sel}}">{{c.label}}</option></sc-for></select>
+<input data-field="loginPhone" class="vf" type="tel" inputmode="tel" autocomplete="tel" aria-label="{{t.mobile}}" placeholder="09123456789">
+</div>
+</div>
+</sc-if>
+<sc-if value="{{byPass}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.userId}} *</span>
+<input data-field="loginId" class="vf" type="text" autocomplete="username">
+</label>
+<label style="display: flex; flex-direction: column; gap: 2px">
+<span class="lab" style="font-size: 13px; line-height: 19px; color: var(--accent-l)">{{t.password}} *</span>
+<input data-field="password" class="vf" type="password" autocomplete="current-password">
+</label>
+</div>
+</sc-if>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 2px">
+<button type="button" class="vb gold" onClick="{{x.loginGo}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{loginCta}}</button>
+<a href="#forgot" onClick="{{x.goForgot}}" style="align-self: center; display: flex; align-items: center; height: 44px; color: var(--accent-l); font-size: 14px; text-underline-offset: 4px">{{t.forgot}}</a>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.isPg}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="vscroll pgs">
+<div class="door ph ph-{{x.pg.ph}}"></div>
+<div class="pgbody">
+<div class="eyb" dir="ltr" style="text-align: {{startAlign}}">{{x.pg.eyebrow}}</div>
+<h1 class="ttl" style="margin: 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 32px; line-height: 42px">{{x.pg.title}}</h1>
+<p>{{x.pg.body}}</p>
+<sc-if value="{{x.isForgot}}">
+<label class="fgrp"><span class="lab">{{t.mobile}} *</span><input class="vf" data-field="forgotPhone" type="tel" inputmode="tel" autocomplete="tel" dir="ltr" placeholder="09123456789"></label>
+</sc-if>
+<div class="rows">
+<sc-for list="{{x.pg.rows}}" as="r" hint-placeholder-count="3">
+<button type="button" class="row" onClick="{{r.go}}"><span class="rk" style="font-family: {{numFont}}">{{r.k}}</span><span class="rt"><b>{{r.t}}</b><i>{{r.d}}</i></span><span class="chev {{r.chev}}"></span></button>
+</sc-for>
+</div>
+<button type="button" class="vb gold" onClick="{{x.pg.cta}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600; margin-top: 10px">{{x.pg.ctaLabel}}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.isOtp}}" hint-placeholder-val="{{false}}">
+<div class="scr otp">
+<div class="otpdial dial"><img src="../assets/img/dial-step.png" alt=""><div class="mk dialmk"></div></div>
+<h1 class="ttl" style="margin: 0; text-align: center; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 28px; line-height: 38px">{{x.t.otpTitle}}</h1>
+<p style="margin: 0; text-align: center; font-size: 14px; line-height: 23px; color: rgb(var(--text-rgb) / .78)">{{x.t.otpBody}}</p>
+<p class="note otp-hint">{{x.otpHint}}</p>
+<div dir="ltr" class="otpin">
+<input data-field="otp0" class="vf" type="text" inputmode="numeric" maxlength="4" autocomplete="one-time-code" aria-label="{{x.digit1}}" placeholder="·">
+<input data-field="otp1" class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="{{x.digit2}}" placeholder="·">
+<input data-field="otp2" class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="{{x.digit3}}" placeholder="·">
+<input data-field="otp3" class="vf" type="text" inputmode="numeric" maxlength="1" aria-label="{{x.digit4}}" placeholder="·">
+</div>
+<button type="button" class="vb linkb" onClick="{{x.resend}}" disabled="{{x.resendOff}}" aria-live="polite">{{x.resendLabel}}</button>
+<button type="button" class="vb gold" onClick="{{x.enter}}" style="margin-top: auto; height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.confirm}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{x.isReset}}">
+<div class="scr"><div class="vscroll pgs"><div class="mb">
+<div class="eyb">{{x.t.forgotTitle}}</div><h1 class="ttl">{{x.resetTitle}}</h1>
+<p class="note">{{x.resetBody}}</p>
+<label class="fgrp"><span class="lab">{{t.password}}</span><input class="vf" data-field="newPassword" type="password" autocomplete="new-password"></label>
+<label class="fgrp"><span class="lab">{{x.confirmPassword}}</span><input class="vf" data-field="confirmPassword" type="password" autocomplete="new-password"></label>
+<button class="vb gold" type="button" onClick="{{x.savePassword}}">{{x.resetCta}}</button>
+</div></div></div>
+</sc-if>
+
+<sc-if value="{{x.isM}}" hint-placeholder-val="{{false}}">
+<div class="scr">
+<div class="vscroll pgs">
+
+<sc-if value="{{x.mHome}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb" style="text-align: {{startAlign}}">{{x.memberNo}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 34px; line-height: 44px">{{x.greet}}</h1>
+<div class="mcardx obj-dark" dir="ltr"><div class="pat" style="position: absolute; inset: 0; opacity: 0.9"></div><div class="gold mchip"><div class="mk" style="width: 30px; height: 31px; background: var(--ground)"></div></div><div class="mline"><span style="font-family: var(--display); font-size: 15px; letter-spacing: 0.12em; color: var(--accent-l)">THE VAULT</span><span style="font-size: 9px; letter-spacing: 0.24em; color: rgb(var(--text-rgb) / .8)">MEMBER Nº 001</span></div></div>
+<div class="stat"><span>{{x.t.openToday}}</span><b dir="ltr">{{x.openHours}}</b></div>
+<div class="blk">
+<div class="eyb">{{x.t.nextVisit}}</div>
+<button type="button" class="row" onClick="{{x.tabReserve}}"><span class="rt"><b>{{x.visitTitle}}</b><i>{{x.visitSub}}</i></span><span class="chev"></span></button>
+</div>
+<div class="blk">
+<div class="eyb">{{x.t.tonight}}</div>
+<button type="button" class="tcard" onClick="{{x.ev0}}"><span class="tph ph ph-auction"></span><span class="rt"><b>{{x.e0.title}}</b><i>{{x.e0.place}}</i></span><span class="chev"></span></button>
+</div>
+<div class="qa">
+<button type="button" class="qab" onClick="{{x.tabReserve}}"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CDB57E' stroke-width='1.3'%3E%3Crect x='4' y='5.5' width='16' height='14'/%3E%3Cpath d='M4 10h16M8.5 3v4M15.5 3v4'/%3E%3C/svg%3E"><span>{{x.t.qReserve}}</span></button>
+<button type="button" class="qab" onClick="{{x.goGuests}}"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CDB57E' stroke-width='1.3'%3E%3Ccircle cx='10' cy='8.5' r='3.5'/%3E%3Cpath d='M3.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M18.5 7v6M15.5 10h6'/%3E%3C/svg%3E"><span>{{x.t.qGuest}}</span></button>
+<button type="button" class="qab" onClick="{{x.tabConc}}"><img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CDB57E' stroke-width='1.3'%3E%3Cpath d='M4.5 17.5c0-4.4 3.3-8 7.5-8s7.5 3.6 7.5 8zM3 17.5h18M12 9.5V7M10 7h4'/%3E%3C/svg%3E"><span>{{x.t.qConc}}</span></button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mReserve}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb">{{x.t.reserveEy}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.t.reserveTitle}}</h1>
+<div class="rows">
+<sc-for list="{{x.zones}}" as="z" hint-placeholder-count="7">
+<button type="button" class="row" onClick="{{z.go}}"><span class="th ph ph-{{z.ph}}"></span><span class="rt"><b>{{z.t}}</b><i>{{z.d}}</i></span><span class="chev"></span></button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mForm}}" hint-placeholder-val="{{false}}">
+<div>
+<div class="door ph ph-{{x.zone.ph}}" style="height: 220px"></div>
+<div class="mb">
+<div class="eyb">{{x.t.reserveEy}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.zone.t}}</h1>
+<p class="note">{{x.zone.note}}</p>
+<div class="fgrp"><span class="lab">{{x.t.day}}</span><div class="chips"><sc-for list="{{x.days}}" as="c" hint-placeholder-count="4"><button type="button" class="vb chip" onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 14px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<sc-if value="{{x.needsDate}}"><label class="fgrp"><span class="lab">{{x.dateLabel}}</span><input class="vf" data-field="reserveDate" type="date" min="{{x.minDate}}" max="{{x.maxDate}}" dir="ltr"></label></sc-if>
+<div class="fgrp"><span class="lab">{{x.t.time}}</span><div class="chips" dir="ltr"><sc-for list="{{x.times}}" as="c" hint-placeholder-count="6"><button type="button" class="vb chip" onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 14px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<div class="fgrp"><span class="lab">{{x.t.party}}</span><div class="chips" dir="ltr"><sc-for list="{{x.sizes}}" as="c" hint-placeholder-count="6"><button type="button" class="vb chip" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="min-height: 44px; min-width: 44px; padding: 0 12px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<label class="fgrp"><span class="lab">{{x.t.guestNames}}</span><textarea data-field="reserveGuests" class="vt" rows="3" placeholder="{{x.t.guestNamesPh}}"></textarea></label>
+<p class="note">{{x.t.guestRule}}</p>
+<button type="button" class="vb gold" onClick="{{x.confirmResv}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.confirmResv}}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mDone}}" hint-placeholder-val="{{false}}">
+<div class="mb done">
+<div class="otpdial dial"><img src="../assets/img/dial-step.png" alt=""><div class="mk dialmk"></div></div>
+<h1 class="ttl" style="margin: 0; text-align: center; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.doneTitle}}</h1>
+<p style="margin: 0; text-align: center">{{x.doneBody}}</p>
+<div class="stat"><span>{{x.doneK}}</span><b>{{x.doneV}}</b></div>
+<sc-if value="{{x.doneDetail}}"><p class="note receipt-detail">{{x.doneDetail}}</p></sc-if>
+<button type="button" class="vb gold" onClick="{{x.tabHome}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.backMember}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mEvents}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb" dir="ltr" style="text-align: {{startAlign}}">THE VAULT CALENDAR</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{t.calTitle}}</h1>
+<sc-for list="{{x.mev}}" as="e" hint-placeholder-count="3">
+<div class="ecard">
+<button type="button" class="eph ph ph-{{e.ph}}" onClick="{{e.go}}" aria-label="{{e.title}}"></button>
+<div class="erow"><span class="rk" style="font-family: {{numFont}}">{{e.day}}</span><span class="rt"><b>{{e.title}}</b><i>{{e.month}} · {{e.place}}</i></span></div>
+<button type="button" class="vb chip" onClick="{{e.rsvp}}" aria-pressed="{{e.on}}" style="min-height: 46px; border-radius: var(--radius); font-size: 14px; font-weight: {{e.fw}}; background: {{e.bg}}; color: {{e.fg}}; border: 1px solid {{e.bd}}">{{e.label}}</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mConc}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb">{{x.t.concEy}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.t.concTitle}}</h1>
+<p class="note">{{x.t.concBody}}</p>
+<div class="fgrp"><span class="lab">{{x.t.concWhat}}</span><div class="chips"><sc-for list="{{x.cats}}" as="c" hint-placeholder-count="8"><button type="button" class="vb chip" onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 14px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<label class="fgrp"><span class="lab">{{x.t.concDetail}}</span><textarea data-field="concDetails" class="vt" rows="4" placeholder="{{x.t.concPh}}"></textarea></label>
+<div class="fgrp"><span class="lab">{{x.t.concWhen}}</span><div class="chips"><sc-for list="{{x.whens}}" as="c" hint-placeholder-count="3"><button type="button" class="vb chip" onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 14px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<button type="button" class="vb gold" onClick="{{x.sendConc}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.concSend}}</button>
+<div class="stat"><span>{{x.t.concHours}}</span><b dir="ltr">09:00 – 02:30</b></div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mAccount}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb">{{x.t.accEy}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.t.accTitle}}</h1>
+<p class="note">{{x.memberDetails}}</p>
+<button type="button" class="stat bal" onClick="{{x.toggleBal}}"><span>{{x.t.balance}}</span><b dir="ltr">{{x.balText}}</b></button>
+<p class="note">{{x.t.balNote}}</p>
+<div class="rows">
+<sc-for list="{{x.accRows}}" as="r" hint-placeholder-count="5">
+<button type="button" class="row" onClick="{{r.go}}"><span class="rt"><b>{{r.t}}</b><i>{{r.d}}</i></span><span class="chev"></span></button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{x.mGuests}}" hint-placeholder-val="{{false}}">
+<div class="mb">
+<div class="eyb">{{x.t.accEy}}</div>
+<h1 class="ttl" style="margin: -8px 0 0; font-family: {{titleFont}}; font-weight: {{titleW}}; font-size: 30px; line-height: 40px">{{x.t.guestsTitle}}</h1>
+<p class="note">{{x.t.guestRule}}</p>
+<label class="fgrp"><span class="lab">{{x.t.guestNames}}</span><textarea data-field="guestNames" class="vt" rows="4" placeholder="{{x.t.guestNamesPh}}"></textarea></label>
+<div class="fgrp"><span class="lab">{{x.t.day}}</span><div class="chips"><sc-for list="{{x.days}}" as="c" hint-placeholder-count="4"><button type="button" class="vb chip" onClick="{{c.pick}}" disabled="{{c.disabled}}" aria-pressed="{{c.on}}" style="min-height: 44px; padding: 0 14px; border-radius: var(--radius); font-size: 14px; font-weight: {{c.fw}}; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid {{c.bd}}">{{c.label}}</button></sc-for></div></div>
+<button type="button" class="vb gold" onClick="{{x.sendGuests}}" style="height: 54px; border: 0; border-radius: var(--radius); color: var(--btn-fg); font-size: 16px; font-weight: 600">{{x.t.guestsSend}}</button>
+</div>
+</sc-if>
+
+</div>
+<nav class="tabbar">
+<sc-for list="{{x.tabsM}}" as="b" hint-placeholder-count="5">
+<button type="button" class="tb {{b.cls}}" onClick="{{b.go}}" aria-current="{{b.cur}}"><img alt="" src="{{b.icon}}"><span>{{b.label}}</span></button>
+</sc-for>
+</nav>
+</div>
+</sc-if>
+
+<sc-if value="{{x.toast}}" hint-placeholder-val="{{false}}">
+<div class="toast" role="status" aria-live="polite">{{x.toast}}</div>
+</sc-if>
+
+<sc-if value="{{x.menu}}" hint-placeholder-val="{{false}}">
+<div class="menu" role="dialog" aria-modal="true" aria-label="{{x.t.menu}}">
+<div class="menuhd"><div class="mk logo-home" role="button" tabindex="0" onClick="{{x.logoHome}}" aria-label="The Vault" style="cursor: pointer; width: 42px; height: 43px; background: var(--accent-l)"></div><button type="button" class="vb menux" onClick="{{x.closeMenu}}">{{x.t.close}}</button></div>
+<sc-for list="{{x.menuItems}}" as="m" hint-placeholder-count="6">
+<button type="button" class="mi" onClick="{{m.go}}" style="font-family: {{titleFont}}"><span class="mik" dir="ltr">{{m.k}}</span>{{m.t}}</button>
+</sc-for>
+<div class="menuft" dir="ltr">THE VAULT · WHERE VALUE IS KEPT</div>
+</div>
+</sc-if>
+
+</div>
+</template>
+
+<script src="runtime.js"></script>
+<script src="demo.js"></script>
+<script src="app.js"></script>
+<script>if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) navigator.serviceWorker.register("sw.js").catch(function () { /* Offline support is optional in previews. */ });</script>
+</body>
+</html>
