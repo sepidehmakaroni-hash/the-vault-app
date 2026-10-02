@@ -8,7 +8,7 @@
 var T = {
 en: {
 lang: 'فا', back: 'Back', close: 'Close', sound: 'Sound', unit: 'Toman',
-eyebrow: 'Private members’ club · Tehran', title: 'Where value is kept.', spin: 'Turn the dial',
+eyebrow: 'Private members’ club · Tehran', title: 'Where value<br>is kept.', spin: 'Turn the dial',
 members: 'Members — open the vault', request: 'Request membership', explore: 'Explore the house',
 loginTitle: 'Members', loginBody: 'Your combination arrives by message: three numbers that open the door.',
 byCode: 'Combination', byPass: 'Password', mobile: 'Mobile number', send: 'Send my combination',
@@ -61,7 +61,7 @@ settings: 'Settings', language: 'Language', notif: 'Notifications', notifs: ['Re
 },
 fa: {
 lang: 'EN', back: 'بازگشت', close: 'بستن', sound: 'صدا', unit: 'تومان',
-eyebrow: 'باشگاه خصوصی اعضا · تهران', title: 'جایی که ارزش نگه داشته می‌شود.', spin: 'قفل را بچرخانید',
+eyebrow: 'باشگاه خصوصی اعضا · تهران', title: 'جایی که ارزش نگه\u00a0داشته می‌شود.', spin: 'قفل را بچرخانید',
 members: 'اعضا — باز کردن گاوصندوق', request: 'درخواست عضویت', explore: 'آشنایی با خانه',
 loginTitle: 'ورود اعضا', loginBody: 'رمز شما با پیامک می‌رسد: سه عدد که در را باز می‌کند.',
 byCode: 'رمز سه‌عددی', byPass: 'رمز عبور', mobile: 'شمارهٔ موبایل', send: 'رمزم را بفرستید',
@@ -131,9 +131,9 @@ var P = { lang: ls.get('vault.lang') || 'en', sound: ls.get('vault.sound') !== '
 var fa = function () { return P.lang === 'fa'; };
 var L = function () { return T[P.lang]; };
 var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, function (_, i) { return a[i]; }); };
-var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x).replace(/\u066C/g, '\u202F'); };
+var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x).replace(/\u066C/g, ','); };
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
-var money = function (x, sign) { var inner = S.hide ? '<span class="money" aria-label="hidden">••••••</span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; return '<bdi dir="ltr" class="amtw">' + (sign || '') + inner + '</bdi>'; };
+var money = function (x, sign) { var inner = S.hide ? '<span class="money mask" role="img" aria-label="' + (fa() ? 'پنهان' : 'hidden') + '"></span>' : '<span class="money" data-to="' + Math.abs(x) + '">' + n(Math.abs(x)) + '</span>'; return '<bdi dir="ltr" class="amtw">' + (sign || '') + inner + '</bdi>'; };
 var dfmt = function (d, o) { var s2 = new Intl.DateTimeFormat(fa() ? 'fa-IR-u-ca-persian' : 'en-GB', o).format(d); return fa() ? s2.replace(/,/g, '،') : s2; };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 
@@ -329,23 +329,23 @@ function unlock() {
   var entered = false;
   var today = new Date().toDateString(), full = ls.get('vault.fullOpen') !== today; ls.set('vault.fullOpen', today);
   var T = full ? OPEN_T : SHORT[SHORT.length - 1][0], at = function (t) { return full ? t : warp(t, SHORT); };
-  timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= ENTER_T) { entered = true; app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
+  timeline(T, function (t0) { var t = at(t0); setVars(doorFrame(t)); if (!entered && t >= ENTER_T) { entered = true; $$('.page', view).forEach(function (p) { p.remove(); }); app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); } },
     full ? [[0, function () { SFX.bolts(); buzz(30); }], [550, SFX.seal], [800, SFX.swing]] : [[0, function () { SFX.bolts(); buzz(30); }], [600, SFX.swing]],
     function () {
-      if (!entered) { app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
+      if (!entered) { $$('.page', view).forEach(function (p) { p.remove(); }); app.classList.add('inside'); app.classList.remove('hidebar'); view.style.opacity = ''; go('m', { replace: true, fade: true }); }
       app.classList.add('instant'); app.classList.remove('animating'); void app.offsetWidth; clearVars();
       requestAnimationFrame(function () { app.classList.remove('instant'); }); view.style.transition = ''; slots = []; busy = false;
     });
 }
 function lockVault() {
-  if (busy) return; closeSheet(); S.authed = false; save();
+  if (busy) return; closeSheet(true); S.authed = false; save();
   busy = true; app.classList.add('animating', 'hidebar');
-  setVars(doorFrame(OPEN_T));
+  setVars(doorFrame(4500));
   view.style.transition = 'none'; view.style.opacity = '0';
   go('', { replace: true, fade: true });
   app.classList.remove('inside');
   // the same moves backwards, quicker: step out of the pattern, the door swings shut, the bolts go home
-  var T = 3400, map = function (t) { return OPEN_T - t * (OPEN_T / T); };
+  var FROM = 4500, T = 3000, map = function (t) { return FROM - t * (FROM / T); };
   timeline(T, function (t) { setVars(doorFrame(map(t))); },
     [[700, SFX.swing], [T - 700, function () { SFX.shut(); buzz(40); view.style.transition = 'opacity .7s'; view.style.opacity = ''; app.classList.remove('hidebar'); }], [T - 300, SFX.bolts]],
     function () { app.classList.remove('animating'); clearVars(); view.style.transition = ''; busy = false; toast(L().locked); });
@@ -363,8 +363,9 @@ function go(path, o) {
 function goBack(fallback) { if (depth > 0) history.back(); else go(fallback, { replace: true, back: true }); }
 window.addEventListener('popstate', function (e) {
   var i = (e.state && e.state.i) || 0;
+  if (ignorePop) { ignorePop = false; depth = i; return; }
   if (busy) { history.pushState({ i: ++depth }, '', '#/' + route.path); return; }
-  closeSheet();
+  if (app.classList.contains('sheet-open')) { depth = i; closeSheet(true); return; }
   var to = curPath();
   // Back out of the member area never shows a public page with the vault still open: it locks instead
   if (S.authed && route.key.indexOf('m') === 0 && to.indexOf('m') !== 0) { depth = i; history.pushState({ i: ++depth }, '', '#/' + route.path); if (route.key !== 'm') { go('m', { replace: true, back: true }); } return; }
@@ -764,13 +765,14 @@ function askMotion() {
 
 /* ================= sheet ================= */
 var sheetFrom = null;
+var sheetHist = false, ignorePop = false;
 function openSheet(title, html) {
-  if (!app.classList.contains('sheet-open')) sheetFrom = document.activeElement;
+  if (!app.classList.contains('sheet-open')) { sheetFrom = document.activeElement; if (!sheetHist) { sheetHist = true; history.pushState({ i: ++depth, sheet: 1 }, '', '#/' + route.path); } }
   $('#sheetT').textContent = title; $('#sheetB').innerHTML = html; $('#sheetX').setAttribute('aria-label', L().close);
   app.classList.add('sheet-open'); [view, bar, dock].forEach(function (x) { x.inert = true; }); hydrate($('#sheetB'));
   setTimeout(function () { $('#sheetX').focus({ preventScroll: true }); }, 60);
 }
-function closeSheet() { if (!app.classList.contains('sheet-open')) return; app.classList.remove('sheet-open'); [view, bar, dock].forEach(function (x) { x.inert = false; }); $('.sheet').style.removeProperty('--drag'); if (sheetFrom && sheetFrom.focus && document.contains(sheetFrom)) sheetFrom.focus({ preventScroll: true }); }
+function closeSheet(fromPop) { if (!app.classList.contains('sheet-open')) return; if (sheetHist && fromPop !== true) { sheetHist = false; ignorePop = true; history.back(); } sheetHist = false; app.classList.remove('sheet-open'); [view, bar, dock].forEach(function (x) { x.inert = false; }); $('.sheet').style.removeProperty('--drag'); if (sheetFrom && sheetFrom.focus && document.contains(sheetFrom)) sheetFrom.focus({ preventScroll: true }); }
 (function () {
   var head = $('.sheet-head'), sh = $('.sheet'), y0 = null, dy = 0;
   head.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) return; y0 = e.clientY; dy = 0; sh.classList.add('dragging'); head.setPointerCapture(e.pointerId); });
@@ -799,10 +801,10 @@ app.addEventListener('click', function (e) {
   var el = e.target.closest('[data-go],[data-act],[data-chip]'); if (!el || busy) return;
   var l = L(), v = el.getAttribute('data-v');
   if (el.hasAttribute('data-go')) {
-    var to = el.getAttribute('data-go');
-    closeSheet();
+    var to = el.getAttribute('data-go'), fromSheet = sheetHist;
+    closeSheet(true);
     if (to === route.path) { var pg = $('.page:not(.leave)'); if (pg) pg.scrollTo({ top: 0, behavior: calm ? 'auto' : 'smooth' }); return; }
-    go(to, { replace: el.hasAttribute('data-replace') && route.key !== '' && route.key !== 'm' && route.key.indexOf('m') === to.indexOf('m') }); return;
+    go(to, { replace: fromSheet || el.hasAttribute('data-replace') && route.key !== '' && route.key !== 'm' && route.key.indexOf('m') === to.indexOf('m') }); return;
   }
   if (el.hasAttribute('data-chip')) {
     var path = el.getAttribute('data-chip');

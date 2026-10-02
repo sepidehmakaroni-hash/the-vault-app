@@ -1,7 +1,7 @@
 /* The Vault — v2 "The Real Vault".
    One world: brushed steel, brass, and the monogram pattern of the card. The door scene and every page share it. */
 @font-face{font-family:'Awaken';src:url(fonts/awaken.woff2) format('woff2');font-display:swap}
-@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni.woff2) format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(fonts/bodoni.woff2) format('woff2');font-weight:400;font-display:swap;font-optical-sizing:auto}
 @font-face{font-family:'Archivo';src:url(fonts/archivo.woff2) format('woff2');font-weight:400 600;font-display:swap}
 @font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-400.woff2) format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Noto Naskh Arabic';src:url(fonts/noto-naskh-arabic-500.woff2) format('woff2');font-weight:500;font-display:swap}
@@ -187,7 +187,7 @@ a{color:var(--gold-l);-webkit-tap-highlight-color:transparent}
 .lab .cnt{letter-spacing:0;text-transform:none;color:var(--faint)}
 [dir=rtl] .lab{letter-spacing:0;font-size:13px}
 .in{width:100%;min-width:0;height:52px;border:1px solid var(--line2);border-radius:3px;background:rgba(15,14,13,.65);font-size:16px;padding:0 14px;outline:none;color:var(--ivory);transition:border-color .25s,box-shadow .25s}
-.in::placeholder{color:rgba(236,229,214,.32)}
+.in::placeholder{color:rgba(236,229,214,.5)}
 .in:focus{border-color:var(--gold-l);box-shadow:0 0 0 3px rgba(205,181,126,.16)}
 textarea.in{height:auto;min-height:112px;padding:12px 14px;line-height:1.6;resize:none;display:block}
 select.in{appearance:none;-webkit-appearance:none;padding:0 30px 0 12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23CDB57E' stroke-width='1.4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:10px 6px;background-position:right 11px center}
@@ -545,3 +545,18 @@ select.in option{background:#1b1a18}
 .seg button{height:44px}
 .eye{min-height:44px;padding:0 6px}
 .chip{min-width:44px}
+
+/* hidden money: a soft blurred bar, never mistakable for digits */
+.mask{display:inline-block;width:5.2em;height:.62em;vertical-align:middle;border-radius:.3em;background:linear-gradient(90deg,rgba(205,181,126,.55),rgba(236,229,214,.35));filter:blur(3px);opacity:.85}
+.hide .money{letter-spacing:0}
+/* small figures never in hairline Bodoni */
+.num{font-optical-sizing:auto}
+.avatar,.stat b,.tum,.day b,.ends,.icard .tag,.pill{font-family:'Archivo','Noto Naskh Arabic',sans-serif;font-variant-numeric:tabular-nums lining-nums}
+.avatar{font-weight:500;letter-spacing:.04em}
+.tum{font-weight:500}
+
+.plate{font-family:'Archivo','Noto Naskh Arabic',sans-serif;font-weight:600;font-size:12.5px;letter-spacing:.08em}
+.chip{min-width:48px}
+.check{min-height:44px}
+.toast{background:rgba(28,26,22,.94);color:var(--ivory);box-shadow:0 0 0 1px var(--line2),0 14px 34px rgba(0,0,0,.55);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.door-copy .h1{text-wrap:wrap}
