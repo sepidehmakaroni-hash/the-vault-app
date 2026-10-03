@@ -121,7 +121,7 @@ var SRC = {
   'lounge': ['img/ph-lounge.webp', '40% 82%'], 'dining': ['img/ph-dining-room.webp', '35% 80%'], 'sushi': ['img/ph-sushi-chef.webp', '50% 78%'],
   'humidor-room': ['img/ph-humidor-room.webp', '50% 62%'], 'terrace': ['img/ph-terrace-couple.webp', '58% 55%'], 'garden': ['img/ph-garden-a.webp', '40% 70%'],
   'ev-art': ['img/ph-ev-art.webp', '55% 50%'], 'ev-dining': ['img/ph-dining.webp', '45% 45%'], 'ev-lounge': ['img/ph-lounge-members.webp', '70% 62%'],
-  'concierge': ['img/ph-concierge-desk.webp', '50% 30%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'],
+  'concierge': ['img/ph-concierge-desk.webp', '50% 30%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'], 'table': ['img/ph-table.webp', '50% 70%'], 'gift': ['img/ph-gift.webp', '40% 70%'], 'travel': ['img/ph-travel.webp', '35% 55%'],
   'card': ['img/ph-card.webp', '50% 40%'], 'seal': ['img/ph-seal.webp', '50% 42%'], 'corridor': ['img/ph-corridor.webp', '50% 46%']
 };
 
@@ -596,7 +596,7 @@ function eventSheet(i) {
     '<button type="button" class="btn ' + (on ? 'line' : 'solid') + '" data-act="rsvp" data-v="' + i + '" data-first>' + (on ? l.release : l.attend) + '</button>' +
     '<button type="button" class="btn ghost" data-act="cal">' + l.addCal + '</button>');
 }
-var TOPIC_IMG = { 1: 'jibdoor', 5: 'humidor' };   // room 6 behind its jib door; the member's humidor drawer
+var TOPIC_IMG = { 0: 'table', 1: 'jibdoor', 3: 'gift', 4: 'travel', 5: 'humidor' };   // room 6 behind its jib door; the member's humidor drawer
 var AMTS = [50000000, 100000000, 200000000, 500000000];
 function pick(sel, el) { $$(sel).forEach(function (b) { var on = b === el; if (b.hasAttribute('aria-checked')) { b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; } else b.setAttribute('aria-pressed', String(on)); }); }
 
