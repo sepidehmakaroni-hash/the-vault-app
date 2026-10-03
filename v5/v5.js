@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=9';
+const V = '?v=10';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -846,18 +846,22 @@ function perfGuard(onDrop) {
 const FINISH = {
   uniforms: {
     tDiffuse: { value: null }, uTime: { value: 0 }, uRes: { value: null },
-    uVig: { value: 0.9 }, uGrain: { value: 0.035 }, uCA: { value: 1 }, uTilt: { value: 0.6 }, uFocus: { value: 0.55 }, uBlur: { value: 2.6 }, uFx: { value: 0 }, uB0: { value: 0.16 }, uB1: { value: 0.55 }, uFlash: { value: 0 }, uFade: { value: 1 }
+    uVig: { value: 0.9 }, uGrain: { value: 0.035 }, uCA: { value: 1 }, uTilt: { value: 0.6 }, uFocus: { value: 0.55 }, uBlur: { value: 2.6 }, uFx: { value: 0 }, uB0: { value: 0.16 }, uB1: { value: 0.55 }, uFlash: { value: 0 }, uFade: { value: 1 },
+    tDepth: { value: null }, uDof: { value: 0 }, uZF: { value: 1 }, uZR: { value: 1 }, uDofMax: { value: 0 }, uDofMin: { value: 0 }, uNear: { value: 0.1 }, uFar: { value: 100 }
   },
   vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader: [
-    'uniform sampler2D tDiffuse;uniform float uTime,uVig,uGrain,uCA,uTilt,uFocus,uFlash,uFade,uBlur,uB0,uB1,uFx;uniform vec2 uRes;varying vec2 vUv;',
+    'uniform sampler2D tDiffuse,tDepth;uniform float uTime,uVig,uGrain,uCA,uTilt,uFocus,uFlash,uFade,uBlur,uB0,uB1,uFx,uDof,uZF,uZR,uDofMax,uDofMin,uNear,uFar;uniform vec2 uRes;varying vec2 vUv;',
     'float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}',
     'void main(){',
     ' vec2 uv=vUv,c=uv-.5;float asp=uRes.x/uRes.y;float r=length(c*vec2(asp,1.));',
     ' vec2 o=c*uCA*r*.0105;',
     ' vec3 col=vec3(texture2D(tDiffuse,uv+o).r,texture2D(tDiffuse,uv).g,texture2D(tDiffuse,uv-o).b);',
-    ' float b=smoothstep(uB0,uB1,length(vec2((uv.x-.5)*asp*uFx,(uv.y-uFocus)*(uv.y<uFocus?1.+uFx*1.2:1.))))*uTilt;',          /* uFx>0: an elliptical focus spot (a macro lens: the bowl curves away from the plane of focus at the sides) */
-    ' if(b>.01){vec2 px=b*uBlur/uRes;vec3 s=col;float n=1.;float j=h(uv*uRes)*6.2832;',          /* a 24-tap disc: soft, round out-of-focus */
+    ' float b;vec2 px;',
+    ' if(uDof>.5){float d=1.-texture2D(tDepth,uv).r;float z=-(uNear*uFar)/((uFar-uNear)*d-uFar);',   /* true depth of field: circle of confusion from view depth */
+    '  float coc=max(clamp(abs(z-uZF)/uZR,0.,1.)*uDofMax,uDofMin);b=coc>.35?1.:0.;px=vec2(coc)/uRes;}',
+    ' else{b=smoothstep(uB0,uB1,length(vec2((uv.x-.5)*asp*uFx,(uv.y-uFocus)*(uv.y<uFocus?1.+uFx*1.2:1.))))*uTilt;px=b*uBlur/uRes;}',
+    ' if(b>.01){vec3 s=col;float n=1.;float j=h(uv*uRes)*6.2832;',          /* a 24-tap disc: soft, round out-of-focus */
     '  for(int i=0;i<24;i++){float a=float(i)*2.39996+j;float r=sqrt((float(i)+.5)/24.);s+=texture2D(tDiffuse,uv+vec2(cos(a),sin(a))*r*px).rgb;n+=1.;}',
     '  col=s/n;}',
     ' col=col*col*(3.-2.*col)*.22+col*.78;',                 /* gentle S-curve */
@@ -1996,6 +2000,31 @@ async function makeSeqGL(stage, ov, q, still) {
   P.fin.uniforms.uBlur.value = (sc.blur != null ? sc.blur : 2.6) * (sc.blur != null ? qDpr(Q.level) : 1);
   P.fin.uniforms.uB0.value = sc.b0 != null ? sc.b0 : 0.16; P.fin.uniforms.uFx.value = sc.fx || 0; P.fin.uniforms.uB1.value = sc.b1 != null ? sc.b1 : 0.55;
   P.fin.uniforms.uFlash.value = 0; P.fin.uniforms.uFade.value = 1; P.fin.uniforms.uVig.value = 0.95;
+  /* depth of field from a real depth pass (scenes that ask for it): focus on a world point, blur capped in CSS px */
+  P.fin.uniforms.uDof.value = sc.dof ? 1 : 0;
+  let dRT = null, dMat = null; const rc = new TH.Raycaster();
+  const zOf = v => -pv2.copy(v).applyMatrix4(sc.camera.matrixWorldInverse).z, pv2 = new TH.Vector3();
+  const depthPass = () => {
+    const d = qDpr(Q.level), W = Math.max(2, Math.round(C.w * d / 2)), H = Math.max(2, Math.round(C.h * d / 2));
+    if (!dRT) { dRT = new TH.WebGLRenderTarget(W, H, { type: TH.HalfFloatType, minFilter: TH.NearestFilter, magFilter: TH.NearestFilter }); dMat = new TH.MeshDepthMaterial({ side: TH.DoubleSide }); }
+    else if (dRT.width !== W || dRT.height !== H) dRT.setSize(W, H);
+    const r = SG.r, bg = sc.scene.background, cc = r.getClearColor(new TH.Color()), ca = r.getClearAlpha(), hid = [];
+    sc.scene.traverse(o => { if ((o.isPoints || o.isSprite || (o.material && o.material.isShaderMaterial)) && o.visible) { o.visible = false; hid.push(o); } });
+    sc.scene.background = null; sc.scene.overrideMaterial = dMat;
+    r.setRenderTarget(dRT); r.setClearColor(0x000000, 1); r.clear(); r.render(sc.scene, sc.camera); r.setRenderTarget(null);
+    sc.scene.overrideMaterial = null; sc.scene.background = bg; r.setClearColor(cc, ca); hid.forEach(o => { o.visible = true; });
+    const u = P.fin.uniforms, f = sc.dof;
+    u.tDepth.value = dRT.texture; u.uNear.value = sc.camera.near; u.uFar.value = sc.camera.far;
+    let zF = zOf(f.focus);
+    if (f.hit) {   /* focus on the first petal surface along the line of sight to the focus point */
+      rc.set(sc.camera.position, pv2.copy(f.focus).sub(sc.camera.position).normalize());
+      const hit = rc.intersectObjects(f.hit, false)[0]; if (hit) zF = zOf(hit.point);
+    }
+    const zH = zOf(f.heart);
+    u.uZF.value = zF; u.uZR.value = Math.max(0.05, (zH - zF) / (f.heartPx / f.maxPx));
+    u.uDofMax.value = f.maxPx * d; u.uDofMin.value = (f.minPx || 0) * d;
+    window.__v5dof = { zF, zH, zR: u.uZR.value, near: u.uNear.value, far: u.uFar.value }; /* testing aid */
+  };
   const pv = new TH.Vector3();
   let last = performance.now();
   const ro = new ResizeObserver(() => {
@@ -2017,10 +2046,12 @@ async function makeSeqGL(stage, ov, q, still) {
         L.el.style.opacity = vis ? L.o : 0;
         if (vis) L.el.style.transform = 'translate(' + ((pv.x * 0.5 + 0.5) * C.w).toFixed(1) + 'px,' + ((-pv.y * 0.5 + 0.5) * C.h).toFixed(1) + 'px)';
       });
+      if (sc.dof) depthPass();
       P.render(dt);
     },
     dispose() {
       ro.disconnect();
+      if (dRT) { dRT.dispose(); dMat.dispose(); }
       if (sc.dispose) sc.dispose();
       disposeScene(sc.scene);
       lbl.remove();
@@ -2583,6 +2614,7 @@ const GL_SCENES = {
     const keyL = new TH.DirectionalLight(0xffdcb6, 1.1); keyL.position.set(4, 3.5, 3); scene.add(keyL);
     const rim = new TH.DirectionalLight(0xffd2a0, 3.6); rim.position.set(-2, 2.2, -5); scene.add(rim); /* warm backlight, behind-left, 2x the key */
     const fill = new TH.DirectionalLight(0xffeedd, 0.35); fill.position.set(2, 5, 4); scene.add(fill);
+    scene.add(new TH.AmbientLight(0xf6e6d0, 0.5)); /* fills the heart, so its folds read cream, not brown */
     const glow = new TH.DirectionalLight(0xffc48a, 1.4); glow.position.set(0.6, 0.15, 4); scene.add(glow); /* warm light from low in front: the backlit guard petals glow amber */
     /* the petal: a soft oval, cupped across on a sine profile, creased along its length,
        and the outer quarter of the rim curled back by 20–35° (a different curl per variant) */
@@ -2611,12 +2643,12 @@ const GL_SCENES = {
       return g;
     };
     const tint = cTex(TH, 128, 256, (g, W, H) => {
-      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#e9dccb'); gr.addColorStop(0.25, '#f1e6d6'); gr.addColorStop(0.75, '#fbf2e9'); gr.addColorStop(1, '#fff7f0');
+      const gr = g.createLinearGradient(0, H, 0, 0); gr.addColorStop(0, '#f1e4d2'); gr.addColorStop(0.25, '#f4eadc'); gr.addColorStop(0.75, '#fbf2e9'); gr.addColorStop(1, '#fff7f0');
       g.fillStyle = gr; g.fillRect(0, 0, W, H);
       g.strokeStyle = 'rgba(170,120,100,.06)'; g.lineWidth = 1;
       for (let k = 0; k < 13; k++) { g.beginPath(); g.moveTo(W / 2, H); g.quadraticCurveTo(W / 2 + (k - 6) * 4, H * 0.5, W / 2 + (k - 6) * 10, 4); g.stroke(); }
       /* a soft shade toward each petal's edges (at most 10%): overlaps read as gentle folds */
-      const eg = g.createLinearGradient(0, 0, W, 0); eg.addColorStop(0, 'rgba(120,80,50,.1)'); eg.addColorStop(0.3, 'rgba(120,80,50,0)'); eg.addColorStop(0.7, 'rgba(120,80,50,0)'); eg.addColorStop(1, 'rgba(120,80,50,.1)');
+      const eg = g.createLinearGradient(0, 0, W, 0); eg.addColorStop(0, 'rgba(120,80,50,.07)'); eg.addColorStop(0.3, 'rgba(120,80,50,0)'); eg.addColorStop(0.7, 'rgba(120,80,50,0)'); eg.addColorStop(1, 'rgba(120,80,50,.07)');
       g.fillStyle = eg; g.fillRect(0, 0, W, H);
     });
     const petalM = new TH.MeshPhysicalMaterial({
@@ -2638,9 +2670,17 @@ const GL_SCENES = {
       sh.fragmentShader = 'varying vec3 vBN;varying float vNear;\n' + sh.fragmentShader.replace('#include <normal_fragment_begin>', '#include <normal_fragment_begin>\nnormal = normalize(mix(normal, vBN, 0.88 * vNear));');
     };
     guardM.customProgramCacheKey = () => 'guard';
+    /* the heart's petals take the same bowl-shaped normals everywhere, so their hidden sides catch the light as cream folds rather than going brown */
+    const heartM = petalM.clone();
+    heartM.onBeforeCompile = sh => {
+      guardM.onBeforeCompile(sh);
+      sh.fragmentShader = sh.fragmentShader.replace('normal = normalize(mix(normal, vBN, 0.88 * vNear));', 'normal = normalize(mix(normal, vBN, 0.35));');
+    };
+    heartM.customProgramCacheKey = () => 'heart';
     /* rings, each a little further out than the last (by more than a petal's thickness) so nothing
        intersects; inner rings smaller and more tightly cupped. Outer rings open first. */
     const RINGS = [
+      /* the heart: few, broad, deeply cupped petals leaning in over one another, so it reads as soft folds */
       { n: 8, r0: 0.06, r1: 0.08, t0: -0.1, t1: 0.05, s: 0.5, cup: 0.3, start: 2.6 },
       { n: 9, r0: 0.09, r1: 0.12, t0: -0.04, t1: 0.16, s: 0.62, cup: 0.28, start: 2.1 },
       { n: 10, r0: 0.12, r1: 0.16, t0: 0.02, t1: 0.3, s: 0.74, cup: 0.26, start: 1.6 },
@@ -2650,26 +2690,26 @@ const GL_SCENES = {
     ];
     const meshes = [], info = [], rr = rng(31), col = new TH.Color(), GA = -0.5 + 0.26;
     RINGS.forEach((R, ri) => {
-      const m = new TH.InstancedMesh(petalGeo(ri === 5 ? 0 : 14 + ri * 2.5, R.cup, ri + 1, ri === 5 ? 0 : 1, ri === 5 ? 0.45 : 0.22), ri >= 4 ? guardM : petalM, R.n); scene.add(m); meshes.push(m);
+            const m = new TH.InstancedMesh(petalGeo(ri === 5 ? 0 : 14 + ri * 2.5, R.cup, ri + 1, ri === 5 ? 0 : 1, ri === 5 ? 0.45 : 0.22), ri >= 4 ? guardM : heartM, R.n); scene.add(m); meshes.push(m);
       for (let k = 0; k < R.n; k++) {
         const a = k / R.n * Math.PI * 2 + (ri === 5 ? GA : ri === 4 ? GA + Math.PI / 14 : ri * 0.53);   /* the bloom turned so no tip or gap points at the lens */
         info.push({ R, a, mesh: m, slot: k, stag: R.yn ? 0 : (k % 2) * 0.012, roll: (rr() - 0.5) * (ri === 5 ? 0.05 : 0.18), sz: R.s * (0.95 + rr() * 0.1), wide: 1.05 + rr() * 0.2 });   /* petals nearly as wide as long, overlapping their neighbours */
-        const wk = ri === 5 ? 1.3 : 1; info[info.length - 1].wide *= wk;
-        const v = Math.max(0.88, (0.9 + 0.1 * ri / (RINGS.length - 1)) * (1 + (rr() - 0.5) * 0.04)); col.setRGB(v, v * (1 + (rr() - 0.5) * 0.04), v * (1 + (rr() - 0.5) * 0.06)); m.setColorAt(k, col);
+        const wk = ri === 5 ? 1.3 : 1;   /* inner petals broad enough to overlap into soft folds, not strips */ info[info.length - 1].wide *= wk;
+        const v = Math.max(0.92, (0.94 + 0.06 * ri / (RINGS.length - 1)) * (1 + (rr() - 0.5) * 0.03)); col.setRGB(v, v * (1 + (rr() - 0.5) * 0.04), v * (1 + (rr() - 0.5) * 0.06)); m.setColorAt(k, col);
       }
     });
     /* the closed soft dome at the heart: 12 small, tightly cupped petals curving over the centre */
     const domeG = petalGeo(6, 0.55, 9);
-    const NC = 22, centre = new TH.InstancedMesh(domeG, petalM, NC);
+    const NC = 22, centre = new TH.InstancedMesh(domeG, heartM, NC);
     { const o2 = new TH.Object3D(); o2.rotation.order = 'YXZ';
-      for (let i = 0; i < NC; i++) { const layer = i < 9 ? 0 : i < 16 ? 1 : 2, a = i * 2.39996, rad = 0.025 + layer * 0.025; o2.rotation.set(-0.42 + layer * 0.2, a, 0); o2.position.set(Math.sin(a) * rad, 0.06 - layer * 0.01, Math.cos(a) * rad); const sc = 0.34 + layer * 0.08; o2.scale.set(sc * 1.2, sc, sc * 1.2); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); const v = 0.9 + layer * 0.04; col.setRGB(v, v * 0.98, v * 0.95); centre.setColorAt(i, col); } }
+      for (let i = 0; i < NC; i++) { const layer = i < 9 ? 0 : i < 16 ? 1 : 2, a = i * 2.39996, rad = 0.025 + layer * 0.025; o2.rotation.set(-0.42 + layer * 0.2, a, 0); o2.position.set(Math.sin(a) * rad, 0.06 - layer * 0.01, Math.cos(a) * rad); const sc = 0.34 + layer * 0.08; o2.scale.set(sc * 1.2, sc, sc * 1.2); o2.updateMatrix(); centre.setMatrixAt(i, o2.matrix); const v = 0.94 + layer * 0.03; col.setRGB(v, v * 0.99, v * 0.97); centre.setColorAt(i, col); } }
     scene.add(centre);
-    const core = new TH.Mesh(new TH.SphereGeometry(0.11, 24, 16), new TH.MeshStandardMaterial({ color: 0xcdb99f, roughness: 0.9 })); core.position.y = 0.05; scene.add(core);
+    const core = new TH.Mesh(new TH.SphereGeometry(0.34, 40, 24), new TH.MeshStandardMaterial({ color: 0xf1e4d2, roughness: 0.85 })); core.scale.y = 0.55; core.position.y = 0.02; scene.add(core); /* a cream floor under the heart, so no gap between petals ever shows the dark */
     /* contact shadow under the bloom */
     const ao = new TH.Mesh(new TH.PlaneGeometry(3.4, 3.4), new TH.MeshBasicMaterial({ map: spriteTex(TH), color: 0x000000, transparent: true, opacity: 0.7, depthWrite: false }));
     ao.rotation.x = -Math.PI / 2; ao.position.y = -0.2; /* not in the macro frame: it would show through the gaps between opening petals */
     /* the heart: gold stamens */
-    const st = new TH.InstancedMesh(new TH.SphereGeometry(0.018, 8, 6), new TH.MeshStandardMaterial({ color: 0xe9bf5c, roughness: 0.5, emissive: 0x4a3008, emissiveIntensity: 0.4 }), 70);
+    const st = new TH.InstancedMesh(new TH.SphereGeometry(0.018, 8, 6), new TH.MeshStandardMaterial({ color: 0xf0d896, roughness: 0.5, emissive: 0x3a2a08, emissiveIntensity: 0.25 }), 70);
     for (let i = 0; i < 70; i++) { const rad = Math.sqrt(i / 70) * 0.13, a = i * 2.39996; const m4 = new TH.Matrix4().setPosition(Math.cos(a) * rad, 0.1 + (0.13 - rad) * 0.5, Math.sin(a) * rad); st.setMatrixAt(i, m4); }
     scene.add(st);
     /* bokeh and a few drifting motes */
@@ -2683,7 +2723,8 @@ const GL_SCENES = {
     const o = new TH.Object3D(), look = new TH.Vector3();
     o.rotation.order = 'YXZ';
     return {
-      scene, camera: cam, dur: 7.4, bloom: 0.42, thresh: 0.88, tilt: 1, focus: 0.365, fx: 0.8, blur: 11, b0: 0.035, b1: 0.15,
+      scene, camera: cam, dur: 7.4, bloom: 0.25, thresh: 0.9, tilt: 0,
+      dof: { focus: new TH.Vector3(), heart: new TH.Vector3(0, 0.08, 0), maxPx: 6, heartPx: 4, minPx: 0, hit: meshes },   /* focus on the front guard-petal belly; the heart softens to ~4px; nothing past 6px */
       frame(t) {
         info.forEach(p => {
           const R = p.R, k = ph(t, R.start + p.stag * 20, R.start + 2.6, eio) * (0.65 + 0.35 * Math.pow((RINGS.indexOf(R) + 1) / RINGS.length, 1.6));
@@ -2697,8 +2738,9 @@ const GL_SCENES = {
         meshes.forEach(m => { m.instanceMatrix.needsUpdate = true; });
         st.visible = t > 2.2;
         pollen.uniforms.uTime.value = t; bm.uniforms.uTime.value = t;
-        const m = ph(t, 0, 7.4, eio), a = lerp(-0.6, -0.45, m), el = lerp(0.56, 0.52, m), d = lerp(7.6, 6.8, m) * fitK(C, 0.5, 1.3);
+        const m = ph(t, 0, 7.4, eio), a = lerp(-0.6, -0.45, m), el = lerp(0.56, 0.52, m), d = lerp(14.2, 12.9, m) * fitK(C, 0.5, 1.3);
         look.set(0, lerp(0.36, 0.3, m), 0);
+        { const df = this.dof; df.focus.set(Math.sin(a) * 0.6, 0.26, Math.cos(a) * 0.6); df.heart.set(0, 0.1, 0); df.minPx = 2.5 * (1 - ph(t, 0.9, 1.6)); }   /* the bud's outline stays soft while it is still tight */
         cam.position.set(Math.sin(a) * Math.cos(el) * d, Math.sin(el) * d, Math.cos(a) * Math.cos(el) * d);
         cam.lookAt(look);
         show01(card, ph(t, 5.3, 6.1, eout));
