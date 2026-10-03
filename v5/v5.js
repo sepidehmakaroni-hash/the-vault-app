@@ -6,7 +6,7 @@
    Vanilla ES module, no build. three.js is self-hosted (lib/) and loaded on demand.
    State: sessionStorage 'vault5'. Language: localStorage 'vault5.lang' (default fa). */
 
-const V = '?v=11';
+const V = '?v=12';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
@@ -216,7 +216,7 @@ const LIVE = {
   flowers: { cd: ['Delivered in', 'تا تحویل'], after: ['Delivered', 'تحویل شد'], onCd: true,
     head: [['Your flowers are being arranged.', 'گل‌هایتان آماده می‌شود.'], ['Delivered, by hand.', 'با دست تحویل داده شد.']],
     sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['White peonies, by hand', 'صدتومانی سفید، دست‌چین'], ['With Sina, the courier', 'همراه سینا، پیک خانه'], ['Delivered', 'تحویل شد']],
-    caps: [[0, ['The florist is choosing.', 'گل‌فروش دارد انتخاب می‌کند.']], [2.0, ['Wrapped by hand.', 'با دست بسته‌بندی می‌شود.']], [4.6, ['Sealed with the house\'s mark.', 'با مُهر خانه.']]] },
+    caps: [[0, ['The florist is choosing.', 'گل‌فروش دارد انتخاب می‌کند.']], [2.0, ['Wrapped by hand.', 'با دست بسته‌بندی می‌شود.']], [4.6, ['Sealed with the house’s mark.', 'با مُهر خانه.']]] },
   travel: { cd: ['Departure in', 'تا پرواز'], after: ['Bon voyage', 'سفر بخیر'],
     head: [['Your journey is being arranged.', 'سفرتان آماده می‌شود.'], ['Everything is ready.', 'همه‌چیز آماده است.']],
     sub: [['The desk has it', 'به میز کانسیرژ رسید'], ['Seats and room held', 'صندلی و اتاق نگه داشته شد'], ['Tickets issued', 'بلیت‌ها صادر شد'], ['Ready to go', 'آمادهٔ رفتن']],
@@ -230,7 +230,7 @@ const LIVE = {
 /* captions that change with the options chosen */
 const CAPS_ALT = {
   travel: o => o.what === 'hotel' && [[0, ['Your room is held.', 'اتاقتان نگه داشته شد.']], [2.4, ['The key is cut.', 'کارت اتاق آماده شد.']], [4, ['A room with a view.', 'اتاقی رو به منظره.']]],
-  flowers: o => o.what === 'gift' && [[0, ['The concierge is choosing.', 'کانسیرژ دارد انتخاب می‌کند.']], [2.0, ['Wrapped by hand.', 'با دست بسته‌بندی می‌شود.']], [4.6, ['Sealed with the house\'s mark.', 'با مُهر خانه.']]],
+  flowers: o => o.what === 'gift' && [[0, ['The concierge is choosing.', 'کانسیرژ دارد انتخاب می‌کند.']], [2.0, ['Wrapped by hand.', 'با دست بسته‌بندی می‌شود.']], [4.6, ['Sealed with the house’s mark.', 'با مُهر خانه.']]],
   call: o => o.how === 'visit' && [[0, ['Leila, your concierge, has it.', 'لیلا، کانسیرژ شما، در جریان است.']], [2.2, ['She knows your table.', 'میزتان را می‌شناسد.']], [4.2, ['She will come to you shortly.', 'به‌زودی سرِ میزتان می‌آید.']]]
 };
 
@@ -1687,31 +1687,33 @@ const SCENES = {
     const whole = E('g', {}, svg);
     /* the box in a three-quarter view: top face, front, side; ivory fills with gold edges */
     const box = E('g', {}, whole);
-    E('ellipse', { cx: 200, cy: 470, rx: 150, ry: 22, fill: '#000', opacity: 0.55, filter: 'blur(6px)' }, box);
-    E('path', { d: 'M70,332 L246,354 L246,470 L70,448 Z', fill: 'url(#sg-ivory)' }, box);
-    E('path', { d: 'M246,354 L330,322 L330,434 L246,470 Z', fill: '#bdae91' }, box);
-    E('path', { d: 'M62,300 L160,262 L340,282 L248,322 Z', fill: '#f4ecdc' }, box);
-    E('path', { d: 'M62,300 L248,322 L248,350 L62,328 Z', fill: '#e6dac2' }, box);
-    E('path', { d: 'M248,322 L340,282 L340,308 L248,350 Z', fill: '#b9a98a' }, box);
-    add(E('path', { d: 'M62,300 L160,262 L340,282 L248,322 Z M62,300 L62,328 L248,350 L340,308 L340,282 M248,322 L248,350 M70,332 L70,448 L246,470 L330,434 L330,322 M246,354 L246,470', class: 'ln' }, box), 0.2, 1.8);
+    /* one oblique projection throughout (depth runs +84, −32): the lid is the base translated up and grown by 4px */
+    E('ellipse', { cx: 205, cy: 462, rx: 150, ry: 20, fill: '#000', opacity: 0.55, filter: 'blur(6px)' }, box);
+    E('path', { d: 'M70,352 L246,352 L246,470 L70,470 Z', fill: 'url(#sg-ivory)' }, box);              /* body, front */
+    E('path', { d: 'M246,352 L330,320 L330,438 L246,470 Z', fill: '#bdae91' }, box);                    /* body, right */
+    E('path', { d: 'M66,318 L150,286 L334,286 L250,318 Z', fill: '#f4ecdc' }, box);                     /* lid, top */
+    E('path', { d: 'M66,318 L250,318 L250,356 L66,356 Z', fill: '#e8dcc4' }, box);                      /* lid, front */
+    E('path', { d: 'M250,318 L334,286 L334,324 L250,356 Z', fill: '#c2b294' }, box);                    /* lid, right */
+    E('path', { d: 'M66,354 L250,354 L250,356 L66,356 Z M250,354 L334,322 L334,324 L250,356 Z', fill: '#6f5f47' }, box);   /* the lid's underside */
+    add(E('path', { d: 'M66,318 L150,286 L334,286 L250,318 Z M66,318 L66,356 L250,356 L334,324 L334,286 M250,318 L250,356 M70,356 L70,470 L246,470 L330,438 L330,327 M246,356 L246,470', class: 'ln' }, box), 0.2, 1.8);
     /* the ribbon, running out from the knot */
     const rib = E('g', {}, whole);
-    const band = (d, a, b) => add(E('path', { d, fill: 'none', stroke: 'url(#sg-gold)', 'stroke-width': 13, 'stroke-linecap': 'butt' }, rib), a, b);
-    band('M201,292 L111,281 L62,300 M62,300 L62,328', 2.0, 3.2);
-    band('M201,292 L294,302 L248,322 L248,350 M248,350 L246,470', 2.1, 3.4);
-    band('M201,292 L250,272 L160,262', 2.5, 3.5);
-    band('M201,292 L155,311 L156,339 L155,460', 2.6, 3.8);
-    const bow = E('g', { transform: 'translate(201,290)' }, whole);
+    const band = (d, a, b) => add(E('path', { d, fill: 'none', stroke: 'url(#sg-gold)', 'stroke-width': 13, 'stroke-linecap': 'butt', 'stroke-linejoin': 'round' }, rib), a, b);
+    band('M200,302 L108,302', 2.0, 2.8);
+    band('M200,302 L292,302 L292,340 M288,338 L288,454', 2.1, 3.4);
+    band('M200,302 L242,286', 2.5, 3.0);
+    band('M200,302 L158,318 L158,356 M158,356 L158,470', 2.6, 3.8);
+    const bow = E('g', { transform: 'translate(200,300)' }, whole);
     const bowIn = E('g', {}, bow);
     E('path', { d: 'M0,0 C-30,-34 -64,-22 -54,-4 C-48,8 -18,6 0,0 Z M0,0 C30,-34 64,-22 54,-4 C48,8 18,6 0,0 Z', fill: 'url(#sg-gold)', stroke: '#8E6C33', 'stroke-width': 0.8 }, bowIn);
     E('path', { d: 'M-4,4 L-30,40 L-20,38 L-14,46 L4,6 Z M4,4 L26,42 L16,40 L12,48 L-4,6 Z', fill: 'url(#sg-gold)', stroke: '#8E6C33', 'stroke-width': 0.8 }, bowIn);
     /* the seal with the house's V */
-    const seal = E('g', { transform: 'translate(201,292)' }, whole);
+    const seal = E('g', { transform: 'translate(200,302)' }, whole);
     const sealIn = E('g', {}, seal);
     E('path', { d: 'M0,-22 C8,-24 12,-18 18,-16 C24,-12 22,-4 23,2 C24,10 18,14 14,18 C8,24 2,22 -4,23 C-12,24 -16,18 -19,13 C-24,7 -23,-1 -22,-7 C-21,-15 -14,-19 -8,-21 C-5,-22 -3,-22 0,-22 Z', fill: 'url(#sg-gold)', stroke: '#7a5a26', 'stroke-width': 1 }, sealIn);
     E('circle', { r: 15, fill: 'none', stroke: '#7a5a26', 'stroke-width': 0.9, 'stroke-opacity': 0.7 }, sealIn);
     E('path', { d: 'M-8,-7 L0,8 L8,-7 L5,-7 L0,3 L-5,-7 Z', fill: '#6b4e1f' }, sealIn);
-    const flashG = E('circle', { cx: 201, cy: 292, r: 60, fill: 'url(#sg-glow)', opacity: 0 }, whole);
+    const flashG = E('circle', { cx: 200, cy: 302, r: 60, fill: 'url(#sg-glow)', opacity: 0 }, whole);
     /* the card */
     const card = E('g', {}, whole);
     const cardIn = E('g', {}, card);
@@ -2660,19 +2662,44 @@ const GL_SCENES = {
     contact.rotation.x = -Math.PI / 2; contact.position.y = 0.004; box.add(contact);
 
     /* gold silk: flat strips along a path, revealed by drawRange from the knot outward */
-    const silk = new TH.MeshPhysicalMaterial({ color: 0xd8ae62, roughness: 0.35, metalness: 0.25, sheen: 1, sheenRoughness: 0.3, sheenColor: new TH.Color(0xe8c98a), side: TH.DoubleSide, envMapIntensity: 0.9, polygonOffset: true, polygonOffsetFactor: -2 });
+    /* gold silk: a fine weave (2px threads along the strip) under an anisotropic sheen, so each strip carries a bright streak */
+    const weave = (() => {
+      const S = 64, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d'), img = g.createImageData(S, S);
+      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { const ph2 = (x % 4) / 4, dx = Math.cos(ph2 * Math.PI * 2) * 0.35 + ((x * 7 + y * 3) % 5 - 2) * 0.02, l = Math.hypot(dx, 1), i = (y * S + x) * 4; img.data[i] = (dx / l * 0.5 + 0.5) * 255; img.data[i + 1] = 128; img.data[i + 2] = (1 / l * 0.5 + 0.5) * 255; img.data[i + 3] = 255; }
+      g.putImageData(img, 0, 0);
+      const tx = new TH.CanvasTexture(c); tx.wrapS = tx.wrapT = TH.RepeatWrapping; tx.colorSpace = TH.LinearSRGBColorSpace; tx.repeat.set(1, 30); return tx;
+    })();
+    /* the silk's own sheen across its width: a soft bright streak a little off-centre, darker selvedges, fine threads */
+    const silkC = (() => {
+      const S = 128, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+      const gr = g.createLinearGradient(0, 0, S, 0);
+      [[0, '#7a5520'], [0.08, '#a87a32'], [0.3, '#c99a48'], [0.42, '#f6dca0'], [0.5, '#fff0c8'], [0.58, '#ecc982'], [0.72, '#b8893a'], [0.92, '#9c7029'], [1, '#6e4b1b']].forEach(([o, col]) => gr.addColorStop(o, col));
+      g.fillStyle = gr; g.fillRect(0, 0, S, S);
+      g.globalAlpha = 0.12; g.fillStyle = '#3a2508'; for (let x = 0; x < S; x += 4) g.fillRect(x, 0, 2, S);
+      const tx = new TH.CanvasTexture(c); tx.wrapS = tx.wrapT = TH.RepeatWrapping; tx.colorSpace = TH.SRGBColorSpace; tx.repeat.set(1, 30); tx.anisotropy = 8; return tx;
+    })();
+    const silk = new TH.MeshPhysicalMaterial({ map: silkC, color: 0xffffff, metalness: 0.15, roughness: 0.28, sheen: 1, sheenRoughness: 0.35, sheenColor: new TH.Color(0xf3d9a0), clearcoat: 0.3, clearcoatRoughness: 0.2, anisotropy: 0.6, anisotropyRotation: Math.PI / 2, normalMap: weave, normalScale: new TH.Vector2(0.8, 0.8), envMapIntensity: 2.4, polygonOffset: true, polygonOffsetFactor: -2 });
+    const TH_R = 0.012;   /* the ribbon has a real thickness, so its edges catch a line of light */
     const strip = (pts, across, wdt, segs) => {   /* pts: Vector3 path; across: Vector3 width direction (or fn(i,t)) */
-      const curve = new TH.CatmullRomCurve3(pts, false, 'catmullrom', 0.2), P = curve.getSpacedPoints(segs);
-      const pos = [], nrm = [], idx = [];
-      P.forEach((p, i) => {
-        const t = i / segs, a = typeof across === 'function' ? across(i, t, p) : across;
-        const tan = curve.getTangentAt(t), n = new TH.Vector3().crossVectors(a, tan).normalize();
-        pos.push(p.x - a.x * wdt / 2, p.y - a.y * wdt / 2, p.z - a.z * wdt / 2, p.x + a.x * wdt / 2, p.y + a.y * wdt / 2, p.z + a.z * wdt / 2);
-        nrm.push(n.x, n.y, n.z, n.x, n.y, n.z);
-        if (i) { const k = i * 2; idx.push(k - 2, k - 1, k, k - 1, k + 1, k); }
-      });
+      const curve = new TH.CatmullRomCurve3(pts, false, 'catmullrom', 0.2), P = curve.getSpacedPoints(segs), L = curve.getLength();
+      const pos = [], nrm = [], uv = [], idx = [];
+      const A = [], N = [];
+      P.forEach((p, i) => { const t = i / segs, a = (typeof across === 'function' ? across(i, t, p) : across).clone().normalize(); const tan = curve.getTangentAt(t); A.push(a); N.push(new TH.Vector3().crossVectors(a, tan).normalize()); });
+      /* four faces per point: top (+n), bottom (−n), and the two edges (±a) */
+      const faces = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      faces.forEach(([fn, fa2]) => P.forEach((p, i) => {
+        const a = A[i], n = N[i], h = wdt / 2, d = TH_R / 2;
+        const c0 = fa2 ? p.clone().addScaledVector(a, fa2 * h).addScaledVector(n, -d) : p.clone().addScaledVector(a, -h).addScaledVector(n, fn * d);
+        const c1 = fa2 ? p.clone().addScaledVector(a, fa2 * h).addScaledVector(n, d) : p.clone().addScaledVector(a, h).addScaledVector(n, fn * d);
+        const nn = fa2 ? a.clone().multiplyScalar(fa2) : n.clone().multiplyScalar(fn);
+        pos.push(c0.x, c0.y, c0.z, c1.x, c1.y, c1.z); nrm.push(nn.x, nn.y, nn.z, nn.x, nn.y, nn.z);
+        const v = i / segs * L / wdt; uv.push(0, v, 1, v);
+      }));
+      const per = (segs + 1) * 2;
+      for (let i = 1; i <= segs; i++) faces.forEach((f, fi) => { const k = fi * per + i * 2; if ((fi % 2) === 0 && fi < 2 || fi === 3) idx.push(k - 2, k - 1, k, k - 1, k + 1, k); else idx.push(k - 2, k, k - 1, k - 1, k, k + 1); });
       const geo = new TH.BufferGeometry();
-      geo.setAttribute('position', new TH.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new TH.Float32BufferAttribute(nrm, 3)); geo.setIndex(idx);
+      geo.setAttribute('position', new TH.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new TH.Float32BufferAttribute(nrm, 3)); geo.setAttribute('uv', new TH.Float32BufferAttribute(uv, 2)); geo.setIndex(idx);
+      geo.computeTangents && geo.computeTangents();
       geo.setDrawRange(0, 0);
       const m = new TH.Mesh(geo, silk); m.castShadow = true; m.userData.n = idx.length; return m;
     };
@@ -2681,7 +2708,7 @@ const GL_SCENES = {
     /* along x: knot → +x edge → down to the table, and knot → −x; along z likewise */
     const leg = (dir) => {
       const hx = dir[0], hz = dir[1], ex = hx ? hx * X2 : 0, ez = hz ? hz * Z2 : 0, bx = hx ? hx * XB : 0, bz = hz ? hz * ZB : 0;
-      const pts = [new TH.Vector3(0, TOP + e, 0), new TH.Vector3(ex * 0.5, TOP + e, ez * 0.5), new TH.Vector3(ex * 0.96, TOP + e, ez * 0.96), new TH.Vector3(ex, TOP - 0.04, ez), new TH.Vector3(ex, LB + 0.03, ez), new TH.Vector3(bx, LB - 0.04, bz), new TH.Vector3(bx, LB * 0.5, bz), new TH.Vector3(bx, Y0, bz)];   /* over the lid, tucked in under its lip, down the body */
+      const pts = [new TH.Vector3(0, TOP + e + 0.01, 0), new TH.Vector3(ex * 0.5, TOP + e, ez * 0.5), new TH.Vector3(ex * 0.9, TOP + e - 0.004, ez * 0.9), new TH.Vector3(ex * 0.985, TOP - 0.006, ez * 0.985), new TH.Vector3(ex * 1.012, TOP - 0.05, ez * 1.012), new TH.Vector3(ex, LB + 0.03, ez), new TH.Vector3(bx, LB - 0.04, bz), new TH.Vector3(bx, LB * 0.5, bz), new TH.Vector3(bx, Y0, bz)];   /* over the lid, tucked in under its lip, down the body */
       const across = hx ? new TH.Vector3(0, 0, 1) : new TH.Vector3(1, 0, 0);
       const m = strip(pts, across, RW, 60); box.add(m); legs.push(m);
     };
@@ -2704,11 +2731,18 @@ const GL_SCENES = {
       g.putImageData(img, 0, 0);
       const tx = new TH.CanvasTexture(c); tx.colorSpace = TH.LinearSRGBColorSpace; return tx;
     })();
+    const sealC = (() => {   /* the recess of the V and the ring sits 10% darker */
+      const S = 256, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, S, S); g.filter = 'blur(2px)';
+      g.strokeStyle = '#e6e6e6'; g.lineWidth = 7; g.beginPath(); g.arc(S / 2, S / 2, S * 0.36, 0, Math.PI * 2); g.stroke();
+      drawV(g, S / 2, S / 2 + 6, S * 0.26, '#e6e6e6');
+      const tx = new TH.CanvasTexture(c); tx.colorSpace = TH.SRGBColorSpace; return tx;
+    })();
     const sealProf = []; for (let i = 0; i <= 12; i++) { const t = i / 12; sealProf.push(new TH.Vector2(0.001 + t * 0.27, 0.05 * Math.sqrt(1 - t * t * t) + 0.01)); }
     sealProf.push(new TH.Vector2(0.285, 0.006), new TH.Vector2(0.27, 0));
     const sealG = new TH.LatheGeometry(sealProf.reverse(), 48);   /* outer rim first, so the faces look up and out */
     { const p = sealG.attributes.position, uv = sealG.attributes.uv, r = rng(3); const wob = Array.from({ length: 9 }, () => r()); for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), rad = Math.hypot(x, z), a = Math.atan2(z, x); const k = 1 + (rad > 0.2 ? 0.07 * Math.sin(a * 5 + wob[0] * 6) * wob[1] + 0.04 * Math.sin(a * 9 + wob[2] * 6) : 0); p.setX(i, x * k); p.setZ(i, z * k); uv.setXY(i, 0.5 + x / 0.6, 0.5 - z / 0.6); } sealG.computeVertexNormals(); }
-    const sealM = new TH.MeshPhysicalMaterial({ color: 0xd2a24c, metalness: 0.45, roughness: 0.3, sheen: 0.4, sheenColor: new TH.Color(0xffe2a8), clearcoat: 0.6, clearcoatRoughness: 0.2, normalMap: sealN, normalScale: new TH.Vector2(2.6, 2.6), envMapIntensity: 1 });
+    const sealM = new TH.MeshPhysicalMaterial({ color: 0xd2a24c, metalness: 0.45, roughness: 0.3, sheen: 0.4, sheenColor: new TH.Color(0xffe2a8), clearcoat: 0.6, clearcoatRoughness: 0.2, normalMap: sealN, normalScale: new TH.Vector2(5.2, 5.2), map: sealC, envMapIntensity: 1 });
     const seal = new TH.Mesh(sealG, sealM); seal.castShadow = true; box.add(seal);
     const sealGlow = glowSprite(TH, 0xffd9a0, 0.9, 1.1); box.add(sealGlow);
 
@@ -2717,17 +2751,17 @@ const GL_SCENES = {
     const PEONY_D = ['M20 44 C19 58 32 70 48 70 C64 70 77 58 76 44', 'M20 44 C21 37 27 34 32 36 C34 30 41 28 44 32 C46 27 52 27 54 32 C57 28 63 30 64 36 C69 34 75 37 76 44', 'M20 44 C24 50 30 52 34 50 C38 55 44 55 48 52 C52 55 58 55 62 50 C66 52 72 50 76 44', 'M31 44.5 C33 40 37.5 39 40 41 C42 37 46 36.5 48 39.5 C50 36.5 54 37 56 41 C58.5 39 63 40 65 44.5', 'M37 47.5 C39.5 45 42.5 45 44.5 46.8 C46.5 44.6 49.5 44.6 51.5 46.8 C53.5 45 56.5 45 59 47.5', 'M34 50 C32.5 57 34.5 63.5 39.5 67.5 M62 50 C63.5 57 61.5 63.5 56.5 67.5', 'M48 70 C48.6 77 47.6 83 45.6 90', 'M47.8 80 C43 74.5 35.5 74 31.5 77.5 C35.5 81.5 42 82.5 47.8 80 M47.8 80 C42.5 78.5 37.5 78 34 78'];
     const GIFT_D = ['M24 46 H72 V82 H24 Z', 'M20 36 H76 V46 H20 Z', 'M48 36 V82', 'M48 36 C42 26 30 24 31 31 C32 37 42 37 48 36', 'M48 36 C54 26 66 24 65 31 C64 37 54 37 48 36'];
     const icon = (isGift ? GIFT_D : PEONY_D).map(d => new Path2D(d));
-    const CW = 1.12, CHh = 0.77;
-    const cardTx = cTex(TH, 640, 442);
+    const CW = 1.79, CHh = 1.23;
+    const cardTx = cTex(TH, 1024, 704);
     const drawCard = k => cardTx.draw((g, W, H) => {
       const gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, '#f6efe2'); gr.addColorStop(1, '#ebe0cc'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
-      g.strokeStyle = '#b88d45'; g.lineWidth = 3; g.strokeRect(18, 18, W - 36, H - 36); g.lineWidth = 1.2; g.strokeRect(28, 28, W - 56, H - 56);
-      g.save(); g.translate(W / 2 - 115, 22); g.scale(2.4, 2.4);
-      g.strokeStyle = '#a77d36'; g.lineWidth = 1.5; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.strokeStyle = '#b88d45'; g.lineWidth = 5; g.strokeRect(28, 28, W - 56, H - 56); g.lineWidth = 2; g.strokeRect(44, 44, W - 88, H - 88);
+      const iS = 140 / 72; g.save(); g.translate(W / 2 - 48 * iS * 1.6, 40); g.scale(iS * 1.6, iS * 1.6);   /* the drawing ~220px tall (140px box) */
+      g.strokeStyle = '#a77d36'; g.lineWidth = 1.6; g.lineCap = 'round'; g.lineJoin = 'round';
       icon.forEach((p, i) => { const s = cl((k * (icon.length + 2) - i) / 3); if (s <= 0) return; g.setLineDash([s * 160, 400]); g.stroke(p); });
       g.restore(); g.setLineDash([]);
       const tk = cl((k - 0.55) / 0.35);
-      if (tk > 0) { g.globalAlpha = tk; g.fillStyle = '#7d5a24'; g.textAlign = 'center'; g.direction = fa() ? 'rtl' : 'ltr'; g.font = fa() ? CF.disp(52) : CF.bod(50, true); g.fillText(X(['For you', 'برای شما']), W / 2, H - 52); g.globalAlpha = 1; }
+      if (tk > 0) { g.globalAlpha = tk; g.fillStyle = '#7d5a24'; g.textAlign = 'center'; g.direction = fa() ? 'rtl' : 'ltr'; g.font = fa() ? CF.disp(108) : CF.bod(112, true); g.fillText(X(['For you', 'برای شما']), W / 2, H - (fa() ? 96 : 104)); g.globalAlpha = 1; }
     });
     drawCard(0);
     const cardM = new TH.MeshStandardMaterial({ map: cardTx.tx, roughness: 0.75, polygonOffset: true, polygonOffsetFactor: -1 });
@@ -2751,30 +2785,31 @@ const GL_SCENES = {
         box.position.set(lerp(-3.4, 0, sIn), 0, lerp(-0.6, 0, sIn));
         box.rotation.y = lerp(0.5, -0.12, sIn);
         /* 2–4.5 s: the ribbon runs out from the knot, then the bow */
-        legs.forEach((m, i) => { const k = ph(t, 2.0 + (i % 2) * 0.12 + (i > 1 ? 0.5 : 0), 3.6 + (i > 1 ? 0.5 : 0), eio); m.geometry.setDrawRange(0, Math.floor(m.userData.n * k / 6) * 6); m.visible = k > 0; });
+        legs.forEach((m, i) => { const k = ph(t, 2.0 + (i % 2) * 0.12 + (i > 1 ? 0.5 : 0), 3.6 + (i > 1 ? 0.5 : 0), eio); m.geometry.setDrawRange(0, Math.floor(m.userData.n * k / 24) * 24); m.visible = k > 0; });
         const b = back01(ph(t, 3.9, 4.5));
         bow.scale.setScalar(Math.max(0.001, b)); bow.visible = t > 3.85;
         /* 4.5–6.5 s: the seal comes down and presses, with a little squash and a flash */
         const down = ph(t, 4.6, 5.2, x => x * x), press = ph(t, 5.2, 5.5), rel = ph(t, 5.5, 6.0, eout);
         seal.position.set(0, TOP + 0.13 + (1 - down) * 1.4, 0.06);
-        const sq = press * (1 - rel); seal.scale.set(0.82 * (1 + sq * 0.12), 0.82 * (1 - sq * 0.28), 0.82 * (1 + sq * 0.12));
+        const sq = press * (1 - rel); seal.scale.set(1.02 * (1 + sq * 0.12), 1.02 * (1 - sq * 0.28), 1.02 * (1 + sq * 0.12));
         seal.visible = t > 4.55; seal.rotation.set(0.32 * down, 0.3 + (1 - down) * 1.2, 0, 'XYZ');   /* settles tipped a little to the lens, so the V reads */
         flash = ph(t, 5.2, 5.3) * (1 - ph(t, 5.3, 5.9));
         sealGlow.position.set(0, TOP + 0.2, 0.05); sealGlow.material.opacity = flash * 0.9; sealGlow.visible = t > 5.15;
         /* 6.5–8 s: the card slides out from under the ribbon, and the drawing strokes on */
         const cOut = ph(t, 6.5, 7.3, eout);
         box.updateMatrixWorld();
-        cardMesh.position.set(box.position.x + lerp(-0.05, -0.32, cOut), 0.006, box.position.z + lerp(0.2, BD / 2 + 0.4, cOut));
-        cardMesh.rotation.y = lerp(-0.12, 0.16, cOut);
+        cardMesh.position.set(box.position.x + lerp(-0.05, 0.12, cOut), 0.006, box.position.z + lerp(0.1, BD / 2 + 0.95, cOut));
+        cardMesh.rotation.y = lerp(-0.12, 0.08, cOut);
         cardMesh.visible = t > 6.45;
         const ck = ph(t, 6.9, 8.0);
         if (Math.abs(ck - lastK) > 0.004) { drawCard(ck); lastK = ck; }
         motes.uniforms.uTime.value = t;
         /* camera: a slow, low drift in towards the box */
         const m = ph(t, 0, 8, eio);
-        look.set(lerp(-0.5, 0, sIn), lerp(0.4, 0.45, m) - (C.h < 700 ? 0.3 : 0.1), lerp(0, 0.4, m));
+        const dl = ph(t, 6.5, 8, eio);
+        look.set(lerp(-0.5, 0, sIn), lerp(0.4, 0.45, m) - (C.h < 700 ? 0.3 : 0.2) - dl * 0.12, lerp(0, 0.4, m) + dl * 0.45);
         cam.position.set(lerp(-1.7, 0.6, m), lerp(5.0, 4.4, m), lerp(9.4, 8.6, m));
-        aim(cam, look, fitK(C, 0.62));
+        aim(cam, look, fitK(C, 0.62) * (1 - 0.15 * dl) * (C.h < 700 ? 1.1 : 1));
         show01(card, ph(t, 7.2, 7.9, eout));
       }
     };
