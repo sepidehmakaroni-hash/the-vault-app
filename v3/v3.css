@@ -68,9 +68,9 @@ bdi{unicode-bidi:isolate}
 /* ---------- masthead bar: solid Vault Black with a Forest hairline; photographs begin below it, so nothing is darkened for the nav.
    Only the title and the cover (bare) leave it clear, over ink, until the cover scrolls. ---------- */
 .bar{position:absolute;top:0;left:0;right:0;z-index:30;height:calc(var(--top) + 56px);padding:var(--top) 8px 0;display:flex;align-items:center;justify-content:space-between;pointer-events:none;
-  background:rgba(27,28,30,.97);border-bottom:1px solid var(--rule);transition:background-color var(--t) var(--ease),border-color var(--t) var(--ease)}
+  background:var(--ink);border-bottom:1px solid var(--rule);transition:background-color var(--t) var(--ease),border-color var(--t) var(--ease)}
 .bar.bare{background:rgba(27,28,30,0);border-bottom-color:transparent}
-.bar.scrolled{background:rgba(27,28,30,.97);border-bottom-color:var(--rule)}
+.bar.scrolled{background:var(--ink);border-bottom-color:var(--rule)}
 .bar>*{pointer-events:auto}
 .bl,.br{display:flex;align-items:center;gap:2px}
 .nb{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 8px;color:var(--ivory)}
@@ -250,7 +250,7 @@ bdi{unicode-bidi:isolate}
 .rvv.none{font-family:var(--txt);font-size:var(--fs-b);color:var(--faint)}
 .fa .rvv{line-height:1.6}
 .rv .tl{grid-column:2;grid-row:1 / span 2;align-self:center}
-.ap-cta{position:sticky;bottom:calc(var(--bot) * -1 - var(--s4));margin:var(--s4) calc(var(--gut) * -1) 0;padding:20px var(--gut) calc(var(--bot) + var(--s4));background:linear-gradient(to bottom,rgba(27,28,30,0),var(--ink) 34%)}
+.ap-cta{position:sticky;bottom:calc(var(--bot) * -1 - var(--s4));margin:var(--s4) calc(var(--gut) * -1) 0;padding:44px var(--gut) calc(var(--bot) + var(--s4));background:linear-gradient(to bottom,rgba(27,28,30,0),var(--ink) 60%)}
 .apply-page .tl{align-self:flex-start;margin-top:4px}
 
 /* ---------- member cover ---------- */
@@ -496,7 +496,7 @@ bdi{unicode-bidi:isolate}
 /* ---------- account ---------- */
 .acc-hero{position:relative;margin:0 calc(var(--gut) * -1);overflow:hidden;background:var(--ink);grid-template-rows:clamp(240px,40vh,380px) auto}
 .ah-in{position:relative;z-index:2;padding:0 32px;width:100%}
-.acc-page section{margin-top:var(--s4)}
+.acc-page section:not(.acc-hero){margin-top:var(--s4)}
 .glist{border-top:1px solid var(--rule);margin-bottom:var(--s3)}
 .glist li{display:flex;align-items:center;justify-content:space-between;min-height:60px;border-bottom:1px solid var(--rule);font-family:var(--disp);font-size:var(--fs-t)}
 .glist li.none{font-family:var(--txt);font-size:var(--fs-b);color:var(--faint)}
