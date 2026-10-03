@@ -10,7 +10,7 @@ var T = {
 en: {
 lang: 'فا', langName: 'فارسی', back: 'Back', close: 'Close', unit: 'Toman', home: 'The Vault, home', mono: 'AF',
 // title sequence
-cred1: 'A private members’ club', cred2: 'Tehran', the: 'The', vault: 'Vault', sub: 'Where value is kept.',
+cred1: 'A private members’ club', the: 'The', vault: 'Vault', sub: 'Where value is kept.',
 enterM: 'Members — enter', request: 'Request membership', skip: 'Tap to skip', scene: 'Maryam St, Tehran', hours: '08:00 – 02:00',
 coords: '<bdi dir="ltr">35°41′ N</bdi>&nbsp;&nbsp;<bdi dir="ltr">51°25′ E</bdi>',
 // login
@@ -34,12 +34,12 @@ dock: ['Home', 'Reserve', 'Events', 'Concierge', 'Wallet'],
 // reserve
 resEy: 'Reserve', resTitle: 'Five rooms. One evening.', resBody: 'Choose a room, then a day and a time. Room 6 is arranged by the concierge; the Japanese garden is never booked — it is offered by the house.', chapter: 'Nº %1', reserveRoom: 'Reserve this room', garden: ['The Japanese garden', 'The rarest room in the house. It is never booked and never sold; the house offers it, now and then.', 'Ask the concierge', 'Ext. The garden — dusk'],
 yourBookings: 'Your bookings', cancel: 'Cancel', cancelQ: 'Cancel this booking?', cancelYes: 'Yes, cancel it', keep: 'Keep it', cancelled: 'The booking is cancelled.',
-rooms: [['The lounge', 'The heart of the club. Hold a table for the evening.', 'lounge', 'Int. The lounge — evening', 'Hold a table'], ['The dining room', 'One room, one service. Lunch, and dinner at the chef’s table.', 'dining', 'Int. Dining room — evening'], ['The sushi counter', 'Eight seats in front of the itamae.', 'sushi', 'Int. Sushi counter — late'], ['The humidor', 'Cigars are kept and smoked here, and nowhere else.', 'humidor-room', 'Int. Humidor — after dinner'], ['The terrace', 'Open air above the city. Dinner served.', 'terrace', 'Ext. Terrace — night']],
+rooms: [['The lounge', 'The heart of the club. Hold a table for the evening.', 'lounge', 'Int. The lounge — evening', 'Hold a table'], ['The dining room', 'One room, one service. Lunch, and dinner at the chef’s table.', 'dining', 'Int. Dining room — evening'], ['The sushi counter', 'Eight seats in front of the itamae.', 'sushi', 'Int. Sushi counter — late'], ['Bar & humidor', 'Cigars are kept and smoked here, and nowhere else.', 'humidor-room', 'Int. Bar & humidor — after dinner'], ['The terrace', 'Open air above the city. Dinner served.', 'terrace', 'Ext. Terrace — night']],
 day: 'Day', time: 'Time', party: 'Guests, with you', full: 'full', hold: 'Hold the table', pickTime: 'Choose a time to hold the table.', confirmT: 'Your table', confirm: 'Confirm', heldT: 'Your table is held.', heldB: 'It is kept under your name. Nothing more is needed at the door — Reza, the host, will be waiting.', heldToast: 'Your table is held.', done: 'Done', room: 'Room', date: 'Date', guests: 'Guests', people: '%1 people', person: 'Just you', today: 'Today', tomorrow: 'Tomorrow', less: 'One fewer', more: 'One more', at: '%1 at %2',
 // events
 evEy: 'The calendar', evTitle: 'This season, in four evenings.', seats: '%1 seats left', seatsK: 'Seats left', attend: 'Hold my seat', going: 'You are going', details: 'Details', bring: 'Guests you bring', rsvpOn: 'Your seat is held.', rsvpOff: 'Your seat is released.', release: 'Release my seat', addCal: 'Add to calendar', calAdded: 'Added to your calendar.', place: 'Place', evNo: 'Nº %1',
 kinds: ['Art', 'Design', 'Music', 'Collectors'],
-events: [['Contemporary art preview', 'The art corridor', '19:00', 'A first look at the winter collection, with the artists in the room.'], ['Design & architecture table', 'The dining room', '20:00', 'Twelve seats, one long table, three architects and a question.'], ['An evening recital', 'The lounge', '20:30', 'A string trio from Istanbul plays Schubert and Komitas. Seated, quiet, members only.', '“Schubert, Komitas, and a very quiet room.”'], ['Collectors’ evening', 'The lounge', '19:30', 'A private sale of six works, introduced by the curator who found them.']],
+events: [['Contemporary art preview', 'The art corridor', '19:00', 'A silent first look in the art corridor; the artists receive members afterwards in the lounge.'], ['Design & architecture table', 'The dining room', '20:00', 'Twelve seats, one long table, three architects and a question.'], ['An evening recital', 'The lounge', '20:30', 'A string trio from Istanbul plays Schubert and Komitas. Seated, quiet, members only.', '“Schubert, Komitas, and a very quiet room.”'], ['Collectors’ evening', 'The lounge', '19:30', 'A private sale of six works, introduced by the curator who found them.']],
 // concierge
 concEy: 'Concierge', concTitle: 'What can we arrange?', concBody: 'Choose, and it is done. One line, day and night.', when: 'When', sendC: 'Send to the concierge', sentC: 'The concierge has it.',
 topics: [['A table, anywhere', 'Restaurants in the city and beyond', ['Tonight', 'Tomorrow', 'This weekend']], ['Room 6, or a table here', 'In the house, arranged quietly', ['Today', 'Tomorrow', 'This week'], 'Room 6 is for meetings that stay between you. It is arranged only through the concierge.'], ['Car and driver', 'To the door, or for the evening', ['Now', 'In 30 minutes', 'Later tonight']], ['Flowers and gifts', 'Chosen and delivered', ['Today', 'Tomorrow', 'No hurry']], ['Travel and tickets', 'Flights, hotels, concerts, theatre', ['This week', 'This month', 'No hurry']], ['Humidor locker Nº 14', 'Nine cigars, kept for you', ['Bring to my table', 'Keep for later']], ['The Japanese garden', 'Offered by the house, never sold', ['This week', 'This month', 'Whenever it can be'], 'The garden is not booked. Tell the concierge you would like an hour there, and the house will offer it when it can.']],
@@ -65,7 +65,7 @@ rulesList: [['Guests', 'Every guest is named before the night. A guest never pay
 },
 fa: {
 lang: 'EN', langName: 'English', back: 'بازگشت', close: 'بستن', unit: 'تومان', home: 'د والت، خانه', mono: 'آف',
-cred1: 'باشگاه خصوصی اعضا', cred2: 'تهران', the: 'THE VAULT', vault: 'د والت', sub: 'جایی که ارزش نگه‌داشته می‌شود.',
+cred1: 'باشگاه خصوصی اعضا', the: 'THE VAULT', vault: 'د والت', sub: 'جایی که ارزش نگه‌داشته می‌شود.',
 enterM: 'ورود اعضا', request: 'درخواست عضویت', skip: 'برای رد شدن بزنید', scene: 'خیابان مریم، تهران', hours: '۰۸:۰۰ تا ۰۲:۰۰',
 coords: '<bdi dir="ltr">۳۵°۴۱′</bdi> شمالی،&nbsp;<bdi dir="ltr">۵۱°۲۵′</bdi> شرقی',
 loginEy: 'اعضا', loginTitle: 'درِ خانه منتظر شماست.', loginBody: 'این دستگاه برای خانه آشناست.', loginWho: 'آرش فراهانی · عضو شمارهٔ ۱', enter: 'ورود', notYou: 'هنوز عضو نیستید؟ درخواست عضویت',
@@ -89,8 +89,8 @@ rooms: [['لانژ', 'قلب باشگاه. میزی برای شب نگه دار�
 day: 'روز', time: 'ساعت', party: 'مهمان‌ها، با خودتان', full: 'پر', hold: 'نگه داشتن میز', pickTime: 'برای نگه داشتن میز یک ساعت انتخاب کنید.', confirmT: 'میز شما', confirm: 'تأیید', heldT: 'میز شما نگه داشته شد.', heldB: 'به نام شما نگه داشته می‌شود. در ورودی چیز دیگری لازم نیست — رضا، میزبان، منتظرتان است.', heldToast: 'میز شما نگه داشته شد.', done: 'تمام', room: 'فضا', date: 'تاریخ', guests: 'مهمان‌ها', people: '%1 نفر', person: 'فقط خودتان', today: 'امروز', tomorrow: 'فردا', less: 'یک نفر کمتر', more: 'یک نفر بیشتر', at: '%1، ساعت %2',
 evEy: 'تقویم', evTitle: 'این فصل، در چهار شب.', seats: '%1 جای خالی', seatsK: 'جای خالی', attend: 'جایم را نگه دارید', going: 'شما می‌آیید', details: 'جزئیات', bring: 'مهمان همراه', rsvpOn: 'جای شما نگه داشته شد.', rsvpOff: 'جای شما آزاد شد.', release: 'آزاد کردن جایم', addCal: 'افزودن به تقویم', calAdded: 'به تقویم شما اضافه شد.', place: 'مکان', evNo: 'شمارهٔ %1',
 kinds: ['هنر', 'طراحی', 'موسیقی', 'مجموعه‌داران'],
-events: [['پیش‌نمایش هنر معاصر', 'کریدور هنر', '19:00', 'نخستین نگاه به مجموعهٔ زمستان، با حضور هنرمندان.'], ['میز طراحی و معماری', 'سالن غذاخوری', '20:00', 'دوازده صندلی، یک میز بلند، سه معمار و یک پرسش.'], ['شب رسیتال', 'لانژ', '20:30', 'یک تریوی زهی از استانبول، شوبرت و کومیتاس می‌نوازد. نشسته، آرام، فقط برای اعضا.', '«شوبرت، کومیتاس، و اتاقی بسیار آرام.»'], ['شب مجموعه‌داران', 'لانژ', '19:30', 'فروش خصوصی شش اثر، با معرفی کیوریتوری که آن‌ها را یافته است.']],
-concEy: 'کانسیرج', concTitle: 'چه کاری برایتان انجام دهیم؟', concBody: 'انتخاب کنید، انجام می‌شود. یک خط، شبانه‌روز.', when: 'کی', sendC: 'ارسال به کانسیرج', sentC: 'کانسیرج درخواست شما را دارد.',
+events: [['پیش‌نمایش هنر معاصر', 'کریدور هنر', '19:00', 'نخستین نگاه، در سکوتِ کریدور هنر؛ هنرمندان پس از آن در لانژ پذیرای اعضا هستند.'], ['میز طراحی و معماری', 'سالن غذاخوری', '20:00', 'دوازده صندلی، یک میز بلند، سه معمار و یک پرسش.'], ['شب رسیتال', 'لانژ', '20:30', 'یک تریوی زهی از استانبول، شوبرت و کومیتاس می‌نوازد. نشسته، آرام، فقط برای اعضا.', 'شوبرت، کومیتاس، و اتاقی بسیار آرام.'], ['شب مجموعه‌داران', 'لانژ', '19:30', 'فروش خصوصی شش اثر، با معرفی کیوریتوری که آن‌ها را یافته است.']],
+concEy: 'کانسیرج', concTitle: 'چه کاری برایتان بکنیم؟', concBody: 'انتخاب کنید، انجام می‌شود. یک خط، شبانه‌روز.', when: 'کی', sendC: 'ارسال به کانسیرج', sentC: 'کانسیرج درخواست شما را دارد.',
 topics: [['میز در هر جای شهر', 'رستوران‌ها، در تهران و فراتر از آن', ['امشب', 'فردا', 'آخر هفته']], ['اتاق ۶، یا میزی در خانه', 'در خود خانه، بی‌سروصدا', ['امروز', 'فردا', 'همین هفته'], 'اتاق ۶ برای دیدارهایی است که میان خودتان می‌ماند. فقط کانسیرج آن را هماهنگ می‌کند.'], ['ماشین و راننده', 'دمِ در، یا برای تمام شب', ['همین حالا', '۳۰ دقیقهٔ دیگر', 'آخر شب']], ['گل و هدیه', 'انتخاب و ارسال', ['امروز', 'فردا', 'عجله‌ای نیست']], ['سفر و بلیت', 'پرواز، هتل، کنسرت، تئاتر', ['همین هفته', 'همین ماه', 'عجله‌ای نیست']], ['قفسهٔ هیومیدور شمارهٔ ۱۴', 'نه سیگار برگ، برای شما', ['سر میزم بیاورید', 'بماند برای بعد']], ['باغ ژاپنی', 'پیشکشِ خانه، هرگز فروشی نیست', ['همین هفته', 'همین ماه', 'هر وقت که بشود'], 'باغ رزرو نمی‌شود. به کانسیرج بگویید ساعتی در آن را می‌خواهید؛ خانه هر وقت بتواند آن را پیشکش می‌کند.']],
 concAlso: 'و بی‌آنکه دوباره فکرش را بکنید: پیک، خشک‌شویی و خیاط، معرفی پزشک، نگهداری از حیوان خانگی.', nightReply: 'پیام شما دریافت شد. همکاران ما از ساعت نُه صبح پیگیری می‌کنند و خبر می‌دهند.',
 lockerB: 'در رطوبت ۷۰٪ و دمای ۱۸ درجه نگه داشته می‌شود. کلید نزد مسئول هیومیدور است.', cigars: [['کوهیبا بهیکه ۵۴', 3], ['مونته‌کریستو شمارهٔ ۲', 4], ['پادرون ۱۹۶۴ آنیورسری', 2]],
@@ -116,13 +116,13 @@ var GUESTS = { en: ['Shirin Ahmadi', 'Kaveh Tehrani', 'Leila Karimi', 'Dariush N
 /* photographs: one per place, all carrying the house grade (no CSS filter). [src, object-position]
    Only the title hero loads eagerly; everything else is lazy. */
 var SRC = {
-  'title': ['img/ph-title-entrance.webp', '50% 40%'], 'open-door': ['img/ph-open-door.webp', '66% 50%'], 'pen': ['img/ph-pen.webp', '50% 62%'], 'tray': ['img/ph-tray.webp', '50% 58%'],
-  'cover': ['img/ph-cover-chef.webp', '50% 60%'], 'artist': ['img/ph-artist.webp', '62% 50%'], 'quince': ['img/ph-quince.webp', '42% 55%'], 'members': ['img/ph-members.webp', '50% 50%'],
-  'lounge': ['img/ph-lounge.webp', '40% 60%'], 'dining': ['img/ph-dining-room.webp', '35% 60%'], 'sushi': ['img/ph-sushi-chef.webp', '50% 55%'],
-  'humidor-room': ['img/ph-humidor-room.webp', '50% 55%'], 'terrace': ['img/ph-terrace-couple.webp', '58% 50%'], 'garden': ['img/ph-garden-a.webp', '40% 55%'],
+  'title': ['img/ph-title-entrance.webp', '50% 18%'], 'open-door': ['img/ph-open-door.webp', '70% 45%'], 'pen': ['img/ph-pen.webp', '50% 62%'], 'tray': ['img/ph-tray.webp', '50% 58%'],
+  'cover': ['img/ph-cover-chef.webp', '50% 55%'], 'artist': ['img/ph-artist.webp', '62% 50%'], 'quince': ['img/ph-quince.webp', '42% 55%'], 'members': ['img/ph-members.webp', '50% 50%'],
+  'lounge': ['img/ph-lounge.webp', '40% 82%'], 'dining': ['img/ph-dining-room.webp', '35% 80%'], 'sushi': ['img/ph-sushi-chef.webp', '50% 78%'],
+  'humidor-room': ['img/ph-humidor-room.webp', '50% 62%'], 'terrace': ['img/ph-terrace-couple.webp', '58% 55%'], 'garden': ['img/ph-garden-a.webp', '40% 70%'],
   'ev-art': ['img/ph-ev-art.webp', '55% 50%'], 'ev-dining': ['img/ph-dining.webp', '45% 45%'], 'ev-lounge': ['img/ph-lounge-members.webp', '70% 62%'],
-  'concierge': ['img/ph-concierge-desk.webp', '50% 42%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'],
-  'card': ['img/ph-card.webp', '50% 40%'], 'seal': ['img/ph-seal.webp', '50% 45%'], 'corridor': ['img/ph-corridor.webp', '50% 50%']
+  'concierge': ['img/ph-concierge-desk.webp', '50% 30%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'],
+  'card': ['img/ph-card.webp', '50% 40%'], 'seal': ['img/ph-seal.webp', '50% 42%'], 'corridor': ['img/ph-corridor.webp', '50% 46%']
 };
 
 /* ================= helpers ================= */
@@ -140,7 +140,13 @@ var fill = function (s) { var a = arguments; return String(s).replace(/%(\d)/g, 
 var digits = function (s) { return fa() ? String(s).replace(/\d/g, function (d) { return '۰۱۲۳۴۵۶۷۸۹'[d]; }) : String(s); };
 var n = function (x) { return new Intl.NumberFormat(fa() ? 'fa-IR' : 'en-US').format(x); };
 var loc = function () { return fa() ? 'fa-IR-u-ca-persian-nu-arabext' : 'en-GB'; };
-var dfmt = function (d, o) { var s = new Intl.DateTimeFormat(loc(), o).format(d); return fa() ? digits(s.replace(/,/g, '،')) : s; };
+/* dates. Persian is built from parts and always reads weekday, day, month, year («شنبه ۱۱ مهر ۱۴۰۵»):
+   the fa-IR pattern otherwise puts the year first whenever a weekday is present. */
+var dfmt = function (d, o) {
+  var f = new Intl.DateTimeFormat(loc(), o); if (!fa()) return f.format(d);
+  var p = f.formatToParts(d), g = function (t) { return (p.filter(function (x) { return x.type === t; })[0] || {}).value; };
+  return digits(['weekday', 'day', 'month', 'year'].map(g).filter(Boolean).join(' '));
+};
 var monthYear = function (d) { var p = new Intl.DateTimeFormat(loc(), { month: 'long', year: 'numeric' }).formatToParts(d), g = function (t) { return (p.filter(function (x) { return x.type === t; })[0] || {}).value || ''; }; return digits(g('month') + ' ' + g('year')); };
 var dayOf = function (off) { var d = new Date(); d.setHours(12, 0, 0, 0); return new Date(d.getTime() + off * DAY); };
 var roman = function (i) { return fa() ? digits(i + 1) : ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'][i]; };
@@ -149,6 +155,7 @@ var two = function (i) { return fa() ? digits(i + 1) : (i < 9 ? '0' : '') + (i +
 /* separators. In Persian a middle dot beside a Persian digit reads like a zero (۷ · ۸ → ۷۰۸):
    next to a digit it becomes a dash, elsewhere it stays a spaced middle dot. */
 var sep = function (h) { return fa() ? String(h).replace(/\s*·\s*/g, ' — ') : h; };
+var nos = function (h) { return ('>' + h).replace(/>[^<]*/g, function (t) { return t.replace(/Nº/g, '<span class="no">Nº</span>'); }).slice(1); };
 function img(key, eager, cls) {
   var s = SRC[key] || [key], pos = s[1] || '50% 50%';
   return '<img' + (cls ? ' class="' + cls + '"' : '') + ' src="' + s[0] + '" alt=""' + (eager ? ' fetchpriority="high"' : ' loading="lazy"') + ' decoding="async" style="object-position:' + pos + ';transform-origin:' + pos + '">';
@@ -172,7 +179,7 @@ function clearToast() { clearTimeout(toastT); $('.toast').classList.remove('on')
 /* ================= data ================= */
 var TIMES = ['12:30', '14:00', '19:30', '20:30', '21:30', '22:30'];
 var isFull = function (day, ti, room) { return (day * 7 + ti * 3 + room * 2 + 1) % 5 === 0; };
-var ZONE = [5, 11, 10, 8, 12];   // rooms follow the house zones: lounge 5, dining 11, sushi 10, humidor 8, terrace 12 (room 6 via the concierge, garden 13 offered)
+var ZONE = [5, 11, 10, 8, 12], BYZONE = [0, 3, 2, 1, 4];   // rooms follow the house zones: lounge 5, dining 11, sushi 10, humidor 8, terrace 12 (room 6 via the concierge, garden 13 offered)
 var FEATURE = { room: 1, day: 0, time: 3 };   // the chef's table: dining room, today, 20:30 (never full)
 var EV = [{ off: 3, seats: 12, img: 'ev-art', ar: '4/3' }, { off: 9, seats: 4, img: 'ev-dining', ar: '3/4' }, { off: 16, seats: 20, img: null }, { off: 27, seats: 9, img: 'ev-lounge', ar: '4/5' }];
 function seatsLeft(i) { return EV[i].seats - (S.rsvp[i] ? 1 + (S.bring[i] || 0) : 0); }
@@ -283,7 +290,7 @@ function render(dir, o) {
 
   var pg = document.createElement('div');
   pg.className = 'page ' + (def.cls || '') + ((first || o.fade) ? ' fade' : (dir === 'back' ? ' enter pback' : ' enter'));
-  pg.innerHTML = sep(def.html(r));
+  pg.innerHTML = nos(sep(def.html(r)));
   view.appendChild(pg);
   if (old) { old.classList.add('leave'); old.setAttribute('aria-hidden', 'true'); old.inert = true; setTimeout(function () { old.remove(); }, calm ? 0 : 620); }
   if (dir === 'back' && scrolls[path]) pg.scrollTop = scrolls[path]; else if (dir !== 'same') scrolls[path] = 0;
@@ -295,7 +302,7 @@ function render(dir, o) {
 function rerender() {
   var pg = $('.page:not(.leave)', view); if (!pg) return; var top = pg.scrollTop, def = ROUTES[route.key];
   var foc = document.activeElement && document.activeElement.closest && document.activeElement.closest('.page') === pg ? focusKey(document.activeElement) : null;
-  pg.classList.remove('enter', 'fade', 'pback'); pg.classList.add('static'); pg.innerHTML = sep(def.html(route)); pg.scrollTop = top;
+  pg.classList.remove('enter', 'fade', 'pback'); pg.classList.add('static'); pg.innerHTML = nos(sep(def.html(route))); pg.scrollTop = top;
   if (def.after) def.after(pg, route, 'same');
   if (foc) { var t = pg.querySelector(foc); if (t) t.focus({ preventScroll: true }); }
 }
@@ -333,7 +340,6 @@ R('', { bare: true, cls: 'title-page', html: function () {
     '<div class="lb top" aria-hidden="true"><span>' + l.coords + '</span></div>' +
     '<div class="credits">' +
       '<p class="cr c1">' + l.cred1 + '</p>' +
-      '<p class="cr c2">' + l.cred2 + '</p>' +
       '<h1 class="ttl" id="ttl"><span class="the" lang="en">' + l.the + '</span><span class="big">' + l.vault + '</span></h1>' +
       '<p class="subt"><span>' + l.sub + '</span></p>' +
       '<div class="acts"><button type="button" class="btn solid" data-go="login">' + l.enterM + '</button><button type="button" class="btn line" data-go="apply/1">' + l.request + '</button></div>' +
@@ -353,7 +359,7 @@ R('', { bare: true, cls: 'title-page', html: function () {
 } });
 
 /* ================= pages: login ================= */
-R('login', { back: true, bare: true, cls: 'login-page', html: function () {
+R('login', { back: true, cls: 'login-page', html: function () {
   var l = L();
   return '<section class="still">' +
     '<div class="kb slow" aria-hidden="true">' + img('open-door') + '</div><div class="veil" aria-hidden="true"></div>' +
@@ -405,7 +411,7 @@ R('apply', { back: true, cls: 'apply-page', html: function (r) {
     '<h1 class="display">' + st[0] + '</h1><p class="lede">' + st[1] + '</p>' + body +
     '<div class="ap-cta"><button type="button" class="btn solid" data-act="apNext">' + (s === 4 ? l.send : l.next) + '</button></div></div>';
 } });
-R('sent', { bare: true, cls: 'sent-page', html: function () {
+R('sent', { cls: 'sent-page', html: function () {
   var l = L();
   return '<section class="still sealed"><div class="sent-photo" aria-hidden="true">' + img('tray') + '</div>' +
     '<div class="still-copy"><p class="kicker">' + l.sentEy + '</p><h1 class="display">' + l.sentTitle + '</h1><p class="lede">' + l.sentBody + '</p>' +
@@ -435,14 +441,14 @@ R('m/reserve', { member: true, cls: 'chapters', html: function () {
   var l = L();
   var mine = S.res.length ? '<div class="mine"><p class="kicker">' + l.yourBookings + '</p><ul>' + S.res.map(function (r, i) { return '<li><span><b>' + l.rooms[r.room][0] + '</b><i>' + whenLine(r.day, r.time) + ' · ' + party(r.party) + '</i></span><button type="button" class="tl small" data-act="cancelRes" data-v="' + i + '">' + l.cancel + '</button></li>'; }).join('') + '</ul></div>' : '';
   return '<section class="chap intro"><div class="chap-in"><p class="kicker">' + l.resEy + '</p><h1 class="display xl">' + l.resTitle + '</h1><p class="lede">' + l.resBody + '</p>' + mine + '</div></section>' +
-    l.rooms.map(function (r, i) {
+    BYZONE.map(function (i) { var r = l.rooms[i];
       return '<section class="chap" aria-labelledby="ch' + i + '"><div class="kb" aria-hidden="true">' + img(r[2]) + '</div><div class="veil" aria-hidden="true"></div>' +
-        '<div class="chap-in"><p class="slug">' + r[3] + '</p><p class="chno"><span>' + fill(l.chapter, digits(ZONE[i])) + '</span></p><h2 class="chap-h" id="ch' + i + '">' + r[0] + '</h2><p class="lede">' + r[1] + '</p>' +
+        '<div class="chap-in"><p class="chno"><span>' + fill(l.chapter, digits(ZONE[i])) + '</span></p><h2 class="chap-h" id="ch' + i + '">' + r[0] + '</h2><p class="lede">' + r[1] + '</p>' +
         '<button type="button" class="btn solid" data-go="m/reserve/' + i + '">' + (r[4] || l.reserveRoom) + '</button></div></section>';
     }).join('') +
     // the garden (zone 13) closes the chapters: it is never booked, only asked for through the concierge
     '<section class="chap garden" aria-labelledby="chG"><div class="kb" aria-hidden="true">' + img('garden') + '</div><div class="veil" aria-hidden="true"></div>' +
-      '<div class="chap-in"><p class="slug">' + l.garden[3] + '</p><p class="chno"><span>' + fill(l.chapter, digits(13)) + '</span></p><h2 class="chap-h" id="chG">' + l.garden[0] + '</h2><p class="lede">' + l.garden[1] + '</p>' +
+      '<div class="chap-in"><p class="chno"><span>' + fill(l.chapter, digits(13)) + '</span></p><h2 class="chap-h" id="chG">' + l.garden[0] + '</h2><p class="lede">' + l.garden[1] + '</p>' +
       '<button type="button" class="btn line" data-act="topic" data-v="6">' + l.garden[2] + '</button></div></section>';
 }, after: function (pg) {
   if (calm || !('IntersectionObserver' in window)) { $$('.chap', pg).forEach(function (c) { c.classList.add('in'); }); return; }
@@ -459,7 +465,7 @@ R('m/room', { member: true, back: true, cls: 'room-page', html: function (r) {
   var times = '<div class="times" role="radiogroup" aria-label="' + l.time + '">' + TIMES.map(function (t, i) { var full = isFull(f.day, i, r.room), tab = f.time === i || (f.time == null && i === firstFree);
     return '<button type="button" class="tbtn" role="radio" data-act="rtime" data-v="' + i + '" aria-checked="' + (f.time === i) + '"' + (full ? ' disabled' : '') + (tab ? '' : ' tabindex="-1"') + '><b>' + digits(t) + '</b>' + (full ? '<span>' + l.full + '</span>' : '') + '</button>'; }).join('') + '</div>';
   var ready = f.time != null;
-  return '<section class="room-hero"><div class="kb" aria-hidden="true">' + img(room[2]) + '</div><div class="veil" aria-hidden="true"></div><div class="rh-in"><p class="chno"><span>' + fill(l.chapter, digits(ZONE[r.room])) + '</span></p><h1 class="chap-h">' + room[0] + '</h1><p class="slug">' + room[3] + '</p></div></section>' +
+  return '<section class="room-hero"><div class="kb" aria-hidden="true">' + img(room[2]) + '</div><div class="veil" aria-hidden="true"></div><div class="rh-in"><p class="chno"><span>' + fill(l.chapter, digits(ZONE[r.room])) + '</span></p><h1 class="chap-h">' + room[0] + '</h1><p class="slug">' + room[3] + '</p></div></section><p class="lede room-lede">' + room[1] + '</p>' +
     '<div class="book"><div class="blk"><h2 class="lab">' + l.day + '</h2>' + days + '</div>' +
     '<div class="blk"><h2 class="lab">' + l.time + '</h2>' + times + '</div>' +
     '<div class="blk"><h2 class="lab">' + l.party + '</h2><div class="stepper"><button type="button" data-act="party" data-v="-1" aria-label="' + l.less + '"' + (f.party <= 1 ? ' disabled' : '') + '><span class="pm" aria-hidden="true"></span></button><output aria-live="polite">' + party(f.party) + '</output><button type="button" data-act="party" data-v="1" aria-label="' + l.more + '"' + (f.party >= 8 ? ' disabled' : '') + '><span class="pm plus" aria-hidden="true"></span></button></div></div>' +
@@ -528,7 +534,7 @@ R('m/wallet', { member: true, cls: 'wallet-page', html: function () {
 R('m/account', { member: true, back: true, cls: 'acc-page', html: function () {
   var l = L(), G = GUESTS[P.lang];
   var sw = function (act, on, label, v) { return '<li><button type="button" class="sw" role="switch" aria-checked="' + !!on + '" data-act="' + act + '"' + (v != null ? ' data-v="' + v + '"' : '') + '><span>' + label + '</span><span class="knob" aria-hidden="true"></span></button></li>'; };
-  return '<section class="acc-hero"><div class="kb slow" aria-hidden="true">' + img('seal') + '</div><div class="veil" aria-hidden="true"></div><div class="ah-in"><span class="mk acc-mark" aria-hidden="true"></span><p class="kicker">' + l.accEy + '</p><h1 class="display xl">' + l.name + '</h1><p class="meta">' + l.tier + '</p><p class="meta">' + (fa() ? 'عضو از ' + monthYear(dayOf(-420)) : 'Member since ' + monthYear(dayOf(-420))) + '</p></div></section>' +
+  return '<section class="acc-hero"><div class="kb slow" aria-hidden="true">' + img('seal') + '</div><div class="veil" aria-hidden="true"></div><div class="ah-in"><p class="kicker">' + l.accEy + '</p><h1 class="display xl">' + l.name + '</h1><p class="meta">' + l.tier + '</p><p class="meta">' + (fa() ? 'عضو از ' + monthYear(dayOf(-420)) : 'Member since ' + monthYear(dayOf(-420))) + '</p></div></section>' +
     '<section aria-labelledby="gH"><h2 class="lab" id="gH">' + l.guestsH + '</h2><p class="fine g-note">' + l.guestsNote + '</p><ul class="glist">' + (S.guests.length ? S.guests.map(function (g, i) { return '<li><span>' + G[g] + '</span><button type="button" class="x" data-act="rmGuest" data-v="' + i + '" aria-label="' + esc(fill(l.remove, G[g])) + '"><span class="xi" aria-hidden="true"></span></button></li>'; }).join('') : '<li class="none">' + l.noGuests + '</li>') + '</ul>' +
       '<button type="button" class="btn line" data-act="addGuest">' + l.addGuest + '</button></section>' +
     '<section aria-labelledby="sH"><h2 class="lab" id="sH">' + l.settings + '</h2><ul class="setl">' +
@@ -546,7 +552,7 @@ var sheetFrom = null, sheetHist = false;
 function openSheet(title, html) {
   var wasOpen = app.classList.contains('sheet-open');
   if (!wasOpen) { sheetFrom = document.activeElement; if (!sheetHist) { sheetHist = true; history.pushState({ i: ++depth, sheet: 1 }, '', '#/' + route.path); } }
-  $('#sheetT').textContent = sep(title); $('#sheetB').innerHTML = sep(html); $('#sheetX').setAttribute('aria-label', L().close);
+  $('#sheetT').innerHTML = nos(sep(esc(title))); $('#sheetB').innerHTML = nos(sep(html)); $('#sheetX').setAttribute('aria-label', L().close);
   app.classList.add('sheet-open'); sheet.setAttribute('aria-hidden', 'false'); [view, bar, dock].forEach(function (x) { x.inert = true; });
   $('#sheetB').scrollTop = 0;
   setTimeout(function () { var first = $('#sheetB [data-first]') || $('#sheetX'); first.focus({ preventScroll: true }); }, wasOpen ? 0 : 80);
@@ -636,7 +642,7 @@ app.addEventListener('click', function (e) {
       var f = rf(route.room), r = { room: route.room, day: f.day, time: f.time, party: f.party };
       S.res.push(r); S.res.sort(function (a, b) { return a.day - b.day || a.time - b.time; }); delete S.rf[route.room]; save();
       openSheet(l.heldT, '<div class="credit-roll"><span class="mk" aria-hidden="true"></span><p class="cr-room">' + l.rooms[r.room][0] + '</p><p class="meta">' + whenLine(r.day, r.time) + '<br>' + party(r.party) + '</p></div><p class="lede">' + l.heldB + '</p>' +
-        '<div class="two-btn"><button type="button" class="btn line" data-act="cal">' + l.addCal + '</button><button type="button" class="btn solid" data-act="heldDone" data-first>' + l.done + '</button></div>');
+        '<div class="stack"><button type="button" class="btn solid" data-act="heldDone" data-first>' + l.done + '</button><button type="button" class="btn ghost" data-act="cal">' + l.addCal + '</button></div>');
       heldOpen = true;
     },
     heldDone: function () { history.back(); },   // the popstate closes the sheet and skips the finished form
