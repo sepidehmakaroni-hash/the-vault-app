@@ -121,7 +121,7 @@ var SRC = {
   'lounge': ['img/ph-lounge.webp', '40% 82%'], 'dining': ['img/ph-dining-room.webp', '35% 80%'], 'sushi': ['img/ph-sushi-chef.webp', '50% 78%'],
   'humidor-room': ['img/ph-humidor-room.webp', '50% 62%'], 'terrace': ['img/ph-terrace-couple.webp', '58% 55%'], 'garden': ['img/ph-garden-a.webp', '40% 70%'],
   'ev-art': ['img/ph-ev-art.webp', '55% 50%'], 'ev-dining': ['img/ph-dining.webp', '45% 45%'], 'ev-lounge': ['img/ph-lounge-members.webp', '70% 62%'],
-  'concierge': ['img/ph-concierge-desk.webp', '50% 30%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'], 'table': ['img/ph-table.webp', '50% 70%'], 'gift': ['img/ph-gift.webp', '40% 70%'], 'travel': ['img/ph-travel.webp', '35% 55%'], 'car': ['img/ph-car.webp', '55% 60%'],
+  'concierge': ['img/ph-concierge-desk.webp', '50% 30%'], 'jibdoor': ['img/ph-jibdoor.webp', '62% 50%'], 'humidor': ['img/ph-humidor.webp', '62% 55%'], 'table': ['img/ph-table.webp', '50% 70%'], 'gift': ['img/ph-gift.webp', '40% 70%'], 'travel': ['img/ph-travel.webp', '35% 55%'], 'car': ['img/ph-car.webp', '55% 60%'], 'ev-recital': ['img/ph-recital.webp', '45% 55%'],
   'card': ['img/ph-card.webp', '50% 40%'], 'seal': ['img/ph-seal.webp', '50% 42%'], 'corridor': ['img/ph-corridor.webp', '50% 46%']
 };
 
@@ -181,7 +181,7 @@ var TIMES = ['12:30', '14:00', '19:30', '20:30', '21:30', '22:30'];
 var isFull = function (day, ti, room) { return (day * 7 + ti * 3 + room * 2 + 1) % 5 === 0; };
 var ZONE = [5, 11, 10, 8, 12], BYZONE = [0, 3, 2, 1, 4];   // rooms follow the house zones: lounge 5, dining 11, sushi 10, humidor 8, terrace 12 (room 6 via the concierge, garden 13 offered)
 var FEATURE = { room: 1, day: 0, time: 3 };   // the chef's table: dining room, today, 20:30 (never full)
-var EV = [{ off: 3, seats: 12, img: 'ev-art', ar: '4/3' }, { off: 9, seats: 4, img: 'ev-dining', ar: '3/4' }, { off: 16, seats: 20, img: null }, { off: 27, seats: 9, img: 'ev-lounge', ar: '4/5' }];
+var EV = [{ off: 3, seats: 12, img: 'ev-art', ar: '4/3' }, { off: 9, seats: 4, img: 'ev-dining', ar: '3/4' }, { off: 16, seats: 20, img: 'ev-recital', ar: '4/5' }, { off: 27, seats: 9, img: 'ev-lounge', ar: '4/5' }];
 function seatsLeft(i) { return EV[i].seats - (S.rsvp[i] ? 1 + (S.bring[i] || 0) : 0); }
 /* wallet: a one-off joining fee, then a prepaid charge with a floor. Unused charge rolls into the next year;
    there is no minimum spend, no credit and nothing owed. Guests never pay: their share comes off the host's charge.
