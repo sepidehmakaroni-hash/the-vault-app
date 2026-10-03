@@ -1,8 +1,8 @@
 /* The Vault — v5 «هر چه بخواهید» / "Ask for anything". Mobile-first; a phone-width column on desktop. */
-@font-face{font-family:'Bodoni Moda';src:url(../v2/fonts/bodoni.woff2?v=10) format('woff2');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Archivo';src:url(../v2/fonts/archivo.woff2?v=10) format('woff2');font-weight:400 700;font-display:swap}
-@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-400.woff2?v=10) format('woff2');font-weight:400 500;font-display:swap}
-@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-600.woff2?v=10) format('woff2');font-weight:600 700;font-display:swap}
+@font-face{font-family:'Bodoni Moda';src:url(../v2/fonts/bodoni.woff2?v=11) format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Archivo';src:url(../v2/fonts/archivo.woff2?v=11) format('woff2');font-weight:400 700;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-400.woff2?v=11) format('woff2');font-weight:400 500;font-display:swap}
+@font-face{font-family:'Noto Naskh Arabic';src:url(../v2/fonts/noto-naskh-arabic-600.woff2?v=11) format('woff2');font-weight:600 700;font-display:swap}
 
 :root{
   --ink:#0A0908; --ink2:#13110E; --ink3:#1C1914;
@@ -316,7 +316,6 @@ bdi{unicode-bidi:isolate}
 .tk-k{fill:var(--gold);font-size:13px;letter-spacing:.2em}
 .fa .tk-k{font-size:14px;letter-spacing:0}
 .tk-big{fill:#EFE8DA;font-size:34px}
-.petal{fill:url(#sg-petal);stroke:var(--gold);stroke-width:.6;stroke-opacity:.75}
 .bp-code{fill:#EFE8DA;font-size:40px}
 .bp-k{fill:var(--gold);font-size:13px}
 .fa .bp-k{font-size:14px}
