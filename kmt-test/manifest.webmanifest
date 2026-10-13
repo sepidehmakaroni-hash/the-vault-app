@@ -1,0 +1,33 @@
+{
+  "name": "Inovosense · نسخه‌ی آزمایشی",
+  "short_name": "Inovosense آزمایشی",
+  "description": "نقشه‌ی تزریق INOVOSENSE و روتین مراقبت پوست، از گروه KMT",
+  "lang": "fa",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#03051A",
+  "theme_color": "#03051A",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
