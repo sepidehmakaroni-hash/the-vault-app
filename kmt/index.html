@@ -593,6 +593,7 @@ body.noscroll { overflow: hidden; }
 .tips summary { cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--aqua); list-style: none; }
 .tips summary::-webkit-details-marker { display: none; }
 .tips ul { margin: 10px 0 2px; padding-inline-start: 18px; font-size: 12.5px; color: var(--mist); line-height: 1.9; font-weight: 300; }
+.steplist li.skip { color: var(--faint); text-decoration: line-through; } .steplist li.skip i { border-style: dashed; }
 
 </style>
 
@@ -2127,8 +2128,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       <div class="acts"><button type="button" class="camb" data-shot="${s.k}" data-src="cam">${shots[s.k] ? 'دوباره' : 'دوربین'}</button><button type="button" data-shot="${s.k}" data-src="gal">گالری</button></div></div>`).join('');
     const n = Object.keys(shots).length;
     $('#shotCount').textContent = `${fa(n)} از ۶ عکس`; $('#shotBar').style.width = (n / 6 * 100) + '%';
-    $('#analyzeBtn').disabled = !shots.front;
-    $('#analyzeBtn').textContent = shots.front ? (n < 6 ? `شروع خوانش با ${fa(n)} عکس` : 'شروع خوانش پوست') : 'اول عکس روبه‌رو رو بگیر';
+    $('#analyzeBtn').disabled = !shots.front || pendingShots.size > 0;
+    $('#analyzeBtn').textContent = pendingShots.size ? 'در حال ذخیره‌ی عکس…' : shots.front ? (n < 6 ? `شروع خوانش با ${fa(n)} عکس` : 'شروع خوانش پوست') : 'اول عکس روبه‌رو رو بگیر';
   }
   $('#shots').addEventListener('click', (e) => {
     const b = e.target.closest('[data-shot]'); if (!b) return;
@@ -2146,14 +2147,16 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
 
   // live camera
   const canLive = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && window.isSecureContext && !window.claude && (!document.featurePolicy || document.featurePolicy.allowsFeature('camera'));
-  let stream = null, loop = 0, facing = load('kmt.facing.v4', 'user'), camShot = null, imgCap = null;
+  let stream = null, loop = 0, facing = load('kmt.facing.v4', 'user'), camShot = null;
   // who takes the photos: the person (front camera) or a helper (rear camera, sharper)
   const setWho = (v) => { facing = v === 'environment' ? 'environment' : 'user'; save('kmt.facing.v4', facing); $('#camInput').setAttribute('capture', facing); const r = $(`input[name="who"][value="${facing}"]`); if (r) r.checked = true; };
   setWho(facing);
   $$('input[name="who"]').forEach(r => r.addEventListener('change', () => setWho(r.value)));
   const video = $('#video');
   // the next angle still missing, in the order of the list (wrapping around), or null when all six are in
-  const nextShot = (k) => { const i = SHOT_LIST.findIndex(s => s.k === k); for (let j = 1; j < SHOT_LIST.length; j++) { const s = SHOT_LIST[(i + j) % SHOT_LIST.length]; if (!shots[s.k]) return s; } return null; };
+  // photos still being encoded count as taken, so a quick next tap never sends the camera back to the same angle
+  const pendingShots = new Set();
+  const nextShot = (k) => { const i = SHOT_LIST.findIndex(s => s.k === k); for (let j = 1; j < SHOT_LIST.length; j++) { const s = SHOT_LIST[(i + j) % SHOT_LIST.length]; if (!shots[s.k] && !pendingShots.has(s.k)) return s; } return null; };
   function armCam(k) {
     clearTimeout(loop);
     camShot = SHOT_LIST.find(s => s.k === k);
@@ -2163,6 +2166,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const isFace = !!camShot.face;
     $('#ovalCut').setAttribute('rx', isFace ? 31 : 40); $('#ovalCut').setAttribute('ry', isFace ? 30 : 34); $('#ovalLine').setAttribute('rx', isFace ? 31 : 40); $('#ovalLine').setAttribute('ry', isFace ? 30 : 34); $('#ovalLine').setAttribute('stroke', '#fff');
     $('#camDone').hidden = !shots.front;
+    guideSince = 0;
     if (camShot.k === 'front') { $('#shutter').classList.remove('ready'); $('#camMsg').textContent = 'صورت رو داخل بیضی بیار'; SkinEngine.init().then(guide).catch(() => {}); }
     else { $('#camMsg').textContent = camShot.face ? 'صورت رو داخل قاب نگه دار' : 'ناحیه رو پر کادر و واضح بگیر'; $('#shutter').classList.add('ready'); }
   }
@@ -2170,22 +2174,28 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $('#cam').hidden = false; $('#camTitle').textContent = ''; $('#camMsg').textContent = 'در حال روشن کردن دوربین…'; $('#camMsg').className = ''; $('#camNext').hidden = true;
     try {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      // ask for the sensor's best resolution; the browser picks the closest it can deliver
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 3840 }, height: { ideal: 3840 } }, audio: false });
+      // Full HD is plenty for the analysis; 4K made the live preview lag and exhausted the phone's GPU memory
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1920 } }, audio: false });
       video.srcObject = stream; video.classList.toggle('mirror', facing === 'user'); await video.play();
       const track = stream.getVideoTracks()[0];
       try { const caps = track.getCapabilities ? track.getCapabilities() : {}; if (caps.focusMode && caps.focusMode.includes('continuous')) await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) {}
-      imgCap = ('ImageCapture' in window) ? new ImageCapture(track) : null;
+
       armCam(k);
     } catch (e) { closeCam(); shotTarget = k; $('#camInput').click(); }
   }
   function closeCam() { clearTimeout(loop); if (stream) stream.getTracks().forEach(t => t.stop()); stream = null; $('#cam').hidden = true; $('#shutter').classList.remove('ready'); }
   const probe = document.createElement('canvas');
+  const guideCv = document.createElement('canvas');
+  let guideSince = 0;
   async function guide() {
     if (!stream || !camShot || camShot.k !== 'front') return;
+    if (!guideSince) guideSince = Date.now();
     let msg = 'صورت رو داخل بیضی بیار', ok = false;
     try {
-      const vw = video.videoWidth, vh = video.videoHeight, f = await SkinEngine.detectQuick(video);
+      // detect on a 320-px copy of the frame, then scale the box back up
+      const VW = video.videoWidth, VH = video.videoHeight, k = 320 / Math.max(VW, VH);
+      guideCv.width = Math.round(VW * k); guideCv.height = Math.round(VH * k); guideCv.getContext('2d').drawImage(video, 0, 0, guideCv.width, guideCv.height);
+      const vw = VW, vh = VH, f0 = await SkinEngine.detectQuick(guideCv), f = f0 && { x: f0.x / k, y: f0.y / k, w: f0.w / k, h: f0.h / k };
       if (f) {
         const cx = (f.x + f.w / 2) / vw, cy = (f.y + f.h / 2) / vh, size = f.w / Math.min(vw, vh);
         probe.width = 32; probe.height = 32; const pc = probe.getContext('2d', { willReadFrequently: true });
@@ -2197,8 +2207,13 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         else { ok = true; msg = 'عالیه، ثابت بمون'; }
       }
     } catch (e) {}
-    $('#camMsg').textContent = msg; $('#camMsg').className = ok ? 'ok' : ''; $('#shutter').classList.toggle('ready', ok); $('#ovalLine').setAttribute('stroke', ok ? '#7FD8E0' : '#fff');
-    loop = setTimeout(guide, 280);
+    // the person may have moved on to another angle while detection was running
+    if (!stream || !camShot || camShot.k !== 'front') return;
+    // never lock the person out: after 5 s the shutter works anyway
+    const free = !ok && Date.now() - guideSince > 5000;
+    if (free) msg = msg + ' · اگه صورت داخل بیضیه، عکس بگیر';
+    $('#camMsg').textContent = msg; $('#camMsg').className = ok ? 'ok' : ''; $('#shutter').classList.toggle('ready', ok || free); $('#ovalLine').setAttribute('stroke', ok ? '#7FD8E0' : '#fff');
+    loop = setTimeout(guide, 380);
   }
   $('#camCancel').addEventListener('click', closeCam);
   $('#camFlip').addEventListener('click', () => { setWho(facing === 'user' ? 'environment' : 'user'); openCam(camShot.k); });
@@ -2207,12 +2222,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const k = camShot.k;
     const frame = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0); return c; };
     const fallback = frame();
-    // a real still (full sensor resolution, autofocus) where the phone supports it; otherwise the video frame
-    const still = imgCap ? Promise.race([imgCap.takePhoto(), new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), 2500))]).catch(() => null) : Promise.resolve(null);
-    still.then(blob => {
-      if (blob && blob.size > 50000) setShot(k, new File([blob], k + '.jpg', { type: blob.type || 'image/jpeg' }));
-      else fallback.toBlob(b => b && setShot(k, new File([b], k + '.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.95);
-    });
+    pendingShots.add(k); renderShots();
+    fallback.toBlob(b => { pendingShots.delete(k); if (b) setShot(k, new File([b], k + '.jpg', { type: 'image/jpeg' })); else renderShots(); }, 'image/jpeg', 0.92);
     // quick light check on the frame
     try { const sm = document.createElement('canvas'); sm.width = 64; sm.height = 64; const g = sm.getContext('2d'); g.drawImage(fallback, 0, 0, 64, 64); const d = g.getImageData(0, 0, 64, 64).data; let L = 0; for (let i = 0; i < d.length; i += 4) L += d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11; L /= 4096; if (L < 55) toast('نور کمه؛ اگه می‌شه رو به پنجره بایست و دوباره بگیر'); else if (L > 215) toast('نور خیلی شدیده؛ از نور مستقیم دور شو'); } catch (e) {}
     const nx = nextShot(k);
@@ -2260,18 +2271,28 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const mark = (k, st) => { const li = $(`#steplist [data-s="${k}"]`); if (li) li.className = st; const im = $(`#busyThumbs [data-k="${k}"]`); if (im) im.className = st === 'now' ? 'on' : st; };
     mark('model', 'now');
     let front, extras = {};
+    closeCam();
+    const limit = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), ms))]);
+    const toCpu = async () => { try { const tf = window.faceapi && faceapi.tf; if (tf && tf.getBackend() !== 'cpu') { await tf.setBackend('cpu'); await tf.ready(); } } catch (e) {} };
     try {
-      await SkinEngine.init(); mark('model', 'done');
-      mark('front', 'now');
-      front = await SkinEngine.analyze(shots.front.file, { allowPatch: false });
+      await limit(SkinEngine.init(), 60000); mark('model', 'done');
+      mark('front', 'now'); await new Promise(r => setTimeout(r, 60));
+      try { front = await limit(SkinEngine.analyze(shots.front.file, { allowPatch: false }), 30000); }
+      catch (e) {
+        if (!e || e.message !== 'slow') throw e;
+        // the phone's graphics engine stalled: switch to the slower but steady processor path and try once more
+        $('#busyT').textContent = 'گوشی کمی کنده؛ با روش سبک‌تر ادامه می‌دم…';
+        await toCpu();
+        front = await limit(SkinEngine.analyze(shots.front.file, { allowPatch: false }), 120000);
+      }
       if (!front.ok) { renderError(front.reason === 'no-face' ? 'front-no-face' : front.reason); return; }
       mark('front', 'done');
       for (const k of keys.filter(k => k !== 'front')) {
         mark(k, 'now'); $('#busyImg').src = shots[k].url; await new Promise(r => setTimeout(r, 30));
-        try { extras[k] = (k === 'left' || k === 'right') ? await SkinEngine.analyze(shots[k].file, { allowPatch: false }) : await SkinEngine.analyzeDetail(shots[k].file, k); } catch (e) { extras[k] = { ok: false }; }
-        mark(k, 'done');
+        try { extras[k] = await limit((k === 'left' || k === 'right') ? SkinEngine.analyze(shots[k].file, { allowPatch: false }) : SkinEngine.analyzeDetail(shots[k].file, k), 40000); mark(k, 'done'); }
+        catch (e) { extras[k] = { ok: false }; mark(k, 'skip'); }
       }
-    } catch (e) { renderError(e && e.message === 'model-missing' ? 'model-missing' : 'error'); return; }
+    } catch (e) { renderError(e && e.message === 'model-missing' ? 'model-missing' : e && e.message === 'slow' ? 'slow' : 'error'); return; }
     mark('plan', 'now');
     merge(front, extras);
     await playMesh(front);
@@ -2369,7 +2390,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
 
   // ---------- report ----------
-  const ERR = { 'front-no-face': 'در عکس روبه‌رو صورت کامل پیدا نشد. صورت رو کامل و صاف داخل بیضی بگیر.', 'little-skin': 'پوست کافی در عکس روبه‌رو دیده نشد؛ مو یا عینک رو کنار بزن.', 'model-missing': 'مدل هوش مصنوعی بارگیری نشد؛ اینترنت رو بررسی کن و صفحه رو دوباره باز کن.', error: 'بررسی عکس‌ها انجام نشد؛ با نور بهتر دوباره امتحان کن.' };
+  const ERR = { 'front-no-face': 'در عکس روبه‌رو صورت کامل پیدا نشد. صورت رو کامل و صاف داخل بیضی بگیر.', 'little-skin': 'پوست کافی در عکس روبه‌رو دیده نشد؛ مو یا عینک رو کنار بزن.', 'model-missing': 'مدل هوش مصنوعی بارگیری نشد؛ اینترنت رو بررسی کن و صفحه رو دوباره باز کن.', error: 'بررسی عکس‌ها انجام نشد؛ با نور بهتر دوباره امتحان کن.', slow: 'تحلیل روی این گوشی بیش از حد طول کشید. اپ رو کامل ببند و دوباره باز کن و دوباره امتحان کن؛ اگه تکرار شد، فقط با عکس روبه‌رو امتحان کن.' };
   const QTXT = { res: 'صورت در عکس روبه‌رو کوچکه؛ نزدیک‌تر بگیر.', dark: 'نور کمه؛ رو به پنجره بایست.', bright: 'نور خیلی شدیده یا فلاش خورده.', side: 'نور از یک طرف می‌تابه.', pose: 'صورت کمی چرخیده.', blur: 'عکس کمی تاره.', many: 'چند صورت در عکس بود؛ بزرگ‌ترین بررسی شد.' };
   function renderError(reason) {
     $('#s-report').innerHTML = `<div class="steps-top"><button class="back" type="button" id="errBack" aria-label="بازگشت">${I('<path d="m9 6 6 6-6 6"/>', 2)}</button></div>
