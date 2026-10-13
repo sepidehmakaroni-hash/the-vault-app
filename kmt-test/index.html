@@ -632,6 +632,11 @@ body.noscroll { overflow: hidden; }
 .lh-t { display: grid; gap: 2px; } .lh-t b { font-size: 16px; font-weight: 600; } .lh-t small { font-size: 12px; color: var(--mist); font-weight: 300; }
 .lh-go { font-size: 20px; color: var(--aqua); }
 .onb-live { margin-top: 10px; min-height: 50px; }
+.forwho { margin-bottom: 16px; }
+.forwho .who { margin-bottom: 4px; }
+#guestBox { margin-top: 12px; }
+#guestBox .fl .input { min-height: 48px; }
+.for-person { margin: 14px 0 0; font-size: 14px; color: var(--aqua); } .for-person b { color: var(--pearl); }
 
 </style>
 
@@ -749,6 +754,17 @@ body.noscroll { overflow: hidden; }
 <section class="screen" id="s-self" hidden>
   <div class="steps-top"><button class="back" type="button" data-back aria-label="بازگشت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button><div class="prog"><i class="on"></i><i></i><i></i></div></div>
   <div class="flow-h"><span class="en">Tell us</span><h1>از پوستت <b>بگو</b></h1><p>نواحی‌ای که بیشتر بهشون فکر می‌کنی رو روی صورت لمس کن و بعد بگو چه حسی دارن. اختیاریه، ولی برنامه‌ی تزریق رو دقیق‌تر می‌کنه.</p></div>
+  <div class="card pad forwho">
+    <p class="group-t" style="margin-top:0">این خوانش برای کیه؟</p>
+    <div class="who"><label class="who-opt"><input type="radio" name="forwho" value="me" checked><span><b>خودم</b><small>پرونده‌ی خودم</small></span></label>
+      <label class="who-opt"><input type="radio" name="forwho" value="other"><span><b>یه نفر دیگه</b><small>پرونده‌ی من دست نمی‌خوره</small></span></label></div>
+    <div id="guestBox" hidden>
+      <div class="row2"><label class="fl"><small>اسم (اختیاری)</small><input class="input" id="gName" maxlength="40" placeholder="مثلاً مامان"></label><label class="fl"><small>سال تولد</small><input class="input" id="gYear" inputmode="numeric" maxlength="4" placeholder="۱۳۴۵"></label></div>
+      <p class="group-t">جنسیت</p><div class="chips"><label class="chip"><input type="radio" name="gGender" value="female" checked><span>زن</span></label><label class="chip"><input type="radio" name="gGender" value="male"><span>مرد</span></label></div>
+      <div id="gPregWrap"><p class="group-t">بارداری یا شیردهی</p><div class="chips"><label class="chip"><input type="radio" name="gPreg" value="no" checked><span>هیچ‌کدوم</span></label><label class="chip"><input type="radio" name="gPreg" value="pregnant"><span>باردار</span></label><label class="chip"><input type="radio" name="gPreg" value="breastfeeding"><span>شیرده</span></label></div></div>
+      <p class="group-t">شرایط خاص</p><div class="chips"><label class="chip"><input type="checkbox" name="gMeds" value="anticoagulant"><span>رقیق‌کننده‌ی خون یا آسپرین</span></label><label class="chip"><input type="checkbox" name="gMeds" value="lidocaine-allergy"><span>حساسیت به لیدوکائین</span></label><label class="chip"><input type="checkbox" name="gMeds" value="autoimmune"><span>بیماری خودایمنی</span></label><label class="chip"><input type="checkbox" name="gMeds" value="herpes"><span>سابقه‌ی تبخال</span></label><label class="chip"><input type="checkbox" name="gMeds" value="permanent-filler"><span>فیلر دائمی قبلی</span></label></div>
+    </div>
+  </div>
   <div class="card facepick">
     <svg viewBox="0 0 300 360" id="facesvg" role="group" aria-label="انتخاب ناحیه‌های صورت">
       <defs><radialGradient id="faceFill" cx="50%" cy="38%" r="65%"><stop offset="0" stop-color="rgba(191,239,242,.16)"/><stop offset="1" stop-color="rgba(191,239,242,.02)"/></radialGradient></defs>
@@ -1798,17 +1814,31 @@ const Recs = (() => {
   // ---------- layer 1: the filler plan ----------
   /* Volumes are typical first-session ranges drawn from expert consensus papers and clinical studies
      (per side where the area is paired). They are a starting point for the physician, never a prescription. */
-  function fillerPlan(cs, p) {
+  function fillerPlan(cs, p, metrics) {
     const lv = (k) => (cs.find(c => c.key === k) || {}).level;
     const src = (k) => (cs.find(c => c.key === k) || {}).source;
     const items = [], advice = [];
+    /* How marked the area measured in this person's photo, 0 (mild) to 1 (marked), or null when it was only
+       self-reported. Used to place the volume inside the typical range, so two people with the same grade
+       but different depth get different amounts. */
+    const LINE_OF = { nasolabial: 'nasolabial', marionette: 'marionette', undereye: 'undereye', crows: 'crows' };
+    const METRIC_OF = { face: 'texture', scars: 'texture' };
+    const sevOf = (key) => {
+      const m = metrics || {}, d = LINE_OF[key] && m.lines && m.lines.detail && m.lines.detail[LINE_OF[key]];
+      const x = d && d.n ? d : METRIC_OF[key] && m[METRIC_OF[key]];
+      if (!x || x.score == null) return null;
+      return Math.max(0, Math.min(1, (100 - x.score) / 70));
+    };
+    const r1 = (v) => Math.round(v * 10) / 10;
+    const fit = (rng, sv) => { if (!rng || sv == null || rng[0] === rng[1]) return rng; const w = rng[1] - rng[0], lo = r1(rng[0] + w * sv * 0.5); return [lo, r1(Math.max(lo + 0.1, lo + w * 0.5))]; };
     const add = (key, area, product, tech, o) => {
-      const sides = o.perSide ? 2 : 1, per = o.perSide || null;
-      const ml = o.ml || (per ? [Math.round(per[0] * 2 * 10) / 10, Math.round(per[1] * 2 * 10) / 10] : null);
+      const sv = o.program && key === 'meso' ? null : sevOf(key);
+      const per = fit(o.perSide || null, sv), sides = per ? 2 : 1;
+      const ml = o.ml ? fit(o.ml, sv) : (per ? [r1(per[0] * 2), r1(per[1] * 2)] : null);
       items.push({ key, area, product, alt: o.alt || null, tech: tech.map(t => TECH[t]), ml, perSide: per, sides,
         depth: o.depth || PRODUCTS[product].depthLabel, risk: o.risk || 'low', evidence: o.evidence || 'ifu', doctorOnly: !!o.doctorOnly,
         sessions: o.sessions || 'یک جلسه؛ بررسی نتیجه بعد از ۲ هفته', note: o.note || '', spots: SPOTS[o.spot || key] || [],
-        level: lv(o.lvKey || key) || 'mid', source: src(o.lvKey || key) || 'self', prio: o.prio || 9, program: !!o.program });
+        level: lv(o.lvKey || key) || 'mid', source: src(o.lvKey || key) || 'self', prio: o.prio || 9, program: !!o.program, sev: sv });
     };
     const sev = (k) => lv(k) === 'high';
 
@@ -1949,7 +1979,7 @@ const Recs = (() => {
 
   function build(result, self, profile) {
     const cs = concerns(result, self);
-    const plan = fillerPlan(cs, profile);
+    const plan = fillerPlan(cs, profile, result && result.metrics);
     const products = plan.totals.map(t => ({ id: t.product, name: 'INOVOSENSE ' + PRODUCTS[t.product].name, status: plan.blocks.length ? 'not-suitable' : 'doctor', ml: [t.min, t.max], syringes: t.syringes }));
     if (plan.items.some(i => i.product === 'mesocell')) products.push({ id: 'mesocell', name: 'INOVOSENSE Mesocell Plus', status: plan.blocks.length ? 'not-suitable' : 'doctor', ml: null });
     return { concerns: cs, plan, products, routine: routine(cs, profile), care: CARE, doctors: doctors(cs, profile, self, plan), treatments: plan.items.map(i => ({ id: i.product, name: 'INOVOSENSE ' + PRODUCTS[i.product].name, area: i.area, reason: (i.ml ? `${i.ml[0]} تا ${i.ml[1]} میلی‌لیتر · ` : '') + i.sessions, blocked: plan.blocks[0] || null })) };
@@ -2003,6 +2033,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } };
   let profile = load(K.profile, null), patient = load(K.patient, null), scans = load(K.scans, []), treats = load(K.treat, []), booking = load(K.booking, null);
+  const myScans = () => scans.filter(s => !s.person);
+  const myLast = () => { const m = myScans(); return m[m.length - 1]; };
   const saveScans = () => { while (!save(K.scans, scans) && scans.length > 1) scans.shift(); };
   const recsProfile = () => profile ? { ...profile, lidocaine: (profile.meds || []).includes('lidocaine-allergy'), autoimmune: (profile.meds || []).includes('autoimmune') } : null;
 
@@ -2032,6 +2064,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       if (!patient) { patient = await api('/api/patients', { method: 'POST', body: profilePayload() }); save(K.patient, patient); profile.dirty = false; save(K.profile, profile); }
       else if (profile.dirty) { await api('/api/patients/' + patient.id, { method: 'PUT', auth: patient.token, body: profilePayload() }); profile.dirty = false; save(K.profile, profile); }
       for (const s of scans) {
+        if (s.person) continue;
         if (!s.serverId) { const r = await api(`/api/patients/${patient.id}/scans`, { method: 'POST', auth: patient.token, body: scanPayload(s) }); s.serverId = r.id; s.fbDirty = false; }
         else if (s.fbDirty) { await api(`/api/patients/${patient.id}/scans/${s.serverId}`, { method: 'PATCH', auth: patient.token, body: { feedback: s.feedback || {} } }); s.fbDirty = false; }
       }
@@ -2125,7 +2158,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   function renderHome() {
     $('#hiDate').textContent = new Date().toLocaleDateString('fa-IR', { weekday: 'long', day: 'numeric', month: 'long' });
     $('#hiName').innerHTML = profile ? `سلام <b>${esc(profile.name.split(' ')[0])}</b>،<br>آماده‌ی یه شیرجه‌ای؟` : 'سلام';
-    const last = scans[scans.length - 1];
+    const last = myLast();
     if (!last) { $('#homeScore').innerHTML = `<div class="empty-hero">${orbHtml(null)}<p class="en" style="margin:0">Your first dive</p><h3>اولین خوانش پوستت</h3><p>چند پرسش کوتاه، شش عکس و یک نقشه‌ی کامل؛ از عمق تا سطح.</p><button class="btn btn-primary btn-block" type="button" data-start-scan>شروع خوانش پوست</button></div>`; renderJourney(); return; }
     const tot = last.recs.plan.totals;
     $('#homeScore').innerHTML = `<div class="scorecard">${orbHtml(last.overall, 'sm')}<div><span class="en">Latest dive · </span><span class="faint small">${fdate(last.t, { day: 'numeric', month: 'long' })}</span><h3>${verdictTitle(last.overall)}</h3>
@@ -2154,10 +2187,28 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   function startScan() {
     if (!profile) { go('s-onboard'); return; }
     selZones.clear(); renderZones(); $$('#s-self input').forEach(i => { i.checked = false; }); $('#selfText').value = ''; $('#acneTypes').hidden = true;
+    // defaults after the clear: the scan is for me; a guest starts as a woman, not pregnant
+    for (const [n, v] of [['forwho', 'me'], ['gGender', 'female'], ['gPreg', 'no']]) $(`input[name="${n}"][value="${v}"]`).checked = true;
+    $('#guestBox').hidden = true; $('#gPregWrap').hidden = false; $('#gName').value = ''; $('#gYear').value = '';
     for (const k in shots) delete shots[k]; renderShots();
     go('s-self'); SkinEngine.init().catch(() => {});
   }
-  $('#selfNext').addEventListener('click', () => { renderShots(); go('s-shots'); });
+  // a scan can be for someone else: their own age, sex and safety answers, kept out of the person's file
+  $$('input[name="forwho"]').forEach(r => r.addEventListener('change', () => { $('#guestBox').hidden = $('input[name="forwho"]:checked').value !== 'other'; }));
+  $$('input[name="gGender"]').forEach(r => r.addEventListener('change', () => { $('#gPregWrap').hidden = $('input[name="gGender"]:checked').value === 'male'; }));
+  let scanFor = null;
+  const guestProfile = (g) => ({ name: g.name, birthYear: g.birthYear, gender: g.gender, pregnancy: g.pregnancy, meds: g.meds, skinType: '', sensitive: false, consent: profile.consent,
+    lidocaine: g.meds.includes('lidocaine-allergy'), autoimmune: g.meds.includes('autoimmune') });
+  $('#selfNext').addEventListener('click', () => {
+    scanFor = null;
+    if ($('input[name="forwho"]:checked').value === 'other') {
+      const by = Number(toEn($('#gYear').value));
+      if (!by || by < 1300 || by > SOLAR_YEAR) { toast('سال تولد اون شخص رو وارد کن؛ نقشه به سن بستگی داره'); $('#gYear').focus(); return; }
+      const gender = $('input[name="gGender"]:checked').value;
+      scanFor = { name: $('#gName').value.trim().slice(0, 40) || 'مهمان', birthYear: by, gender, pregnancy: gender === 'male' ? 'no' : $('input[name="gPreg"]:checked').value, meds: $$('input[name="gMeds"]:checked').map(i => i.value) };
+    }
+    renderShots(); go('s-shots');
+  });
 
   // ---------- six shots ----------
   const POSE = {
@@ -2355,9 +2406,10 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     merge(front, extras);
     await playMesh(front);
     const self = readSelf();
-    const recs = Recs.build(front, self, recsProfile());
+    const recs = Recs.build(front, self, scanFor ? guestProfile(scanFor) : recsProfile());
     mark('plan', 'done');
     const rec = makeRecord(front, extras, self, recs, keys);
+    if (scanFor) rec.person = { name: scanFor.name, birthYear: scanFor.birthYear, gender: scanFor.gender };
     try { if (typeof FaceSim !== 'undefined' && simAreas(recs.plan.items).length) { rec.simBefore = jpgOf(front.view.canvas); rec.simAfter = jpgOf(FaceSim.render(front.view, simAreas(recs.plan.items))); } } catch (e) {}
     scans.push(rec); if (scans.length > 10) scans.shift(); saveScans();
     renderReport(rec, front);
@@ -2479,7 +2531,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $('#s-report').innerHTML = `
       <div class="topbar">${BRAND.logoWhite}<img class="inovo-logo" src="${ART.inovoLogo}" alt="INOVOSENSE"></div>
       <div class="portrait-hero reveal"><div class="arch"><img src="${rec.portraitJpg}" alt="پرتره"></div>${orbHtml(o)}
-        <p class="caps" style="margin:14px 0 0">Skin portrait</p><h1>${verdictTitle(o)}</h1><span class="faint small">${fdate(rec.t)} · ${fa(rec.shotsTaken.length)} عکس</span>
+        ${rec.person ? `<p class="for-person">خوانش برای <b>${esc(rec.person.name)}</b> · ${fa(SOLAR_YEAR - rec.person.birthYear)} سال</p>` : '<p class="caps" style="margin:14px 0 0">پرتره‌ی پوست</p>'}<h1>${verdictTitle(o)}</h1><span class="faint small">${fdate(rec.t)} · ${fa(rec.shotsTaken.length)} عکس</span>
         <div class="tagrow">${R.concerns.slice(0, 3).map(c => `<span class="htag">${esc(c.label)}</span>`).join('') || '<span class="htag">همه‌ی نشانه‌ها در تعادل</span>'}</div></div>
       <div class="card savebar reveal d2" id="saveBar"></div>
       ${qual.length ? `<div class="notice warn">${iWarn}<div><b>برای دقت بیشتر دفعه‌ی بعد:</b><ul>${qual.map(x => `<li>${QTXT[x.k]}</li>`).join('')}</ul></div></div>` : ''}
@@ -2565,7 +2617,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
   // clinical summary for the injecting physician (shareable as plain text)
   function doctorText(rec) {
-    const R = rec.recs, pl = R.plan, g = pl.glogau, pr = profile || {};
+    const R = rec.recs, pl = R.plan, g = pl.glogau, pr = rec.person || profile || {};
     const age = pr.birthYear ? SOLAR_YEAR - Number(pr.birthYear) : null;
     const L = [`خلاصه‌ی بالینی · اپ پوست‌نگار KMT · ${fdate(rec.t)}`, `${pr.name || ''}${age ? ' · ' + fa(age) + ' سال' : ''}${pr.gender === 'female' ? ' · زن' : pr.gender === 'male' ? ' · مرد' : ''}`];
     if (g) L.push(`پیری نوری (برآورد Glogau): ${g.label}`);
@@ -2617,7 +2669,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
 
   // ---------- products: the INOVOSENSE depth ladder ----------
   function renderProducts() {
-    const last = scans[scans.length - 1], mine = new Set(last ? last.recs.plan.items.map(i => i.product) : []);
+    const last = myLast(), mine = new Set(last ? last.recs.plan.items.map(i => i.product) : []);
     const order = ['shine', 'silk', 'mesocell', 'smile', 'style', 'shape'];
     $('#s-products').innerHTML = `<div class="topbar"><img class="inovo-logo" src="${ART.inovoLogo}" alt="INOVOSENSE" style="height:44px"><span class="htag">ساخت گروه KMT</span></div>
       <div class="flow-h"><span class="en">From the surface · to the depths</span><h1>خانواده‌ی <b>Inovosense</b></h1><p>فیلرهای هیالورونیک اسید ساخت گروه KMT با فناوری MXM®؛ هر کدوم برای عمق و ناحیه‌ای از صورت.${mine.size ? ' موارد مشخص‌شده در نقشه‌ی تزریق تو هستن.' : ''}</p></div>
@@ -2654,8 +2706,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         <div class="kv"><div><small>سن</small><b>${age ? fa(age) + ' سال' : '—'}</b></div><div><small>جنسیت</small><b>${GENDER[profile.gender || '']}</b></div><div><small>نوع پوست</small><b>${SKIN[profile.skinType || '']}</b></div><div><small>خوانش‌ها</small><b>${fa(scans.length)}</b></div></div></div>
       ${compareHtml()}
       ${sessionsHtml()}
-      ${scans.length > 1 ? `<div class="sec"><div class="sec-h"><div><span class="en">Progress</span><h2>مسیر پوست تو</h2></div></div><div class="card chart">${trendSvg(scans)}</div></div>` : ''}
-      <div class="sec"><div class="sec-h"><div><span class="en">Dives</span><h2>خوانش‌ها</h2></div></div><div class="stack">${scans.length ? [...scans].reverse().map(s => `<button class="scan-row" type="button" data-open-scan="${s.id}"><img src="${s.portraitJpg}" alt=""><div><b>${verdictTitle(s.overall)}</b><small>${fdate(s.t)}${stageOf(s) ? ' · ' + stageOf(s) : ''} · ${s.recs.plan.totals.map(t => P[t.product].name).join('، ') || 'بدون فیلر'}</small></div><span class="sc num">${fa(s.overall)}</span></button>`).join('') : '<div class="card pad"><p class="muted">هنوز خوانشی ثبت نشده.</p></div>'}</div></div>
+      ${myScans().length > 1 ? `<div class="sec"><div class="sec-h"><div><span class="en">Progress</span><h2>مسیر پوست تو</h2></div></div><div class="card chart">${trendSvg(myScans())}</div></div>` : ''}
+      <div class="sec"><div class="sec-h"><div><span class="en">Dives</span><h2>خوانش‌ها</h2></div></div><div class="stack">${scans.length ? [...scans].reverse().map(s => `<button class="scan-row" type="button" data-open-scan="${s.id}"><img src="${s.portraitJpg}" alt=""><div><b>${s.person ? esc(s.person.name) + ' · ' : ''}${verdictTitle(s.overall)}</b><small>${fdate(s.t)}${s.person ? '' : stageOf(s) ? ' · ' + stageOf(s) : ''} · ${s.recs.plan.totals.map(t => P[t.product].name).join('، ') || 'بدون فیلر'}</small></div><span class="sc num">${fa(s.overall)}</span></button>`).join('') : '<div class="card pad"><p class="muted">هنوز خوانشی ثبت نشده.</p></div>'}</div></div>
       <div class="sec"><div class="card pad"><b>حریم خصوصی</b><p class="small muted" style="margin:4px 0 10px">ذخیره در KMT: ${profile.consent.store ? 'روشن' : 'خاموش'} · تماس مشاور: ${profile.consent.contact ? 'روشن' : 'خاموش'} · نگه داشتن عکس: ${profile.consent.photo ? 'روشن' : 'خاموش'}</p><div id="delBox"><button class="btn btn-text danger" type="button" id="delAll">پاک کردن همه‌ی اطلاعات من</button></div></div></div>`;
     $('#editPf').onclick = () => { fillProfileForm(profile); showPStep(0); go('s-profile'); };
     wireCompare();
@@ -2684,7 +2736,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   const PRODUCT_ORDER = ['shine', 'silk', 'smile', 'style', 'shape', 'mesocell'];
   const pname = (id) => P[id].name;
   const saveTreats = () => { save(K.treat, treats); save(K.treatDirty, true); };
-  const plannedProducts = () => { const last = scans[scans.length - 1]; return last ? [...new Set(last.recs.plan.items.map(i => i.product))] : []; };
+  const plannedProducts = () => { const last = myLast(); return last ? [...new Set(last.recs.plan.items.map(i => i.product))] : []; };
   // Intervals follow the INOVOSENSE guidance: Shine and Mesocell Plus as three sessions four weeks apart,
   // fillers checked about two weeks after injection and refreshed after 6–12 months.
   function schedule() {
@@ -2770,6 +2822,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   const stageOf = (s) => { if (!treats.length) return ''; const n = treats.filter(t => Date.parse(t.date) <= s.t).length; return n ? `بعد از جلسه‌ی ${fa(n)}` : 'قبل از درمان'; };
   let cmpA = null, cmpB = null;
   function compareHtml() {
+    const scans = myScans();
     if (scans.length < 2) return '';
     const first = treats.length ? Math.min(...treats.map(t => Date.parse(t.date))) : null;
     const before = (first && scans.filter(s => s.t < first).pop()) || scans[0];
@@ -2879,7 +2932,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   function openProduct(id, dir) {
     const p = P[id], info = PINFO[id]; if (!p || !info) return;
     curProd = id;
-    const last = scans[scans.length - 1], mine = last ? last.recs.plan.items.filter(i => i.product === id) : [];
+    const last = myLast(), mine = last ? last.recs.plan.items.filter(i => i.product === id) : [];
     const tot = last ? last.recs.plan.totals.find(t => t.product === id) : null;
     const hero = (window.PIMG || {})[id];
     $('#psheetBody').innerHTML = `<div class="ps-hero" style="--pc:${p.color}">${hero ? `<img src="${hero}" alt="جعبه‌ی INOVOSENSE ${p.name}">` : `<span class="ps-meso">M+</span>`}<button type="button" class="ps-x" data-close aria-label="بستن">${I('<path d="M6 6l12 12M18 6 6 18"/>', 2)}</button></div>
@@ -3001,8 +3054,9 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
   let liveStream = null, liveOn = false, livePts = null, liveLost = 0, liveSel = null, liveAll = false;
   const liveSmall = document.createElement('canvas');
+  let liveScan = null;
   function livePlan() {
-    const last = scans[scans.length - 1], out = {};
+    const last = liveScan, out = {};
     if (!last) return null;
     for (const it of last.recs.plan.items) if (LIVE[it.key]) out[it.key] = it;
     for (const a of last.recs.plan.advice || []) if (LIVE[a.key]) out[a.key] = { advice: a };
@@ -3072,7 +3126,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
           const eye = Math.hypot(up[45].x - up[36].x, up[45].y - up[36].y) || 1, a = d > eye * 0.12 ? 1 : 0.6;
           livePts = livePts ? livePts.map((p, i) => ({ x: p.x + (up[i].x - p.x) * a, y: p.y + (up[i].y - p.y) * a })) : up;
           liveLost = 0;
-          $('#liveMsg').textContent = livePlan() ? 'ناحیه‌های رنگی، نقشه‌ی تزریق خودته؛ روی هر کدوم بزن' : 'روی هر ناحیه بزن تا ببینی چیه و چی لازم داره';
+          $('#liveMsg').textContent = liveScan ? `نقشه‌ی خوانش ${liveScan.person ? esc(liveScan.person.name) : 'تو'} · ${fdate(liveScan.t, { day: 'numeric', month: 'long' })}؛ روی هر ناحیه بزن` : 'روی هر ناحیه بزن تا ببینی چیه و چی لازم داره';
         } else {
           // never draw on a doubtful face: a wrong map is worse than none
           if (why !== 'none' || ++liveLost > 4) livePts = null;
@@ -3146,7 +3200,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     requestAnimationFrame(liveDraw);
   }
   document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-live]')) { openLive(); return; }
+    const lv = e.target.closest('[data-live]');
+    if (lv) { liveScan = lv.closest('#s-report') ? curRec : null; openLive(); return; }
     if (e.target.closest('[data-live-scan]')) { closeLive(); startScan(); return; }
   });
   $('#liveClose').addEventListener('click', closeLive);
