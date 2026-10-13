@@ -1496,14 +1496,22 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   $$('img.inovo-logo').forEach(i => { i.src = ART.inovoLogo; });
   // living backdrop: the hero video plays only while the hero sea is showing
   const seaVideo = $('#seaVideo');
-  if (BRAND.heroVideo && seaVideo && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (BRAND.heroVideo && seaVideo) {
+    // iPhone only autoplays a video that is muted and inline, set as properties as well as attributes
+    seaVideo.muted = true; seaVideo.defaultMuted = true; seaVideo.playsInline = true; seaVideo.autoplay = true;
+    ['muted', 'playsinline', 'webkit-playsinline', 'autoplay'].forEach(a => seaVideo.setAttribute(a, ''));
     // H.264 for iPhone and most phones, VP9 for browsers without H.264
     seaVideo.innerHTML = `<source src="${BRAND.heroVideo}.mp4" type="video/mp4"><source src="${BRAND.heroVideo}.webm" type="video/webm">`;
     seaVideo.load();
-    seaVideo.addEventListener('playing', () => seaVideo.classList.add('ready'), { once: true });
+    seaVideo.addEventListener('playing', () => seaVideo.classList.add('ready'));
   }
-  const playHero = (on) => { if (!seaVideo || !seaVideo.firstChild) return; if (on) { const p = seaVideo.play(); p && p.catch(() => {}); } else seaVideo.pause(); };
-  document.addEventListener('visibilitychange', () => playHero(!document.hidden && $('#seaHero').classList.contains('on')));
+  const heroOn = () => $('#seaHero').classList.contains('on');
+  const playHero = (on) => { if (!seaVideo || !seaVideo.firstChild) return; if (on) { if (seaVideo.paused) { const p = seaVideo.play(); p && p.catch(() => {}); } } else seaVideo.pause(); };
+  document.addEventListener('visibilitychange', () => playHero(!document.hidden && heroOn()));
+  // Low Power Mode and data-saver block autoplay until the first touch; start the sea then
+  const kick = () => { if (heroOn()) playHero(true); };
+  ['touchstart', 'pointerdown', 'scroll', 'keydown'].forEach(ev => addEventListener(ev, kick, { passive: true }));
+  if (seaVideo) seaVideo.addEventListener('canplay', kick);
   function sea(which) { playHero(which === 'hero'); $('#seaHero').classList.toggle('on', which === 'hero'); $('#seaDeep').classList.toggle('on', which === 'deep'); $('#seaSurface').classList.toggle('on', which === 'surface'); }
 
   // ---------- storage ----------
