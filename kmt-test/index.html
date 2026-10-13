@@ -638,6 +638,30 @@ body.noscroll { overflow: hidden; }
 #guestBox .fl .input { min-height: 48px; }
 .for-person { margin: 14px 0 0; font-size: 14px; color: var(--aqua); } .for-person b { color: var(--pearl); }
 
+/* measured need: five steps from white (no need) to black (very much needed) */
+.needbar { display: flex; align-items: center; gap: 10px; margin: 10px 0 8px; font-size: 12px; color: var(--mist); }
+.needbar b { color: #fff; }
+.nb-scale { display: flex; gap: 3px; padding: 3px; border-radius: 99px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); }
+.nb-scale i { width: 16px; height: 9px; border-radius: 99px; opacity: .35; box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+.nb-scale i.on { opacity: 1; width: 26px; box-shadow: 0 0 0 1.5px #fff, 0 0 10px rgba(255,255,255,.4); }
+.live-mid { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 70px); inset-inline: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none; padding: 0 12px; }
+.live-legend { display: flex; justify-content: center; gap: 4px; margin: 0 auto; padding: 6px 10px; width: max-content; max-width: 100%; border-radius: 99px; background: rgba(3,5,26,.62); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,.14); }
+.live-legend span { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; color: #fff; min-width: 46px; }
+.live-legend i { width: 30px; height: 10px; border-radius: 99px; box-shadow: 0 0 0 1px rgba(255,255,255,.55); }
+.live-meter { width: max-content; display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 99px; background: rgba(3,5,26,.7); border: 1px solid rgba(255,255,255,.16); font-size: 12px; color: #fff; }
+.live-meter i { width: 8px; height: 8px; border-radius: 50%; background: var(--aqua, #7FD8E0); box-shadow: 0 0 10px var(--aqua, #7FD8E0); animation: lmPulse 1.2s ease-in-out infinite; }
+.live-meter.done i { animation: none; background: #A6CE39; box-shadow: 0 0 10px #A6CE39; }
+@keyframes lmPulse { 50% { opacity: .25; } }
+.lc-need { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; margin-bottom: 10px; border-radius: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); font-size: 13px; }
+.lc-need .sw { width: 34px; height: 14px; border-radius: 99px; background: var(--nc); box-shadow: 0 0 0 1.5px #fff; flex: none; }
+.lchip i.need { background: var(--zc); box-shadow: 0 0 0 1.5px #fff; }
+.vidbox { margin: 14px 0 6px; padding: 14px; border-radius: 18px; border: 1px dashed rgba(127,216,224,.45); background: rgba(127,216,224,.06); }
+.vidbox b { display: block; font-size: 15px; margin-bottom: 4px; }
+.vidbox p { margin: 0 0 10px; font-size: 13px; color: var(--mist); }
+
+.live-card { max-height: 48vh; overflow-y: auto; }
+.live-legend span { min-width: 40px; }
+
 </style>
 
 <div class="sea" aria-hidden="true"><div class="layer" id="seaHero"><video id="seaVideo" muted loop playsinline preload="auto" aria-hidden="true"></video></div><div class="layer" id="seaDeep"></div><div class="layer" id="seaSurface"></div><div class="rays"></div><div class="veil"></div><div class="motes"></div><div class="motes m2"></div></div>
@@ -813,6 +837,8 @@ body.noscroll { overflow: hidden; }
     <label class="who-opt"><input type="radio" name="who" value="user" checked><span><b>خودم می‌گیرم</b><small>دوربین جلو</small></span></label>
     <label class="who-opt"><input type="radio" name="who" value="environment"><span><b>یکی دیگه می‌گیره</b><small>دوربین اصلی · کیفیت بالاتر</small></span></label>
   </div>
+  <div class="vidbox"><b>خوانش با ویدیو · دقیق‌تر از عکس</b><p>یک ویدیوی ۵ تا ۱۰ ثانیه‌ای بگیر: چند ثانیه صاف روبه‌رو، بعد آروم سر رو کمی به چپ و راست بچرخون. اپ هر فریم رو جدا اندازه می‌گیره و میانه‌ی همه رو حساب می‌کنه، پس یک سایه یا یک حالت صورت نتیجه رو خراب نمی‌کنه.</p>
+    <div class="row2"><button class="btn btn-primary" id="vidCam" type="button">ضبط ویدیو</button><button class="btn btn-ghost" id="vidGal" type="button">ویدیو از گالری</button></div></div>
   <details class="card tips"><summary>راهنمای عکس استاندارد پزشکی</summary><ul>
     <li>پشت سر یک دیوار ساده و روشن؛ رو به پنجره یا نور یکنواخت، بدون فلاش و بدون نور از یک طرف.</li>
     <li>بدون آرایش، عینک و فیلتر؛ موها پشت گوش و پیشانی باز.</li>
@@ -825,6 +851,8 @@ body.noscroll { overflow: hidden; }
   <div class="sticky-cta"><button class="btn btn-primary btn-block" id="analyzeBtn" type="button" disabled>شروع خوانش پوست</button></div>
   <input id="camInput" type="file" accept="image/*" capture="user" hidden>
   <input id="galInput" type="file" accept="image/*" hidden>
+  <input id="vidCamInput" type="file" accept="video/*" capture="user" hidden>
+  <input id="vidGalInput" type="file" accept="video/*" hidden>
 </section>
 
 <!-- BUSY -->
@@ -856,6 +884,7 @@ body.noscroll { overflow: hidden; }
   <div class="live-top"><button type="button" id="liveClose" class="lbtn" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="live-t"><b>نقشه‌ی زنده</b><small id="liveMsg">در حال روشن کردن دوربین…</small></div>
     <button type="button" id="liveFlip" class="lbtn" aria-label="چرخش دوربین"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M9 13a3 3 0 0 0 5 2M15 12a3 3 0 0 0-5-2"/></svg></button></div>
+  <div class="live-mid"><div class="live-meter" id="liveMeter" hidden><i></i><span id="liveMeterT">اندازه‌گیری زنده…</span></div><div class="live-legend" id="liveLegend"></div></div>
   <div class="live-bottom"><div class="live-card" id="liveCard" hidden></div><div class="live-chips" id="liveChips"></div></div>
 </div>
 <div class="cam" id="cam" hidden>
@@ -942,21 +971,35 @@ const SkinEngine = (() => {
     d.getContext('2d').drawImage(c, 0, 0, d.width, d.height);
     return { canvas: d, s };
   }
-  async function detect(canvas) {
+  /* loose: a close selfie (video frames) may touch the side edges; the brows and the chin must still be in frame */
+  async function detect(canvas, loose) {
     const fa = await init();
     const small = downscale(canvas, 1024);
-    for (const size of [416, 608, 320]) {
+    const tries = [{ c: small.canvas, s: small.s, ox: 0, oy: 0 }];
+    if (loose) {
+      // the small detector misses a face that fills the whole frame: try again with the frame inside a wide margin
+      const w = small.canvas.width, h = small.canvas.height, m = 0.3, P = document.createElement('canvas');
+      P.width = Math.round(w * (1 + 2 * m)); P.height = Math.round(h * (1 + 2 * m));
+      const g = P.getContext('2d'); g.fillStyle = '#808080'; g.fillRect(0, 0, P.width, P.height); g.drawImage(small.canvas, w * m, h * m);
+      const d = downscale(P, 1024);
+      tries.push({ c: d.canvas, s: small.s * d.s, ox: w * m * d.s, oy: h * m * d.s });
+    }
+    for (const T of tries) for (const size of [416, 608, 320]) {
       const opts = new fa.TinyFaceDetectorOptions({ inputSize: size, scoreThreshold: 0.35 });
-      const res = await fa.detectAllFaces(small.canvas, opts).withFaceLandmarks();
-      if (res.length) {
-        res.sort((a, b) => b.detection.box.area - a.detection.box.area);
-        const r = res[0], k = 1 / small.s;
-        const pts = r.landmarks.positions.map(p => ({ x: p.x * k, y: p.y * k }));
-        const inside = pts.filter(p => p.x >= 0 && p.y >= 0 && p.x <= canvas.width && p.y <= canvas.height).length / pts.length;
-        const jawInside = pts.slice(0, 17).filter(p => p.y <= canvas.height * 0.995 && p.x >= 0 && p.x <= canvas.width).length;
-        if (inside < 0.95 || jawInside < 15 || r.detection.score < 0.5) return null;   // a partial face → treat as a close-up
+      const res = await fa.detectAllFaces(T.c, opts).withFaceLandmarks();
+      if (!res.length) continue;
+      res.sort((a, b) => b.detection.box.area - a.detection.box.area);
+      const r = res[0], k = 1 / T.s;
+      const pts = r.landmarks.positions.map(p => ({ x: (p.x - T.ox) * k, y: (p.y - T.oy) * k }));
+      const inside = pts.filter(p => p.x >= 0 && p.y >= 0 && p.x <= canvas.width && p.y <= canvas.height).length / pts.length;
+      const jawInside = pts.slice(0, 17).filter(p => p.y <= canvas.height * 0.995 && p.x >= 0 && p.x <= canvas.width).length;
+      if (loose) {
+        const H = canvas.height, W = canvas.width, browY = Math.min(pts[19].y, pts[24].y);
+        if (r.detection.score < 0.5 || pts[8].y > H * 1.01 || browY < 0 || pts[30].x < 0 || pts[30].x > W) return null;
         return { count: res.length, score: r.detection.score, pts };
       }
+      if (inside < 0.95 || jawInside < 15 || r.detection.score < 0.5) return null;   // a partial face → treat as a close-up
+      return { count: res.length, score: r.detection.score, pts };
     }
     return null;
   }
@@ -1009,14 +1052,17 @@ const SkinEngine = (() => {
     const browTop = Math.min(A[19].y, A[24].y);
     const topY = Math.max(6, EYE_Y - 1.12 * IOD);
     // nasolabial fold: from just outside the nose wing to just outside the mouth corner
-    const nlR0 = off(A[31], -0.1, -0.02), nlR1 = off(A[48], -0.07, 0.02);
-    const nlL0 = off(A[35], 0.1, -0.02), nlL1 = off(A[54], 0.07, 0.02);
+    // (with age the fold moves out toward the cheek, so the band reaches further out)
+    const nlR0 = off(A[31], -0.13, -0.03), nlR1 = off(A[48], -0.1, 0.03);
+    const nlL0 = off(A[35], 0.13, -0.03), nlL1 = off(A[54], 0.1, 0.03);
     // marionette line: from the mouth corner down toward the jaw
     const mrR0 = off(A[48], -0.02, 0.06), mrR1 = lerp(off(A[48], -0.04, 0.06), A[6], 0.75);
     const mrL0 = off(A[54], 0.02, 0.06), mrL1 = lerp(off(A[54], 0.04, 0.06), A[10], 0.75);
     return {
       forehead: [{ x: A[18].x, y: topY + 0.08 * IOD }, { x: A[25].x, y: topY + 0.08 * IOD }, { x: A[25].x, y: browTop - 0.1 * IOD }, { x: A[18].x, y: browTop - 0.1 * IOD }],
-      glabella: [off(A[21], 0.0, -0.2), off(A[22], 0.0, -0.2), off(A[22], -0.02, 0.05), off(A[27], 0, 0.0), off(A[21], 0.02, 0.05)],
+      // frown lines sit between the inner brow ends and rise above them; stop short of the nose bridge and the inner
+      // eye corners, whose shadows read as vertical creases
+      glabella: [off(A[21], 0.04, -0.34), off(A[22], -0.04, -0.34), off(A[22], -0.04, 0.08), off(A[21], 0.04, 0.08)],
       cheekR: [off(A[1], 0.08, 0), { x: A[39].x, y: A[40].y + 0.34 * IOD }, off(A[31], -0.12, 0), off(A[48], -0.14, -0.1), off(A[4], 0.06, 0), off(A[3], 0.07, 0), off(A[2], 0.08, 0)],
       cheekL: [off(A[15], -0.08, 0), { x: A[42].x, y: A[47].y + 0.34 * IOD }, off(A[35], 0.12, 0), off(A[54], 0.14, -0.1), off(A[12], -0.06, 0), off(A[13], -0.07, 0), off(A[14], -0.08, 0)],
       nose: [off(A[27], -0.12, 0.1), off(A[27], 0.12, 0.1), { x: A[35].x, y: A[30].y }, off(A[33], 0, -0.08), { x: A[31].x, y: A[30].y }],
@@ -1027,7 +1073,7 @@ const SkinEngine = (() => {
       refL: [off(A[42], 0, 0.42), off(A[45], 0, 0.42), off(A[45], 0, 0.62), off(A[42], 0, 0.62)],
       crowsR: [off(A[36], -0.44, -0.16), off(A[36], -0.08, -0.16), off(A[36], -0.08, 0.26), off(A[36], -0.44, 0.26)],
       crowsL: [off(A[45], 0.08, -0.16), off(A[45], 0.44, -0.16), off(A[45], 0.44, 0.26), off(A[45], 0.08, 0.26)],
-      nasoR: band(nlR0, nlR1, 0.09), nasoL: band(nlL0, nlL1, 0.09),
+      nasoR: band(nlR0, nlR1, 0.13), nasoL: band(nlL0, nlL1, 0.13),
       marioR: band(mrR0, mrR1, 0.07), marioL: band(mrL0, mrL1, 0.07),
     };
   }
@@ -1192,9 +1238,10 @@ const SkinEngine = (() => {
   async function analyze(file, opts = {}) {
     const onStep0 = opts.onStep || (() => {}); const T = {}; let tPrev = performance.now(), sPrev = 'load';
     const onStep = (n) => { const t = performance.now(); T[sPrev] = Math.round(t - tPrev); tPrev = t; sPrev = n; onStep0(n); };
-    const src = await fileToCanvas(file);
+    // a ready canvas (a video frame) skips decoding; known landmarks (from the live tracker) skip detection
+    const src = (typeof HTMLCanvasElement !== 'undefined' && file instanceof HTMLCanvasElement) ? file : await fileToCanvas(file);
     onStep('detect');
-    const det = await detect(src);
+    const det = opts.pts ? { count: 1, score: 1, pts: opts.pts } : await detect(src, opts.loose);
     let mode, al, A = null, M = {}, geo, R = {};
     if (det) {
       mode = 'face';
@@ -1359,15 +1406,16 @@ const SkinEngine = (() => {
     const fine = ridges(L, skinLoose, fineZone, 0.5);
     const thrF = Math.max(0.5, fine.noise * 3.4);
     const foldZone = and(or(M.nasoR, M.nasoL, M.marioR, M.marioL), skinLE);
-    const fold = ridges(L, skinLoose, foldZone, 1.4);
+    const fold = ridges(L, skinLoose, foldZone, 2);
     const thrB = Math.max(0.35, fold.noise * 3.0);
     const C = (k) => new Uint8Array(N);
     const cFh = C(), cGl = C(), cCr = C(), cUe = C(), cNl = C(), cMr = C();
     for (let i = 0; i < N; i++) {
       if (fineZone[i]) {
         const xx = fine.Hxx[i], yy = fine.Hyy[i], l1 = fine.l1[i];
-        if (M.forehead[i]) { if (yy > thrF && yy > 1.8 * Math.abs(xx)) cFh[i] = 1; }
-        else if (M.glabella[i]) { if (xx > thrF * 0.9 && xx > 1.6 * Math.abs(yy)) cGl[i] = 1; }
+        if (M.glabella[i] && xx > thrF * 0.9 && xx > 1.6 * Math.abs(yy)) cGl[i] = 1;
+        else if (M.forehead[i]) { if (yy > thrF && yy > 1.8 * Math.abs(xx)) cFh[i] = 1; }
+        else if (M.glabella[i]) { /* horizontal creases at the root of the nose are not frown lines */ }
         else if (M.crowsR[i] || M.crowsL[i]) { if (l1 > thrF * 1.05) cCr[i] = 1; }
         else if (l1 > thrF * 1.1) cUe[i] = 1;
       }
@@ -1814,72 +1862,116 @@ const Recs = (() => {
   // ---------- layer 1: the filler plan ----------
   /* Volumes are typical first-session ranges drawn from expert consensus papers and clinical studies
      (per side where the area is paired). They are a starting point for the physician, never a prescription. */
+  /* Measured need, per area, on a five-step scale from "no need" to "very much needed".
+     It comes straight from what the camera measured in that area (line length × depth, graded 0–100),
+     so the colour on the live map and the volume in the plan follow the measurement, not a fixed band. */
+  const NEED_LEVELS = [
+    { t: 'بی‌نیاز', c: '#FFFFFF' }, { t: 'کم‌نیاز', c: '#C9CDD5' }, { t: 'نیازمند', c: '#8C919C' },
+    { t: 'پرنیاز', c: '#474A52' }, { t: 'خیلی نیازمند', c: '#08080A' },
+  ];
+  const needLevel = (score) => score >= 86 ? 0 : score >= 72 ? 1 : score >= 58 ? 2 : score >= 40 ? 3 : 4;
+  const needV = (score) => Math.max(0, Math.min(1, (92 - score) / 67));
+  /* Areas the camera can grade from the skin surface, and the measured line type behind each. */
+  const MEASURED = { forehead: 'forehead', glabella: 'glabella', crows: 'crows', undereye: 'undereye', nasolabial: 'nasolabial', marionette: 'marionette' };
+  function measure(metrics) {
+    const D = metrics && metrics.lines && metrics.lines.detail, out = {};
+    if (!D) return out;
+    for (const [k, lk] of Object.entries(MEASURED)) {
+      const d = D[lk]; if (!d || d.score == null) continue;
+      let sc = d.score;
+      // under the eye, a hollow shows as a shadow: take the worse of the creases and the darkening
+      if (k === 'undereye' && metrics.circles && metrics.circles.score != null) sc = Math.min(sc, metrics.circles.score + 6);
+      out[k] = { score: Math.round(sc), lvl: needLevel(sc), v: needV(sc), n: d.n || 0, mm: d.mm || 0 };
+    }
+    return out;
+  }
+  const NEED = { LEVELS: NEED_LEVELS, level: needLevel, v: needV, measure, MEASURED };
+
   function fillerPlan(cs, p, metrics) {
     const lv = (k) => (cs.find(c => c.key === k) || {}).level;
     const src = (k) => (cs.find(c => c.key === k) || {}).source;
     const items = [], advice = [];
-    /* How marked the area measured in this person's photo, 0 (mild) to 1 (marked), or null when it was only
-       self-reported. Used to place the volume inside the typical range, so two people with the same grade
-       but different depth get different amounts. */
-    const LINE_OF = { nasolabial: 'nasolabial', marionette: 'marionette', undereye: 'undereye', crows: 'crows' };
-    const METRIC_OF = { face: 'texture', scars: 'texture' };
-    const sevOf = (key) => {
-      const m = metrics || {}, d = LINE_OF[key] && m.lines && m.lines.detail && m.lines.detail[LINE_OF[key]];
-      const x = d && d.n ? d : METRIC_OF[key] && m[METRIC_OF[key]];
-      if (!x || x.score == null) return null;
-      return Math.max(0, Math.min(1, (100 - x.score) / 70));
-    };
+    const meas = measure(metrics);
+    const a = age(p) || 0;
     const r1 = (v) => Math.round(v * 10) / 10;
-    const fit = (rng, sv) => { if (!rng || sv == null || rng[0] === rng[1]) return rng; const w = rng[1] - rng[0], lo = r1(rng[0] + w * sv * 0.5); return [lo, r1(Math.max(lo + 0.1, lo + w * 0.5))]; };
+    /* Need of an area, 0–1: the camera's measurement when the area is measurable; otherwise the self-report
+       (mid ≈ 0.45, marked ≈ 0.75), nudged by age for the volume areas, where loss grows with the years. */
+    const needOf = (key, lvKey, vol) => {
+      const m = meas[key] || (lvKey && meas[String(lvKey).replace('lines_', '')]);
+      if (m) return { v: m.v, lvl: m.lvl, score: m.score, measured: true };
+      const l = lv(lvKey || key);
+      let v = l === 'high' ? 0.75 : l === 'mid' ? 0.45 : 0.3;
+      if (vol && a) v += Math.max(-0.1, Math.min(0.15, (a - 40) * 0.01));
+      v = Math.max(0.1, Math.min(1, v));
+      return { v, lvl: v >= 0.8 ? 4 : v >= 0.6 ? 3 : v >= 0.4 ? 2 : 1, measured: false };
+    };
+    /* Volume follows the need on a continuous scale across the clinical range of the area:
+       the least need gets the low end, the most marked gets the top end, ±0.1 ml either side. */
+    const dose = (span, v) => {
+      const c = span[0] + (span[1] - span[0]) * v;
+      let lo = r1(Math.max(span[0], c - 0.1)), hi = r1(Math.min(span[1], c + 0.1));
+      if (hi <= lo) hi = r1(lo + 0.1);
+      return [lo, hi];
+    };
     const add = (key, area, product, tech, o) => {
-      const sv = o.program && key === 'meso' ? null : sevOf(key);
-      const per = fit(o.perSide || null, sv), sides = per ? 2 : 1;
-      const ml = o.ml ? fit(o.ml, sv) : (per ? [r1(per[0] * 2), r1(per[1] * 2)] : null);
+      const nd = o.program ? null : needOf(key, o.lvKey, o.vol);
+      const v = nd ? nd.v : (lv(o.lvKey || key) === 'high' ? 0.8 : 0.4);
+      const per = o.perSide ? dose(o.perSide, v) : null, sides = per ? 2 : 1;
+      const ml = o.ml ? (o.ml[0] === o.ml[1] ? o.ml : dose(o.ml, v)) : (per ? [r1(per[0] * 2), r1(per[1] * 2)] : null);
       items.push({ key, area, product, alt: o.alt || null, tech: tech.map(t => TECH[t]), ml, perSide: per, sides,
         depth: o.depth || PRODUCTS[product].depthLabel, risk: o.risk || 'low', evidence: o.evidence || 'ifu', doctorOnly: !!o.doctorOnly,
         sessions: o.sessions || 'یک جلسه؛ بررسی نتیجه بعد از ۲ هفته', note: o.note || '', spots: SPOTS[o.spot || key] || [],
-        level: lv(o.lvKey || key) || 'mid', source: src(o.lvKey || key) || 'self', prio: o.prio || 9, program: !!o.program, sev: sv });
+        level: lv(o.lvKey || key) || 'mid', source: src(o.lvKey || key) || (nd && nd.measured ? 'measured' : 'self'), prio: o.prio || 9, program: !!o.program,
+        need: nd, sev: nd ? nd.v : null });
     };
     const sev = (k) => lv(k) === 'high';
+    // an area enters the plan when the camera measured at least "low need" there, or the person reported it
+    const want = (key, lvKey) => (meas[key] && meas[key].lvl >= 1) || !!lv(lvKey || key);
 
-    // structure first (deep products), then folds, lips and fine lines
-    const cheekNeed = lv('cheek_volume') || lv('laxity') || (sev('nasolabial') && (age(p) || 0) >= 35);
+    // structure (deep products), then folds, lips and fine lines
+    const cheekNeed = lv('cheek_volume') || lv('laxity') || ((meas.nasolabial ? meas.nasolabial.lvl >= 3 : sev('nasolabial')) && a >= 35);
     if (cheekNeed) add('cheeks', 'گونه و استخوان گونه', lv('laxity') && !lv('cheek_volume') ? 'style' : 'shape', ['bolus', 'linear', 'fan'],
-      { perSide: sev('cheek_volume') || sev('laxity') ? [1.0, 1.5] : [0.5, 1.0], risk: 'high', prio: 1, lvKey: lv('cheek_volume') ? 'cheek_volume' : lv('laxity') ? 'laxity' : 'nasolabial', alt: 'Style برای لیفت / Shape برای حجم',
+      { perSide: [0.5, 1.5], vol: true, risk: 'high', prio: 1, lvKey: lv('cheek_volume') ? 'cheek_volume' : lv('laxity') ? 'laxity' : 'nasolabial', alt: 'Style برای لیفت / Shape برای حجم',
         note: 'گونه‌ی کناری کم‌خطره ولی بخش داخلی گونه جزو نواحی پرخطره. حمایت از گونه خط خنده رو هم نرم‌تر می‌کنه.' });
-    if (lv('temples')) add('temples', 'شقیقه', 'style', ['linear', 'fan'], { perSide: [0.5, 1.0], risk: 'high', prio: 2, alt: 'یا Shape', note: 'ناحیه‌ی پرعروق؛ معمولاً روی استخوان یا با کانولا.' });
-    if (lv('chin')) add('chin', 'چانه', 'style', ['bolus', 'linear'], { ml: sev('chin') ? [1.5, 2.0] : [1.0, 1.5], risk: 'low', prio: 3, alt: 'یا Shape' });
-    if (lv('jawline') || sev('laxity')) add('jawline', 'خط فک و زاویه‌ی فک', 'shape', ['bolus', 'linear', 'fan'], { perSide: sev('jawline') ? [1.5, 2.0] : [1.0, 1.5], risk: 'low', prio: 4, lvKey: lv('jawline') ? 'jawline' : 'laxity', evidence: 'ifu' });
-    if (lv('nasolabial')) {
-      if (sev('nasolabial')) add('nasolabial', 'خط خنده‌ی شدید', 'style', ['linear', 'fan'], { perSide: [0.7, 1.0], risk: 'high', prio: 5, lvKey: 'nasolabial', note: 'بخش بالایی خط خنده، نزدیک بینی، از نواحی پرخطر عروقیه.' });
-      else add('nasolabial', 'خط خنده', 'smile', ['linear', 'fan'], { perSide: [0.5, 0.8], risk: 'high', prio: 5, lvKey: 'nasolabial', alt: 'یا Silk برای چین سطحی', note: 'بخش بالایی خط خنده، نزدیک بینی، از نواحی پرخطر عروقیه.' });
+    if (lv('temples')) add('temples', 'شقیقه', 'style', ['linear', 'fan'], { perSide: [0.4, 1.0], vol: true, risk: 'high', prio: 2, alt: 'یا Shape', note: 'ناحیه‌ی پرعروق؛ معمولاً روی استخوان یا با کانولا.' });
+    if (lv('chin')) add('chin', 'چانه', 'style', ['bolus', 'linear'], { ml: [0.8, 2.0], vol: true, risk: 'low', prio: 3, alt: 'یا Shape' });
+    if (lv('jawline') || sev('laxity')) add('jawline', 'خط فک و زاویه‌ی فک', 'shape', ['bolus', 'linear', 'fan'], { perSide: [0.8, 2.0], vol: true, risk: 'low', prio: 4, lvKey: lv('jawline') ? 'jawline' : 'laxity' });
+    if (want('nasolabial')) {
+      const deep = meas.nasolabial ? meas.nasolabial.v >= 0.65 : sev('nasolabial');
+      add('nasolabial', deep ? 'خط خنده‌ی عمیق' : 'خط خنده', deep ? 'style' : 'smile', ['linear', 'fan'], { perSide: [0.3, 1.0], risk: 'high', prio: 5, lvKey: 'nasolabial',
+        alt: deep ? 'یا Smile برای بخش سطحی‌تر' : 'یا Silk برای چین سطحی', note: 'بخش بالایی خط خنده، نزدیک بینی، از نواحی پرخطر عروقیه.' });
     }
-    if (lv('marionette')) add('marionette', 'خط غم و گوشه‌ی لب', 'smile', ['linear', 'fan', 'cross'], { perSide: sev('marionette') ? [0.7, 1.0] : [0.4, 0.7], risk: 'low', prio: 6, alt: 'یا Silk برای چین سطحی' });
-    if (lv('lips')) add('lips', 'حجم لب', 'smile', ['linear', 'submucosal'], { ml: [0.5, 1.0], risk: 'mid', prio: 7, depth: 'زیر مخاط یا زیرجلدی', note: 'طبق نظر متخصصان، برای هر لب حدود ۰٫۲۵ تا ۰٫۵ میلی‌لیتر در جلسه‌ی اول. برای فرم و خط دور لب، Silk.' });
+    if (want('marionette')) add('marionette', 'خط غم و گوشه‌ی لب', 'smile', ['linear', 'fan', 'cross'], { perSide: [0.3, 1.0], risk: 'low', prio: 6, alt: 'یا Silk برای چین سطحی' });
+    if (lv('lips')) add('lips', 'حجم لب', 'smile', ['linear', 'submucosal'], { ml: [0.4, 1.0], risk: 'mid', prio: 7, depth: 'زیر مخاط یا زیرجلدی', note: 'طبق نظر متخصصان، برای هر لب حدود ۰٫۲۵ تا ۰٫۵ میلی‌لیتر در جلسه‌ی اول. برای فرم و خط دور لب، Silk.' });
     if (lv('perioral')) add('perioral', 'خطوط دور لب', 'silk', ['linear', 'serial'], { ml: [0.2, 0.5], risk: 'mid', prio: 8 });
-    if (lv('lines_undereye') || lv('hollows') || lv('circles') === 'high') add('undereye', 'زیر چشم (گودی و چین)', 'silk', ['serial', 'linear'],
-      { perSide: [0.3, 0.5], risk: 'high', prio: 9, evidence: 'catalog', doctorOnly: true, depth: 'روی استخوان، با کانولا یا بولوس‌های بسیار کوچک', lvKey: lv('hollows') ? 'hollows' : lv('lines_undereye') ? 'lines_undereye' : 'circles',
+    if (want('undereye', 'lines_undereye') || lv('hollows') || lv('circles') === 'high') add('undereye', 'زیر چشم (گودی و چین)', 'silk', ['serial', 'linear'],
+      { perSide: [0.2, 0.6], risk: 'high', prio: 9, evidence: 'catalog', doctorOnly: true, depth: 'روی استخوان، با کانولا یا بولوس‌های بسیار کوچک', lvKey: lv('hollows') ? 'hollows' : lv('lines_undereye') ? 'lines_undereye' : 'circles',
         note: 'ناحیه‌ی ظریف و پرخطر؛ فقط پزشک باتجربه. اگر تیرگی از رنگدانه یا رگ باشه، فیلر کمکی نمی‌کنه.' });
-    if (lv('lines_crows')) add('crows', 'پنجه‌کلاغی', 'silk', ['serial', 'linear'], { perSide: [0.1, 0.3], risk: 'high', prio: 10, evidence: 'catalog', doctorOnly: true, lvKey: 'lines_crows',
-      note: 'پنجه‌کلاغی بیشتر خط حرکتیه و پزشک معمولاً اول درمان‌های دیگه رو بررسی می‌کنه؛ فیلر سطحی فقط برای خط‌هایی که در حالت آرام هم دیده می‌شن.' });
-
-    // areas where the app does not plan a filler
-    if (lv('lines_glabella')) advice.push({ key: 'glabella', area: 'خط اخم (بین ابرو)', risk: 'vhigh', text: 'طبق دفترچه‌ی رسمی، Silk و Smile نباید در ناحیه‌ی بین ابرو تزریق بشن و این ناحیه از پرخطرترین نقاط صورت برای فیلره. برای خط اخم، پزشک درمان مناسب دیگه‌ای رو بررسی می‌کنه.' });
-    if (lv('lines_forehead')) advice.push({ key: 'forehead', area: 'خطوط پیشانی', risk: 'vhigh', text: 'پیشانی جزو پرخطرترین نواحی برای فیلره و در دفترچه‌ی Silk هم با هشدار ذکر شده. خطوط پیشانی معمولاً حرکتی‌ان و پزشک اول درمان‌های دیگه رو بررسی می‌کنه؛ برای پوست پیشانی، Shine یا Mesocell Plus کمک می‌کنن.' });
+    if (want('crows', 'lines_crows')) add('crows', 'پنجه‌کلاغی', 'silk', ['serial', 'linear'], { perSide: [0.1, 0.4], risk: 'high', prio: 10, evidence: 'catalog', doctorOnly: true, lvKey: 'lines_crows',
+      note: 'پنجه‌کلاغی بیشتر خط حرکتیه؛ فیلر سطحی برای خط‌هایی که در حالت آرام هم دیده می‌شن.' });
+    // forehead and frown lines: listed for Silk in the Inovosense catalogue (the IFU warns against them) — the
+    // highest-risk areas of the face, so very small amounts, superficial, by an experienced physician only
+    if (want('glabella', 'lines_glabella')) add('glabella', 'خط اخم (بین ابرو)', 'silk', ['serial', 'linear'], { ml: [0.1, 0.4], risk: 'vhigh', prio: 11, evidence: 'catalog', doctorOnly: true, lvKey: 'lines_glabella',
+      depth: 'درم سطحی؛ مقدار بسیار کم، آهسته و با کمترین فشار',
+      note: 'کاتالوگ Inovosense این ناحیه رو برای Silk ذکر کرده ولی دفترچه‌ی رسمی Silk تزریق بین ابرو رو منع کرده. بین ابرو پرخطرترین نقطه‌ی صورت برای انسداد رگه؛ تصمیم و تزریق فقط با پزشک باتجربه.' });
+    if (want('forehead', 'lines_forehead')) add('forehead', 'خطوط پیشانی', 'silk', ['serial', 'linear'], { ml: [0.2, 0.8], risk: 'vhigh', prio: 12, evidence: 'catalog', doctorOnly: true, lvKey: 'lines_forehead',
+      depth: 'درم سطحی، در امتداد خط',
+      note: 'کاتالوگ Inovosense پیشانی رو برای Silk ذکر کرده و دفترچه‌ی رسمی اون رو ناحیه‌ی پرخطر می‌دونه. فقط پزشک باتجربه؛ برای کیفیت پوست پیشانی Shine و Mesocell Plus هم کمک می‌کنن.' });
 
     // skin-quality programmes (not counted in the filler session)
     if (lv('scars')) add('scars', 'اسکار فرورفته‌ی جوش', 'shine', ['serial', 'micro'], { ml: [0.5, 1.0], risk: 'low', prio: 20, program: true, sessions: 'یک جلسه در درم سطحی', note: 'طبق دفترچه‌ی رسمی Shine. جوش فعال باید اول کنترل بشه.' });
     if (lv('dull') || lv('dryness') || lv('texture') || lv('tone') || lv('neck')) add('face', lv('neck') ? 'کل صورت و گردن (آبرسانی)' : 'کل صورت (آبرسانی و درخشش)', 'shine', ['multi', 'micro'],
       { ml: [1.0, 2.0], risk: 'low', prio: 21, program: true, lvKey: lv('dull') ? 'dull' : lv('dryness') ? 'dryness' : lv('texture') ? 'texture' : lv('tone') ? 'tone' : 'neck',
         sessions: '۳ جلسه با فاصله‌ی ۴ هفته؛ نگهداری هر ۶ تا ۱۲ ماه', note: 'میکروپاپول‌ها ممکنه ۲ تا ۳ روز دیده بشن.' });
-    const a = age(p) || 0;
     if (lv('laxity') || lv('lines_undereye') || lv('lines_forehead') || (a >= 35 && (lv('texture') || lv('lines_crows'))))
       add('meso', 'کل صورت و گردن (کیفیت و سفتی پوست)', 'mesocell', ['micro', 'nappage'], { ml: [2.0, 2.0], risk: 'low', prio: 22, program: true, spot: 'face', sessions: 'حداقل ۳ جلسه با فاصله‌ی ۴ هفته؛ هر جلسه یک سرنگ ۲ میلی‌لیتری',
         note: 'با فیلرهای هیالورونیک قابل ترکیبه به شرط تزریق در عمق جدا؛ زمان‌بندی نسبت به فیلر رو پزشک تعیین می‌کنه.' });
 
-    // first session: the three highest-priority filler areas, at most 4 ml; the rest move to a second session
+    // first session: three areas, at most 4 ml; the rest move to a second session
     let used = 0, n = 0;
-    for (const it of items.filter(i => !i.program).sort((x, y) => x.prio - y.prio)) {
+    // the most needed areas first; at equal need, uses in the official IFU before catalogue-only uses
+    const rankOf = (i) => (i.need ? i.need.lvl : 0) - (i.evidence === 'catalog' ? 0.5 : 0);
+    for (const it of items.filter(i => !i.program).sort((x, y) => (rankOf(y) - rankOf(x)) || x.prio - y.prio)) {
       const mx = it.ml ? it.ml[1] : 0;
       if (n < 3 && used + mx <= 4.01) { it.phase = 1; used += mx; n++; } else it.phase = 2;
     }
@@ -1984,7 +2076,7 @@ const Recs = (() => {
     if (plan.items.some(i => i.product === 'mesocell')) products.push({ id: 'mesocell', name: 'INOVOSENSE Mesocell Plus', status: plan.blocks.length ? 'not-suitable' : 'doctor', ml: null });
     return { concerns: cs, plan, products, routine: routine(cs, profile), care: CARE, doctors: doctors(cs, profile, self, plan), treatments: plan.items.map(i => ({ id: i.product, name: 'INOVOSENSE ' + PRODUCTS[i.product].name, area: i.area, reason: (i.ml ? `${i.ml[0]} تا ${i.ml[1]} میلی‌لیتر · ` : '') + i.sessions, blocked: plan.blocks[0] || null })) };
   }
-  return { CONCERNS, PRODUCTS, TECH, SPOTS, CARE, RISK, EVIDENCE, build, concerns };
+  return { CONCERNS, PRODUCTS, TECH, SPOTS, CARE, RISK, EVIDENCE, NEED, build, concerns };
 })();
 </script>
 <script>
@@ -2353,10 +2445,12 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     if (!m.lines) return;
     const D = m.lines.detail;
     for (const k in D) D[k].via = D[k].n ? ['front'] : [];
-    const up = (k, lvl, n, via) => { const d = D[k]; if (!d) return; if (LEVEL_RANK[lvl] > LEVEL_RANK[d.level]) { d.level = lvl; d.n = Math.max(d.n || 0, n || 1); } if (lvl !== 'good') d.via = [...new Set([...(d.via || []), via])]; };
+    const up = (k, lvl, n, via, sc) => { const d = D[k]; if (!d) return; if (LEVEL_RANK[lvl] > LEVEL_RANK[d.level]) { d.level = lvl; d.n = Math.max(d.n || 0, n || 1); }
+      // a close-up that sees more keeps the worse measurement, so the need and the volume follow it
+      if (lvl !== 'good') d.score = Math.min(d.score, sc != null ? sc : lvl === 'high' ? 50 : 76); if (lvl !== 'good') d.via = [...new Set([...(d.via || []), via])]; };
     for (const [k, r] of Object.entries(extras)) {
       if (!r || !r.ok) continue;
-      if (r.metrics && r.metrics.lines) { for (const lk of ['crows', 'nasolabial', 'marionette', 'undereye']) { const d = r.metrics.lines.detail[lk]; if (d) up(lk, d.level, d.n, k); } }
+      if (r.metrics && r.metrics.lines) { for (const lk of ['crows', 'nasolabial', 'marionette', 'undereye']) { const d = r.metrics.lines.detail[lk]; if (d) up(lk, d.level, d.n, k, d.score); } }
       if (r.lines) for (const [lk, d] of Object.entries(r.lines)) up(lk, d.level, d.n, k);
       if (r.freckles != null && m.freckles) { const f = r.freckles; if (f >= 8 && m.freckles.level === 'good') { m.freckles.level = f >= 25 ? 'high' : 'mid'; m.freckles.score = Math.min(m.freckles.score, f >= 25 ? 50 : 76); m.freckles.detail.count = Math.max(m.freckles.detail.count || 0, f); } }
     }
@@ -2402,6 +2496,9 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         catch (e) { extras[k] = { ok: false }; mark(k, 'skip'); }
       }
     } catch (e) { renderError(e && e.message === 'model-missing' ? 'model-missing' : e && e.message === 'slow' ? 'slow' : 'error'); return; }
+    await finishScan(front, extras, keys, mark);
+  }
+  async function finishScan(front, extras, keys, mark, video) {
     mark('plan', 'now');
     merge(front, extras);
     await playMesh(front);
@@ -2409,6 +2506,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const recs = Recs.build(front, self, scanFor ? guestProfile(scanFor) : recsProfile());
     mark('plan', 'done');
     const rec = makeRecord(front, extras, self, recs, keys);
+    if (video) rec.video = video;
     if (scanFor) rec.person = { name: scanFor.name, birthYear: scanFor.birthYear, gender: scanFor.gender };
     try { if (typeof FaceSim !== 'undefined' && simAreas(recs.plan.items).length) { rec.simBefore = jpgOf(front.view.canvas); rec.simAfter = jpgOf(FaceSim.render(front.view, simAreas(recs.plan.items))); } } catch (e) {}
     scans.push(rec); if (scans.length > 10) scans.shift(); saveScans();
@@ -2416,6 +2514,102 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     hist.length = 0; go('s-report', { push: false });
     sync().then(st => { rec.sync = st; updateSaveBar(rec); });
   }
+
+  // ---------- video scan: many frames of one short clip, measured one by one and combined ----------
+  /* A single photo can be thrown off by one shadow or one expression. From a short video, every usable frontal
+     frame is analysed on its own and each measurement is the median across frames; turned frames serve as the side
+     views. The sharpest frontal frame is kept for the map and the report. */
+  const lvlOf = (sc) => sc >= 86 ? 'good' : sc >= 56 ? 'mid' : 'high';
+  function combine(best, list) {
+    const m = best.metrics;
+    for (const k in m) {
+      const sc = list.map(x => x[k] && x[k].score).filter(v => v != null);
+      if (sc.length >= 2) { m[k].score = Math.round(medianOf(sc)); m[k].level = lvlOf(m[k].score); }
+    }
+    if (m.lines && m.lines.detail) for (const lk in m.lines.detail) {
+      const rows = list.map(x => x.lines && x.lines.detail && x.lines.detail[lk]).filter(Boolean);
+      if (rows.length < 2) continue;
+      const d = m.lines.detail[lk];
+      d.score = Math.round(medianOf(rows.map(r => r.score))); d.level = lvlOf(d.score);
+      d.n = Math.round(medianOf(rows.map(r => r.n || 0))); d.mm = medianOf(rows.map(r => r.mm || 0));
+      d.frames = rows.length;
+    }
+    const W8 = { acne: 1.2, spots: 1, freckles: 0.3, redness: 1, tone: 0.8, shine: 0.6, texture: 0.7, lines: 1.2, circles: 0.6 };
+    let ws = 0, wt = 0; for (const k in m) { if (!W8[k]) continue; const w = W8[k] * (m[k].reliable === false ? 0.4 : 1); ws += m[k].score * w; wt += w; }
+    best.overall = Math.round(ws / wt);
+  }
+  async function seekFrames(file, onFrame, onInfo) {
+    const v = document.createElement('video'), url = URL.createObjectURL(file);
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = url;
+    try {
+      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('video')); setTimeout(() => rej(new Error('video')), 20000); });
+      // some phones only paint a frame after playback has started once
+      try { await v.play(); v.pause(); } catch (e) {}
+      const D = isFinite(v.duration) ? v.duration : 0;
+      if (!D || !v.videoWidth) throw new Error('video');
+      const n = Math.max(4, Math.min(18, Math.floor(D / 0.4)));
+      onInfo && onInfo(n, D);
+      const c = document.createElement('canvas'), k = Math.min(1, 1600 / Math.max(v.videoWidth, v.videoHeight));
+      c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+      for (let i = 0; i < n; i++) {
+        const t = Math.min(D - 0.05, (i + 0.5) * D / n);
+        await new Promise((res) => { const done = () => { v.removeEventListener('seeked', done); res(); }; v.addEventListener('seeked', done); v.currentTime = t; setTimeout(done, 4000); });
+        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        if ((await onFrame(c, i, n)) === false) break;
+      }
+    } finally { URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); }
+  }
+  async function runVideo(file) {
+    $('#steplist').innerHTML = `<li data-s="model"><i></i>آماده‌سازی هوش مصنوعی</li><li data-s="frames"><i></i>جدا کردن و اندازه‌گیری فریم‌ها</li><li data-s="combine"><i></i>ترکیب فریم‌ها (میانه‌ی اندازه‌ها)</li><li data-s="plan"><i></i>ساخت نقشه‌ی تزریق و آیین مراقبت</li>`;
+    $('#busyThumbs').innerHTML = ''; $('#busyImg').hidden = true; $('#sweep').hidden = false;
+    const mc = $('#meshCv'), mg = mc.getContext('2d'); mg.clearRect(0, 0, mc.width, mc.height);
+    $('#busyT').textContent = 'در حال خوانش ویدیو…';
+    go('s-busy');
+    const mark = (k, st) => { const li = $(`#steplist [data-s="${k}"]`); if (li) li.className = st; };
+    closeCam();
+    const limit = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), ms))]);
+    const fronts = [], sides = {};
+    const weak = []; let best = null, bestQ = -1, weakBest = null, weakQ = -1, total = 0;
+    try {
+      mark('model', 'now'); await limit(SkinEngine.init(), 60000); mark('model', 'done');
+      mark('frames', 'now');
+      const t0 = Date.now();
+      await seekFrames(file, async (c, i, n) => {
+        $('#busyT').textContent = `فریم ${fa(i + 1)} از ${fa(n)} · ${fa(fronts.length || weak.length)} فریم روبه‌رو اندازه‌گیری شد`;
+        mg.drawImage(c, 0, 0, mc.width, mc.height);
+        total++;
+        let r; try { r = await limit(SkinEngine.analyze(c, { allowPatch: false, loose: true }), 30000); } catch (e) { return Date.now() - t0 < 150000; }
+        if (!r.ok) return true;
+        // frames with a serious light or blur problem are kept apart and used only when no clean frame exists
+        const yaw = r.raw.yaw, flawed = (r.issues || []).some(q => q.sev === 'high' && q.k !== 'res' && q.k !== 'pose');
+        if (Math.abs(yaw) <= 0.12) {
+          const pool = flawed ? weak : fronts;
+          pool.push(JSON.parse(JSON.stringify(r.metrics)));
+          const q = r.raw.sharp * (1 - Math.abs(yaw) * 3) * (r.quality === 'good' ? 1.2 : 1);
+          if (!flawed && q > bestQ) { bestQ = q; best = r; $('#busyThumbs').innerHTML = `<img src="${jpgOf(r.view.canvas)}" class="on" alt="">`; }
+          if (flawed && q > weakQ) { weakQ = q; weakBest = r; }
+        } else if (!flawed && Math.abs(yaw) <= 0.35) {
+          const side = yaw > 0 ? 'right' : 'left', q = r.raw.sharp;
+          if (!sides[side] || q > sides[side].raw.sharp) sides[side] = r;
+        }
+        return Date.now() - t0 < 150000;
+      }, (n, D) => { $('#busyT').textContent = `ویدیوی ${fa(Math.round(D))} ثانیه‌ای · ${fa(n)} فریم`; });
+      mark('frames', 'done');
+    } catch (e) { renderError(e && e.message === 'video' ? 'video' : e && e.message === 'model-missing' ? 'model-missing' : 'error'); return; }
+    let used = fronts;
+    if (!best && weakBest) { best = weakBest; used = weak; best.quality = 'low'; }
+    if (!best) { renderError('video-no-face'); return; }
+    mark('combine', 'now');
+    combine(best, used);
+    // too few clear frontal frames: the result rests on little evidence, say so in the report
+    if (used.length < 3) { best.issues = (best.issues || []).concat({ k: 'frames', sev: 'mid' }); if (best.quality === 'good') best.quality = 'mid'; }
+    mark('combine', 'done');
+    const keys = ['front'].concat(Object.keys(sides));
+    await finishScan(best, sides, keys, mark, { frames: used.length, total, sides: Object.keys(sides).length });
+  }
+  $('#vidCam').addEventListener('click', () => { $('#vidCamInput').setAttribute('capture', facing); $('#vidCamInput').click(); });
+  $('#vidGal').addEventListener('click', () => $('#vidGalInput').click());
+  for (const id of ['#vidCamInput', '#vidGalInput']) $(id).addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) runVideo(f); });
   const EDGES = (() => { const e = []; const ch = (a, b, c) => { for (let i = a; i < b; i++) e.push([i, i + 1]); if (c) e.push([b, a]); };
     ch(0, 16); ch(17, 21); ch(22, 26); ch(27, 30); ch(31, 35); ch(36, 41, 1); ch(42, 47, 1); ch(48, 59, 1); ch(60, 67, 1);
     [[17, 36], [21, 39], [22, 42], [26, 45], [27, 39], [27, 42], [30, 31], [30, 35], [31, 48], [35, 54], [48, 4], [54, 12], [57, 8], [1, 36], [15, 45], [2, 31], [14, 35], [39, 31], [42, 35], [33, 51], [21, 22], [3, 48], [13, 54], [6, 58], [10, 56], [0, 17], [16, 26]].forEach(p => e.push(p)); return e; })();
@@ -2500,8 +2694,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
 
   // ---------- report ----------
-  const ERR = { 'front-no-face': 'در عکس روبه‌رو صورت کامل پیدا نشد. صورت رو کامل و صاف داخل بیضی بگیر.', 'little-skin': 'پوست کافی در عکس روبه‌رو دیده نشد؛ مو یا عینک رو کنار بزن.', 'model-missing': 'مدل هوش مصنوعی بارگیری نشد؛ اینترنت رو بررسی کن و صفحه رو دوباره باز کن.', error: 'بررسی عکس‌ها انجام نشد؛ با نور بهتر دوباره امتحان کن.', slow: 'تحلیل روی این گوشی بیش از حد طول کشید. اپ رو کامل ببند و دوباره باز کن و دوباره امتحان کن؛ اگه تکرار شد، فقط با عکس روبه‌رو امتحان کن.' };
-  const QTXT = { res: 'صورت در عکس روبه‌رو کوچکه؛ نزدیک‌تر بگیر.', dark: 'نور کمه؛ رو به پنجره بایست.', bright: 'نور خیلی شدیده یا فلاش خورده.', side: 'نور از یک طرف می‌تابه.', pose: 'صورت کمی چرخیده.', blur: 'عکس کمی تاره.', many: 'چند صورت در عکس بود؛ بزرگ‌ترین بررسی شد.' };
+  const ERR = { 'front-no-face': 'در عکس روبه‌رو صورت کامل پیدا نشد. صورت رو کامل و صاف داخل بیضی بگیر.', 'little-skin': 'پوست کافی در عکس روبه‌رو دیده نشد؛ مو یا عینک رو کنار بزن.', 'model-missing': 'مدل هوش مصنوعی بارگیری نشد؛ اینترنت رو بررسی کن و صفحه رو دوباره باز کن.', error: 'بررسی عکس‌ها انجام نشد؛ با نور بهتر دوباره امتحان کن.', video: 'این ویدیو روی این گوشی باز نشد. با دوربین خود اپ ضبط کن یا ویدیوی دیگه‌ای انتخاب کن.', 'video-no-face': 'در ویدیو فریم روبه‌روی سالمی پیدا نشد. ویدیو رو در نور روز بگیر، کل صورت از پیشانی تا چانه در کادر باشه و چند ثانیه صاف به دوربین نگاه کن.', slow: 'تحلیل روی این گوشی بیش از حد طول کشید. اپ رو کامل ببند و دوباره باز کن و دوباره امتحان کن؛ اگه تکرار شد، فقط با عکس روبه‌رو امتحان کن.' };
+  const QTXT = { res: 'صورت در عکس روبه‌رو کوچکه؛ نزدیک‌تر بگیر.', dark: 'نور کمه؛ رو به پنجره بایست.', bright: 'نور خیلی شدیده یا فلاش خورده.', side: 'نور از یک طرف می‌تابه.', pose: 'صورت کمی چرخیده.', blur: 'عکس کمی تاره.', many: 'چند صورت در عکس بود؛ بزرگ‌ترین بررسی شد.', frames: 'در ویدیو فقط چند فریم روبه‌رو و واضح بود (بقیه تار یا ناقص بودن). برای نتیجه‌ی دقیق‌تر گوشی رو ثابت نگه دار، کل صورت در کادر باشه و چند ثانیه آروم و صاف نگاه کن.' };
   function renderError(reason) {
     $('#s-report').innerHTML = `<div class="steps-top"><button class="back" type="button" id="errBack" aria-label="بازگشت">${I('<path d="m9 6 6 6-6 6"/>', 2)}</button></div>
       <div class="flow-h"><span class="en">Let's try again</span><h1>یک عکس <b>دیگه</b></h1></div><div class="notice err" role="alert">${iWarn}<div>${ERR[reason] || ERR.error}</div></div>
@@ -2531,7 +2725,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $('#s-report').innerHTML = `
       <div class="topbar">${BRAND.logoWhite}<img class="inovo-logo" src="${ART.inovoLogo}" alt="INOVOSENSE"></div>
       <div class="portrait-hero reveal"><div class="arch"><img src="${rec.portraitJpg}" alt="پرتره"></div>${orbHtml(o)}
-        ${rec.person ? `<p class="for-person">خوانش برای <b>${esc(rec.person.name)}</b> · ${fa(SOLAR_YEAR - rec.person.birthYear)} سال</p>` : '<p class="caps" style="margin:14px 0 0">پرتره‌ی پوست</p>'}<h1>${verdictTitle(o)}</h1><span class="faint small">${fdate(rec.t)} · ${fa(rec.shotsTaken.length)} عکس</span>
+        ${rec.person ? `<p class="for-person">خوانش برای <b>${esc(rec.person.name)}</b> · ${fa(SOLAR_YEAR - rec.person.birthYear)} سال</p>` : '<p class="caps" style="margin:14px 0 0">پرتره‌ی پوست</p>'}<h1>${verdictTitle(o)}</h1><span class="faint small">${fdate(rec.t)} · ${rec.video ? `ویدیو · میانه‌ی ${fa(rec.video.frames)} فریم` : fa(rec.shotsTaken.length) + ' عکس'}</span>
         <div class="tagrow">${R.concerns.slice(0, 3).map(c => `<span class="htag">${esc(c.label)}</span>`).join('') || '<span class="htag">همه‌ی نشانه‌ها در تعادل</span>'}</div></div>
       <div class="card savebar reveal d2" id="saveBar"></div>
       ${qual.length ? `<div class="notice warn">${iWarn}<div><b>برای دقت بیشتر دفعه‌ی بعد:</b><ul>${qual.map(x => `<li>${QTXT[x.k]}</li>`).join('')}</ul></div></div>` : ''}
@@ -2597,9 +2791,17 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const vol = per ? `<b class="num">${mlText(per)}</b><small>میلی‌لیتر هر طرف</small>` : it.ml ? `<b class="num">${mlText(it.ml)}</b><small>میلی‌لیتر</small>` : `<small>جلسه‌ای</small>`;
     return `<article class="card pitem" style="--pc:${p.color}" data-product="${it.product}" role="button" tabindex="0"><header>${it.product === 'mesocell' ? `<span class="jm">M+</span>` : `<img src="${jelly(it.product)}" alt="">`}
         <h3>${esc(it.area)}<small>INOVOSENSE ${p.name}${it.alt ? ` <span class="alt">· ${esc(it.alt)}</span>` : ''}</small></h3><div class="ml">${vol}</div></header>
+      ${needBar(it.need)}
       <div class="badges">${it.risk ? `<span class="rk ${it.risk}">${Recs.RISK[it.risk].label}</span>` : ''}${it.evidence === 'catalog' ? `<span class="ev cat">فقط با نظر پزشک · خارج از دفترچه</span>` : it.evidence ? `<span class="ev">طبق دفترچه‌ی رسمی</span>` : ''}</div>
       <div class="kv"><div><small>روش تزریق</small><span>${it.tech.join('، ')}</span></div><div><small>عمق</small><span>${esc(it.depth || p.depthLabel)}</span></div><div><small>جلسات</small><span>${esc(it.sessions)}</span></div><div><small>${per ? 'جمع دو طرف' : 'دلیل'}</small><span class="why">${per && it.ml ? mlText(it.ml) + ' میلی‌لیتر' : SRC[it.source] || ''}</span></div></div>
       ${it.note ? `<p>${esc(it.note)}</p>` : ''}</article>`;
+  }
+  // five-step need scale, white (no need) to black (very much needed), with where the number came from
+  function needBar(nd) {
+    if (!nd) return '';
+    const L = Recs.NEED.LEVELS;
+    return `<div class="needbar" style="--nc:${L[nd.lvl].c}"><div class="nb-scale">${L.map((l, i) => `<i class="${i === nd.lvl ? 'on' : ''}" style="background:${l.c}"></i>`).join('')}</div>
+      <span><b>${L[nd.lvl].t}</b> · ${nd.measured ? `اندازه‌گیری‌شده${nd.score != null ? ' · شدت ' + fa(Math.round(nd.v * 100)) + '٪' : ''}` : 'بر اساس گفته‌ی خودت'}</span></div>`;
   }
   function phaseBlock(title, sub, items) {
     if (!items.length) return '';
@@ -2622,7 +2824,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const L = [`خلاصه‌ی بالینی · اپ پوست‌نگار KMT · ${fdate(rec.t)}`, `${pr.name || ''}${age ? ' · ' + fa(age) + ' سال' : ''}${pr.gender === 'female' ? ' · زن' : pr.gender === 'male' ? ' · مرد' : ''}`];
     if (g) L.push(`پیری نوری (برآورد Glogau): ${g.label}`);
     L.push('', 'نقشه‌ی پیشنهادی:');
-    for (const it of pl.items) L.push(`- ${it.phase === 2 ? '[مرحله‌ی ۲] ' : it.phase === 0 ? '[کیفیت پوست] ' : ''}${it.area}: INOVOSENSE ${P[it.product].name} · ${it.perSide ? mlText(it.perSide) + ' ml هر طرف' : it.ml ? mlText(it.ml) + ' ml' : ''} · ${it.depth || P[it.product].depthLabel} · ${it.tech.join('، ')}${it.risk ? ' · ' + Recs.RISK[it.risk].short : ''}${it.evidence === 'catalog' ? ' · خارج از IFU' : ''}`);
+    for (const it of pl.items) L.push(`- ${it.phase === 2 ? '[مرحله‌ی ۲] ' : it.phase === 0 ? '[کیفیت پوست] ' : ''}${it.area}: INOVOSENSE ${P[it.product].name} · ${it.perSide ? mlText(it.perSide) + ' ml هر طرف' : it.ml ? mlText(it.ml) + ' ml' : ''} · ${it.depth || P[it.product].depthLabel} · ${it.tech.join('، ')}${it.need ? ' · نیاز: ' + Recs.NEED.LEVELS[it.need.lvl].t + (it.need.measured ? ' (اندازه‌گیری ' + fa(Math.round(it.need.v * 100)) + '٪)' : '') : ''}${it.risk ? ' · ' + Recs.RISK[it.risk].short : ''}${it.evidence === 'catalog' ? ' · خارج از IFU' : ''}`);
     for (const a of pl.advice || []) L.push(`- ${a.area}: فیلر پیشنهاد نشده (${Recs.RISK[a.risk].short})`);
     if (pl.blocks.length || pl.cautions.length) { L.push('', 'غربالگری:'); for (const x of pl.blocks.concat(pl.cautions)) L.push('- ' + x); }
     L.push('', 'این خلاصه از پردازش تصویر روی گوشی و پاسخ‌های بیمار ساخته شده و جای معاینه رو نمی‌گیره.');
@@ -3010,23 +3212,24 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   })();
 
   // ---------- live map: anatomical zones tracked on the face in real time ----------
-  /* Zones are placed from the 68 landmarks (not detected wrinkles: that needs the full scan). When a scan exists,
-     the zones in the person's own plan are drawn in their product colour with the planned volume. */
+  /* Zones are placed from the 68 landmarks. While the face is steady, full camera frames are analysed one after
+     another and each measurable zone keeps the median of its last readings; that median sets the zone's colour on
+     the five-step need scale (white → black) and the volume in the live plan. Volume areas (cheek, lips, chin, …)
+     cannot be measured from a flat image: they show the person's scan plan, or "needs examination". */
   const LIVE = {
-    forehead: { t: 'خطوط پیشانی', d: 'خطوط افقی که با بالا بردن ابرو ایجاد می‌شن.' },
-    glabella: { t: 'خط اخم', d: 'خطوط عمودی بین دو ابرو.' },
-    temples: { t: 'شقیقه', d: 'گودی کنار پیشانی، بالای گوشه‌ی چشم.', def: 'style' },
+    forehead: { t: 'خطوط پیشانی', d: 'خطوط افقی که با بالا بردن ابرو ایجاد می‌شن.', def: 'silk' },
+    glabella: { t: 'خط اخم', d: 'خطوط عمودی بین دو ابرو.', def: 'silk' },
+    temples: { t: 'شقیقه', d: 'گودی کنار پیشانی، بالای گوشه‌ی چشم.', def: 'style', vol: 1 },
     crows: { t: 'پنجه‌کلاغی', d: 'خطوط گوشه‌ی چشم که با خنده عمیق‌تر می‌شن.', def: 'silk' },
     undereye: { t: 'زیر چشم', d: 'گودی و چین زیر چشم (ناودان اشک).', def: 'silk' },
-    cheeks: { t: 'گونه', d: 'حجم گونه و برجستگی استخوان گونه.', def: 'shape' },
+    cheeks: { t: 'گونه', d: 'حجم گونه و برجستگی استخوان گونه.', def: 'shape', vol: 1 },
     nasolabial: { t: 'خط خنده', d: 'چین کنار بینی تا گوشه‌ی لب.', def: 'smile' },
-    perioral: { t: 'خطوط دور لب', d: 'خطوط ریز عمودی بالای لب.', def: 'silk' },
-    lips: { t: 'لب', d: 'حجم و فرم لب.', def: 'smile' },
+    perioral: { t: 'خطوط دور لب', d: 'خطوط ریز عمودی بالای لب.', def: 'silk', vol: 1 },
+    lips: { t: 'لب', d: 'حجم و فرم لب.', def: 'smile', vol: 1 },
     marionette: { t: 'خط غم', d: 'چین از گوشه‌ی لب به سمت چانه.', def: 'smile' },
-    chin: { t: 'چانه', d: 'فرم و جلوآمدگی چانه.', def: 'style' },
-    jawline: { t: 'خط فک', d: 'تعریف خط و زاویه‌ی فک.', def: 'shape' },
+    chin: { t: 'چانه', d: 'فرم و جلوآمدگی چانه.', def: 'style', vol: 1 },
+    jawline: { t: 'خط فک', d: 'تعریف خط و زاویه‌ی فک.', def: 'shape', vol: 1 },
   };
-  const NO_FILLER = { forehead: 1, glabella: 1 };
   function liveShapes(A) {
     const avg = (i, j) => { let x = 0, y = 0; for (let k = i; k <= j; k++) { x += A[k].x; y += A[k].y; } const n = j - i + 1; return { x: x / n, y: y / n }; };
     const eR = avg(36, 41), eL = avg(42, 47), iod = Math.hypot(eL.x - eR.x, eL.y - eR.y) || 1;
@@ -3052,61 +3255,84 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       jawline: { shapes: [L(A.slice(3, 7)), L(A.slice(10, 14))], at: A[12] },
     };
   }
-  let liveStream = null, liveOn = false, livePts = null, liveLost = 0, liveSel = null, liveAll = false;
-  const liveSmall = document.createElement('canvas');
+  let liveStream = null, liveOn = false, livePts = null, liveLost = 0, liveSel = null, liveRaw = null;
+  const liveSmall = document.createElement('canvas'), liveFull = document.createElement('canvas');
   let liveScan = null;
+  // live measurement: the last readings of each measurable zone (scores 0–100, higher = smoother skin)
+  let liveBuf = {}, liveFrames = 0, liveBusy = false, liveTried = 0, liveBuilt = null;
+  const NEED_KEYS = Object.keys(Recs.NEED.MEASURED);
+  const medianOf = (arr) => { const v = arr.slice().sort((x, y) => x - y), n = v.length; return n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2; };
+  const liveReady = (k) => liveBuf[k] && liveBuf[k].length >= 2;
+  // the live plan: volumes from the live measurement for the measured zones, the scan's plan for the rest
+  function liveBuild() {
+    if (!NEED_KEYS.some(liveReady)) return null;
+    const detail = {};
+    for (const k of NEED_KEYS) { const lk = Recs.NEED.MEASURED[k]; if (liveReady(k)) { const sc = medianOf(liveBuf[k]); detail[lk] = { score: sc, n: sc < 86 ? 1 : 0, mm: 0, level: sc >= 86 ? 'good' : sc >= 56 ? 'mid' : 'high' }; } }
+    const pr = liveScan && liveScan.person ? guestProfile(liveScan.person) : recsProfile();
+    return Recs.build({ metrics: { lines: { detail } } }, { concerns: [] }, pr);
+  }
   function livePlan() {
-    const last = liveScan, out = {};
-    if (!last) return null;
-    for (const it of last.recs.plan.items) if (LIVE[it.key]) out[it.key] = it;
-    for (const a of last.recs.plan.advice || []) if (LIVE[a.key]) out[a.key] = { advice: a };
+    const out = {};
+    if (liveScan) for (const it of liveScan.recs.plan.items) if (LIVE[it.key]) out[it.key] = it;
+    if (liveBuilt) for (const it of liveBuilt.plan.items) if (LIVE[it.key] && NEED_KEYS.includes(it.key)) out[it.key] = it;
     return out;
   }
-  function liveColor(key, plan) {
-    if (NO_FILLER[key]) return '#9AA3B8';
-    const it = plan && plan[key];
-    if (it && it.product) return P[it.product].color;
-    return P[LIVE[key].def].color;
+  /* The need of a zone and where it came from: live frames, the saved scan, the plan, or nothing yet. */
+  function liveNeed(key) {
+    if (NEED_KEYS.includes(key)) {
+      if (liveReady(key)) { const sc = medianOf(liveBuf[key]); return { lvl: Recs.NEED.level(sc), v: Recs.NEED.v(sc), src: 'live', n: liveBuf[key].length }; }
+      const m = liveScan && Recs.NEED.measure(liveScan.metrics)[key];
+      if (m) return { lvl: m.lvl, v: m.v, src: 'scan' };
+      return null;
+    }
+    const it = liveScan && liveScan.recs.plan.items.find(i => i.key === key);
+    return it && it.need ? { lvl: it.need.lvl, v: it.need.v, src: it.need.measured ? 'scan' : 'self' } : null;
   }
+  const LVL = Recs.NEED.LEVELS;
+  const liveColor = (key) => { const n = liveNeed(key); return n ? LVL[n.lvl].c : LIVE[key].vol ? 'rgba(255,255,255,.55)' : '#7FD8E0'; };
   function renderLiveChips() {
-    const plan = livePlan(), keys = Object.keys(LIVE);
-    const mine = plan ? keys.filter(k => plan[k]) : [];
-    const order = mine.concat(keys.filter(k => !mine.includes(k)));
-    $('#liveChips').innerHTML = (plan ? `<button type="button" class="lchip all ${liveAll ? 'on' : ''}" data-lall>${liveAll ? 'فقط نقشه‌ی من' : 'همه‌ی ناحیه‌ها'}</button>` : '') +
-      order.map(k => `<button type="button" class="lchip ${liveSel === k ? 'on' : ''} ${plan && !plan[k] ? 'dim' : ''}" data-lzone="${k}" style="--zc:${liveColor(k, plan)}"><i></i>${LIVE[k].t}</button>`).join('');
+    const keys = Object.keys(LIVE), score = (k) => { const n = liveNeed(k); return n ? n.lvl : -1; };
+    const order = keys.slice().sort((x, y) => score(y) - score(x));
+    $('#liveChips').innerHTML = order.map(k => { const n = liveNeed(k); return `<button type="button" class="lchip ${liveSel === k ? 'on' : ''} ${n ? '' : 'dim'}" data-lzone="${k}" style="--zc:${liveColor(k)}"><i class="${n ? 'need' : ''}"></i>${LIVE[k].t}${n ? ' · ' + LVL[n.lvl].t : ''}</button>`; }).join('');
   }
+  function renderLegend() { $('#liveLegend').innerHTML = LVL.map(l => `<span><i style="background:${l.c}"></i>${l.t}</span>`).join(''); }
   function liveInfo(key) {
     liveSel = key; renderLiveChips();
-    const plan = livePlan(), it = plan && plan[key], z = LIVE[key], card = $('#liveCard');
+    const plan = livePlan(), it = plan[key], z = LIVE[key], card = $('#liveCard'), n = liveNeed(key);
+    const srcT = n ? (n.src === 'live' ? `اندازه‌گیری زنده از ${fa(n.n)} فریم` : n.src === 'scan' ? 'از خوانش کامل' : 'بر اساس گفته‌ی خودت') : '';
+    const needH = n ? `<div class="lc-need" style="--nc:${LVL[n.lvl].c}"><span class="sw"></span><b>${LVL[n.lvl].t}</b><span class="faint">${srcT}${n.src !== 'self' ? ' · شدت ' + fa(Math.round(n.v * 100)) + '٪' : ''}</span></div>`
+      : `<div class="lc-need"><span>${z.vol ? 'حجم این ناحیه از تصویر تخت قابل اندازه‌گیری نیست؛ نیاز به معاینه‌ی حضوری یا خوانش کامل داره.' : 'در حال اندازه‌گیری… صورت رو ثابت و روبه‌روی نور نگه دار.'}</span></div>`;
     let body;
-    if (it && it.product) {
+    if (it && it.product && (!n || n.lvl >= 1)) {
       const p = P[it.product];
       body = `<div class="lc-prod" style="--pc:${p.color}"><b>INOVOSENSE ${p.name}</b><span class="num">${it.perSide ? mlText(it.perSide) + ' میلی‌لیتر هر طرف' : it.ml ? mlText(it.ml) + ' میلی‌لیتر' : esc(it.sessions)}</span></div>
         <p>${it.tech.join('، ')} · ${esc(it.depth || p.depthLabel)}</p>
-        <div class="badges">${it.risk ? `<span class="rk ${it.risk}">${Recs.RISK[it.risk].label}</span>` : ''}${it.evidence === 'catalog' ? '<span class="ev cat">فقط با نظر پزشک</span>' : ''}${it.phase === 2 ? '<span class="ev">مرحله‌ی دوم</span>' : ''}</div>
+        <div class="badges">${it.risk ? `<span class="rk ${it.risk}">${Recs.RISK[it.risk].label}</span>` : ''}${it.evidence === 'catalog' ? '<span class="ev cat">فقط با نظر پزشک · طبق کاتالوگ</span>' : ''}</div>
+        ${it.note ? `<p class="small faint">${esc(it.note)}</p>` : ''}
         <button type="button" class="btn btn-ghost btn-block" data-product="${it.product}">اطلاعات کامل ${p.name}</button>`;
-    } else if (NO_FILLER[key] || (it && it.advice)) {
-      body = `<p>${esc(it && it.advice ? it.advice.text : 'طبق دفترچه‌ی رسمی، فیلرهای Silk و Smile نباید در بین ابرو تزریق بشن و پیشانی از پرخطرترین نواحیه. برای این خطوط پزشک درمان مناسب دیگه‌ای رو بررسی می‌کنه.')}</p>`;
     } else {
       const p = P[z.def];
       body = `<div class="lc-prod" style="--pc:${p.color}"><b>معمولاً INOVOSENSE ${p.name}</b></div>
-        <p>${plan ? 'در خوانش آخرت، این ناحیه نیازی نشون نداد.' : 'برای اینکه بدونی این ناحیه در صورت تو چقدر لازمه، یک خوانش کامل بگیر.'}</p>
-        <div class="row2"><button type="button" class="btn btn-ghost" data-product="${z.def}">درباره‌ی ${p.name}</button>${plan ? '' : '<button type="button" class="btn btn-primary" data-live-scan>خوانش کامل</button>'}</div>`;
+        <p>${n && n.lvl === 0 ? 'در اندازه‌گیری، این ناحیه نیازی به فیلر نشون نداد.' : 'برای برنامه‌ی دقیق‌تر، یک خوانش کامل بگیر.'}</p>
+        <div class="row2"><button type="button" class="btn btn-ghost" data-product="${z.def}">درباره‌ی ${p.name}</button>${liveScan ? '' : '<button type="button" class="btn btn-primary" data-live-scan>خوانش کامل</button>'}</div>`;
     }
-    card.innerHTML = `<div class="lc-h"><b>${z.t}</b><button type="button" class="lc-x" data-lclose aria-label="بستن">×</button></div><p class="lc-d">${z.d}</p>${body}`;
+    card.innerHTML = `<div class="lc-h"><b>${z.t}</b><button type="button" class="lc-x" data-lclose aria-label="بستن">×</button></div><p class="lc-d">${z.d}</p>${needH}${body}`;
     card.hidden = false; buzz();
   }
   async function openLive() {
     if (!canLive) { toast('دوربین زنده در این مرورگر در دسترس نیست؛ اپ رو در مرورگر اصلی گوشی باز کن'); return; }
-    $('#live').hidden = false; $('#liveCard').hidden = true; liveSel = null; liveAll = false; renderLiveChips();
+    $('#live').hidden = false; $('#liveCard').hidden = true; liveSel = null;
+    liveBuf = {}; liveFrames = 0; liveTried = 0; liveBuilt = null; renderLegend(); renderLiveChips();
+    $('#liveMeter').hidden = true;
     $('#liveMsg').textContent = 'در حال روشن کردن دوربین…';
     try {
       if (liveStream) liveStream.getTracks().forEach(t => t.stop());
-      liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1280 }, height: { ideal: 1280 } }, audio: false });
+      // a sharper stream: the fine lines are measured on full frames, the tracking still runs on a small copy
+      liveStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1920 }, height: { ideal: 1920 } }, audio: false });
       const v = $('#liveVideo'); v.srcObject = liveStream; v.classList.toggle('mirror', facing === 'user'); await v.play();
       $('#liveMsg').textContent = 'در حال آماده‌سازی…';
       await SkinEngine.init();
-      liveOn = true; livePts = null; liveLost = 0; liveDetect(); liveDraw();
+      liveOn = true; livePts = null; liveLost = 0; liveDetect(); liveDraw(); setTimeout(liveMeasure, 1200);
     } catch (e) { closeLive(); toast('دوربین باز نشد؛ اجازه‌ی دوربین رو بررسی کن'); }
   }
   function closeLive() { liveOn = false; if (liveStream) liveStream.getTracks().forEach(t => t.stop()); liveStream = null; $('#live').hidden = true; }
@@ -3125,16 +3351,46 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
           const d = livePts ? up.reduce((s, q, i) => s + Math.hypot(q.x - livePts[i].x, q.y - livePts[i].y), 0) / up.length : 1e9;
           const eye = Math.hypot(up[45].x - up[36].x, up[45].y - up[36].y) || 1, a = d > eye * 0.12 ? 1 : 0.6;
           livePts = livePts ? livePts.map((p, i) => ({ x: p.x + (up[i].x - p.x) * a, y: p.y + (up[i].y - p.y) * a })) : up;
+          liveRaw = { pts: up, t: performance.now(), still: d < eye * 0.05 ? ((liveRaw && liveRaw.still) || 0) + 1 : 0 };
           liveLost = 0;
-          $('#liveMsg').textContent = liveScan ? `نقشه‌ی خوانش ${liveScan.person ? esc(liveScan.person.name) : 'تو'} · ${fdate(liveScan.t, { day: 'numeric', month: 'long' })}؛ روی هر ناحیه بزن` : 'روی هر ناحیه بزن تا ببینی چیه و چی لازم داره';
+          $('#liveMsg').textContent = liveFrames ? 'روی هر ناحیه بزن تا نیاز و مقدار رو ببینی' : 'صورت رو ثابت نگه دار تا اندازه‌گیری شروع بشه';
         } else {
           // never draw on a doubtful face: a wrong map is worse than none
           if (why !== 'none' || ++liveLost > 4) livePts = null;
+          liveRaw = null;
           $('#liveMsg').textContent = { close: 'کمی عقب‌تر برو تا کل صورتت از پیشانی تا چانه در کادر باشه', far: 'کمی نزدیک‌تر بیا', edge: 'صورتت رو وسط کادر بیار', none: 'صورتت رو روبه‌روی دوربین بیار', odd: 'صاف به دوربین نگاه کن' }[why];
         }
       } catch (e) {}
     }
-    setTimeout(liveDetect, 40);
+    setTimeout(liveDetect, liveBusy ? 120 : 40);
+  }
+  /* One full skin analysis on the current camera frame, when the face is whole, frontal and steady. */
+  async function liveMeasure() {
+    if (!liveOn) return;
+    const v = $('#liveVideo'), r = liveRaw;
+    if (!liveBusy && r && r.still >= 2 && performance.now() - r.t < 250 && v.videoWidth) {
+      liveBusy = true;
+      const meter = $('#liveMeter'); meter.hidden = false; meter.classList.remove('done');
+      $('#liveMeterT').textContent = liveFrames ? `اندازه‌گیری زنده · ${fa(liveFrames)} فریم` : 'در حال اندازه‌گیری…';
+      try {
+        const VW = v.videoWidth, VH = v.videoHeight, k = Math.min(1, 1600 / Math.max(VW, VH));
+        liveFull.width = Math.round(VW * k); liveFull.height = Math.round(VH * k);
+        liveFull.getContext('2d').drawImage(v, 0, 0, liveFull.width, liveFull.height);
+        const res = await SkinEngine.analyze(liveFull, { allowPatch: false, pts: r.pts.map(p => ({ x: p.x * k, y: p.y * k })) });
+        liveTried++;
+        // a turned head foreshortens the lines and a dark or blurry frame hides them: such frames are not counted
+        const bad = !res.ok || Math.abs(res.raw.yaw) > 0.12 || (res.issues || []).some(q => q.sev === 'high' && q.k !== 'res');
+        if (!bad) {
+          const m = Recs.NEED.measure(res.metrics);
+          for (const key of NEED_KEYS) if (m[key]) { const b = liveBuf[key] || (liveBuf[key] = []); b.push(m[key].score); if (b.length > 9) b.shift(); }
+          liveFrames++; liveBuilt = liveBuild(); renderLiveChips(); if (liveSel) liveInfo(liveSel);
+        }
+        $('#liveMeterT').textContent = bad ? (res.ok && Math.abs(res.raw.yaw) > 0.12 ? 'صاف روبه‌روی دوربین نگاه کن' : 'نور کافی نیست یا تصویر تاره؛ رو به پنجره بایست') : `اندازه‌گیری زنده · ${fa(liveFrames)} فریم`;
+        if (liveFrames >= 6) meter.classList.add('done');
+      } catch (e) {}
+      liveBusy = false;
+    }
+    setTimeout(liveMeasure, liveFrames >= 9 ? 2500 : 700);
   }
   // is this a whole, plausible face? returns null when fine, else the reason
   function liveCheck(A, VW, VH) {
@@ -3163,36 +3419,40 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
     if (livePts) {
-      const m = liveMap(), Z = liveShapes(livePts), plan = livePlan(), t = performance.now() / 1000;
+      const m = liveMap(), Z = liveShapes(livePts), t = performance.now() / 1000;
       liveDraw.anchors = [];
+      const path = (sh) => {
+        g.beginPath();
+        if (sh.kind === 'ellipse') { const c = m(sh.c); g.ellipse(c.x, c.y, sh.rx * m.s, sh.ry * m.s, facing === 'user' ? -sh.rot : sh.rot, 0, Math.PI * 2); }
+        else if (sh.kind === 'line' && sh.pts.length === 3) {
+          // a smooth curve through the middle point instead of a sharp V
+          const [p0, p1, p2] = sh.pts.map(m), cx = 2 * p1.x - (p0.x + p2.x) / 2, cy = 2 * p1.y - (p0.y + p2.y) / 2;
+          g.moveTo(p0.x, p0.y); g.quadraticCurveTo(cx, cy, p2.x, p2.y);
+        }
+        else { sh.pts.forEach((p, i) => { const q = m(p); i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y); }); if (sh.kind === 'closed') g.closePath(); }
+      };
       for (const key of Object.keys(LIVE)) {
-        const z = Z[key], inPlan = plan && plan[key], show = !plan || liveAll || inPlan || liveSel === key;
-        if (!show) continue;
-        const col = liveColor(key, plan), sel = liveSel === key, faint = plan && !inPlan && !sel;
-        g.save();
-        g.strokeStyle = col; g.fillStyle = col; g.lineCap = 'round'; g.lineJoin = 'round';
-        g.globalAlpha = faint ? 0.35 : 1; g.lineWidth = sel ? 4 : 2.6; g.shadowColor = col; g.shadowBlur = sel ? 18 : 10;
-        if (NO_FILLER[key] || (inPlan && inPlan.evidence === 'catalog')) { g.setLineDash([6, 6]); g.lineDashOffset = -t * 20; }
+        const z = Z[key], n = liveNeed(key), sel = liveSel === key;
+        const col = n ? LVL[n.lvl].c : liveColor(key);
+        // a contrasting halo keeps white zones visible on light skin and black zones visible on dark skin
+        const halo = !n ? null : n.lvl <= 1 ? 'rgba(3,5,26,.85)' : 'rgba(255,255,255,.9)';
+        g.save(); g.lineCap = 'round'; g.lineJoin = 'round';
+        if (!n) { g.setLineDash([5, 6]); g.lineDashOffset = -t * 18; g.globalAlpha = sel ? 1 : 0.75; }
+        const w = n ? (sel ? 7 : 5) : (sel ? 3.5 : 2);
         for (const sh of z.shapes) {
-          g.beginPath();
-          if (sh.kind === 'ellipse') { const c = m(sh.c); g.ellipse(c.x, c.y, sh.rx * m.s, sh.ry * m.s, facing === 'user' ? -sh.rot : sh.rot, 0, Math.PI * 2); }
-          else if (sh.kind === 'line' && sh.pts.length === 3) {
-            // a smooth curve through the middle point instead of a sharp V
-            const [p0, p1, p2] = sh.pts.map(m), cx = 2 * p1.x - (p0.x + p2.x) / 2, cy = 2 * p1.y - (p0.y + p2.y) / 2;
-            g.moveTo(p0.x, p0.y); g.quadraticCurveTo(cx, cy, p2.x, p2.y);
-          }
-          else { sh.pts.forEach((p, i) => { const q = m(p); i ? g.lineTo(q.x, q.y) : g.moveTo(q.x, q.y); }); if (sh.kind === 'closed') g.closePath(); }
-          g.stroke();
-          if (sel && sh.kind !== 'line') { g.globalAlpha = 0.12 + 0.08 * Math.sin(t * 4); g.fill(); g.globalAlpha = 1; }
+          path(sh);
+          if (n && sh.kind !== 'line') { g.globalAlpha = 0.5 + (sel ? 0.12 * Math.sin(t * 4) : 0); g.fillStyle = col; g.fill(); g.globalAlpha = 1; }
+          if (halo) { g.strokeStyle = halo; g.lineWidth = w + 4; g.stroke(); }
+          g.strokeStyle = col; g.lineWidth = w; g.stroke();
         }
         g.restore();
         const a = m(z.at); liveDraw.anchors.push({ key, x: a.x, y: a.y });
-        if ((inPlan || sel) && !faint) {
-          const label = LIVE[key].t + (inPlan && inPlan.product ? ' · ' + P[inPlan.product].name : '');
+        if (sel || (n && n.lvl >= 2)) {
+          const label = LIVE[key].t + (n ? ' · ' + LVL[n.lvl].t : '');
           g.save(); g.font = '600 12px Vazirmatn, system-ui, sans-serif'; g.direction = 'rtl'; g.textAlign = 'center';
-          const w = g.measureText(label).width + 22, x = Math.min(W - w / 2 - 6, Math.max(w / 2 + 6, a.x)), y = a.y - 16;
-          g.fillStyle = 'rgba(3,5,26,.72)'; g.strokeStyle = col; g.lineWidth = 1;
-          g.beginPath(); if (g.roundRect) g.roundRect(x - w / 2, y - 12, w, 24, 12); else g.rect(x - w / 2, y - 12, w, 24); g.fill(); g.stroke();
+          const lw = g.measureText(label).width + 22, x = Math.min(W - lw / 2 - 6, Math.max(lw / 2 + 6, a.x)), y = a.y - 16;
+          g.fillStyle = 'rgba(3,5,26,.78)'; g.strokeStyle = n ? (n.lvl >= 3 ? '#fff' : col) : '#7FD8E0'; g.lineWidth = 1;
+          g.beginPath(); if (g.roundRect) g.roundRect(x - lw / 2, y - 12, lw, 24, 12); else g.rect(x - lw / 2, y - 12, lw, 24); g.fill(); g.stroke();
           g.fillStyle = '#fff'; g.fillText(label, x, y + 4); g.restore();
         }
       }
@@ -3208,7 +3468,6 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   $('#liveFlip').addEventListener('click', () => { setWho(facing === 'user' ? 'environment' : 'user'); openLive(); });
   $('#live').addEventListener('click', (e) => {
     const z = e.target.closest('[data-lzone]'); if (z) { liveInfo(z.dataset.lzone); return; }
-    if (e.target.closest('[data-lall]')) { liveAll = !liveAll; renderLiveChips(); return; }
     if (e.target.closest('[data-lclose]')) { $('#liveCard').hidden = true; liveSel = null; renderLiveChips(); return; }
     if (e.target.id === 'liveCv' && liveDraw.anchors) {
       const r = e.target.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
