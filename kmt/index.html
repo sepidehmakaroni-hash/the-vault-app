@@ -530,6 +530,27 @@ body.noscroll { overflow: hidden; }
 .ps-cta { margin-top: 26px; }
 .ps-meso, .prod .jelly.meso, .pitem .jm { direction: ltr; unicode-bidi: isolate; }
 
+/* ---------- plan preview ---------- */
+.simcard .cmp { margin-top: 0; }
+.sim-hint { text-align: center; font-size: 12px; color: var(--faint); margin: 10px 0 0; }
+.sim-busy { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); font-size: 12px; padding: 3px 12px; border-radius: 99px; background: rgba(3,5,26,.65); border: 1px solid var(--hair-2); }
+.sim-note { font-size: 12.5px; color: var(--mist); line-height: 1.9; font-weight: 300; margin: 16px 0 0; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(241,194,125,.35); background: rgba(241,194,125,.07); }
+.sim-note b { color: var(--mid); font-weight: 600; }
+.sim-pro { display: grid; gap: 4px; margin-top: 12px; padding: 12px 14px; border-radius: 16px; border: 1px dashed var(--hair-2); font-size: 12.5px; color: var(--faint); }
+.sim-pro b { color: var(--aqua); font-size: 13px; font-weight: 600; }
+/* product sheet navigation */
+.ps-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin: -6px 0 0; position: relative; z-index: 2; }
+.ps-dots { display: flex; gap: 8px; }
+.ps-dots button { width: 9px; height: 9px; padding: 0; border-radius: 99px; border: 0; background: rgba(255,255,255,.22); transition: width .3s var(--ease), background .3s; }
+.ps-dots button.on { width: 26px; background: var(--pc); box-shadow: 0 0 10px var(--pc); }
+.ps-arrow { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--hair-2); background: rgba(255,255,255,.04); color: var(--pearl); display: grid; place-items: center; }
+.ps-arrow svg { width: 16px; height: 16px; }
+.sheet-card { touch-action: pan-y; }
+#simChips { gap: 6px; }
+#simChips .chip span { padding: 6px 12px; font-size: 12.5px; gap: 6px; }
+.ps-nav { margin: 12px 0 4px; }
+.ps-in { margin-top: 0; padding-top: 8px; }
+
 </style>
 
 <div class="sea" aria-hidden="true"><div class="layer" id="seaHero"><video id="seaVideo" muted loop playsinline preload="auto" aria-hidden="true"></video></div><div class="layer" id="seaDeep"></div><div class="layer" id="seaSurface"></div><div class="rays"></div><div class="veil"></div><div class="motes"></div><div class="motes m2"></div></div>
@@ -1358,6 +1379,215 @@ const SkinEngine = (() => {
   return { init, analyze, analyzeDetail, detect, detectQuick, fileToCanvas, OUT_W, OUT_H };
 })();
 </script>
+<script>/* FaceSim — an approximate "after the injection plan" preview, computed on the phone.
+   Works on the aligned face frame from SkinEngine (768×960, inter-ocular distance 240 px):
+   - lines and folds are softened by lifting dark valleys toward a blurred copy (lighten-only, so
+     hair and shadows never spread),
+   - volume areas (lips, cheeks, chin) get a small smooth warp plus soft light,
+   - whole-face treatments (Shine, Mesocell Plus) get a light even glow.
+   Every effect is kept deliberately modest and scales with the plan's level. It is a preview,
+   not a prediction. */
+const FaceSim = (() => {
+  const IOD = 240;
+
+  // ---------- helpers ----------
+  function boxBlur(src, W, H, r) {
+    // three passes of a separable box ≈ Gaussian; operates on one Float32 channel
+    const tmp = new Float32Array(W * H), out = new Float32Array(src);
+    for (let pass = 0; pass < 3; pass++) {
+      for (let y = 0; y < H; y++) {
+        let acc = 0; const row = y * W;
+        for (let x = -r; x <= r; x++) acc += out[row + Math.min(W - 1, Math.max(0, x))];
+        for (let x = 0; x < W; x++) {
+          tmp[row + x] = acc / (2 * r + 1);
+          acc += out[row + Math.min(W - 1, x + r + 1)] - out[row + Math.max(0, x - r)];
+        }
+      }
+      for (let x = 0; x < W; x++) {
+        let acc = 0;
+        for (let y = -r; y <= r; y++) acc += tmp[Math.min(H - 1, Math.max(0, y)) * W + x];
+        for (let y = 0; y < H; y++) {
+          out[y * W + x] = acc / (2 * r + 1);
+          acc += tmp[Math.min(H - 1, y + r + 1) * W + x] - tmp[Math.max(0, y - r) * W + x];
+        }
+      }
+    }
+    return out;
+  }
+  function blurRGB(rgb, W, H, r) { return rgb.map(ch => boxBlur(ch, W, H, r)); }
+  // feathered weight map (0..1) from polygons, ellipses and pixel lists, drawn on a small canvas
+  function weightMap(W, H, draw, feather) {
+    // draw sharp first, then blur once (a canvas filter on every small shape is very slow)
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'); g.fillStyle = '#fff'; g.strokeStyle = '#fff';
+    draw(g);
+    const c2 = document.createElement('canvas'); c2.width = W; c2.height = H;
+    const g2 = c2.getContext('2d'); g2.filter = `blur(${feather}px)`; g2.drawImage(c, 0, 0);
+    const d = g2.getImageData(0, 0, W, H).data, m = new Float32Array(W * H);
+    for (let i = 0; i < m.length; i++) m[i] = d[i * 4 + 3] / 255;
+    return m;
+  }
+  const polyPath = (g, P) => { g.beginPath(); P.forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.closePath(); };
+  const lum = (r, g, b) => 0.299 * r + 0.587 * g + 0.114 * b;
+
+  // flatten lines inside the mask: dark valleys are lifted almost fully toward the blurred image,
+  // the ridges between them come down a little, so the texture reads smoother rather than hazy
+  function softenLines(img, blur, mask, amount) {
+    // changes brightness only (scales R, G and B together), so skin keeps its own colour instead of turning grey
+    const [R, G, B] = img, [r2, g2, b2] = blur;
+    for (let i = 0; i < mask.length; i++) {
+      const w = mask[i] * amount; if (w < 0.01) continue;
+      const l = lum(R[i], G[i], B[i]) + 1, lb = lum(r2[i], g2[i], b2[i]) + 1, d = lb - l;
+      const k = d > 0 ? w * Math.min(1, d / 5 + 0.45) : w * 0.4;
+      const f = Math.min(2.2, (l + d * k) / l);
+      R[i] *= f; G[i] *= f; B[i] *= f;
+    }
+  }
+  // gentle glow: evens texture (brightness only) and lifts a touch
+  function glow(img, blur, mask, amount, lift) {
+    const [R, G, B] = img, [r2, g2, b2] = blur;
+    for (let i = 0; i < mask.length; i++) {
+      const w = mask[i] * amount; if (w < 0.01) continue;
+      const l = lum(R[i], G[i], B[i]) + 1, lb = lum(r2[i], g2[i], b2[i]) + 1;
+      const f = (l + ((lb - l) * 0.35 + lift) * w) / l;
+      R[i] *= f; G[i] *= f; B[i] *= f;
+    }
+  }
+  // soft highlight (screen-like) to suggest volume
+  function highlight(img, mask, amount) {
+    const [R, G, B] = img;
+    for (let i = 0; i < mask.length; i++) {
+      const w = mask[i] * amount; if (w < 0.01) continue;
+      R[i] += (255 - R[i]) * w; G[i] += (255 - G[i]) * w * 0.96; B[i] += (255 - B[i]) * w * 0.92;
+    }
+  }
+  function shade(img, mask, amount) {
+    const [R, G, B] = img;
+    for (let i = 0; i < mask.length; i++) { const w = 1 - mask[i] * amount; if (w > 0.999) continue; R[i] *= w; G[i] *= w; B[i] *= w; }
+  }
+  function saturate(img, mask, amount) {
+    const [R, G, B] = img;
+    for (let i = 0; i < mask.length; i++) {
+      const w = mask[i] * amount; if (w < 0.01) continue;
+      const l = lum(R[i], G[i], B[i]);
+      R[i] += (R[i] - l) * w; G[i] += (G[i] - l) * w; B[i] += (B[i] - l) * w;
+    }
+  }
+  // inverse-mapped warp: each output pixel samples from p - D(p); D is a sum of smooth bumps
+  function warp(img, W, H, fields) {
+    if (!fields.length) return img;
+    let x0 = W, y0 = H, x1 = 0, y1 = 0;
+    for (const f of fields) { x0 = Math.min(x0, f.cx - f.rx * 2.2); x1 = Math.max(x1, f.cx + f.rx * 2.2); y0 = Math.min(y0, f.cy - f.ry * 2.2); y1 = Math.max(y1, f.cy + f.ry * 2.2); }
+    x0 = Math.max(0, x0 | 0); y0 = Math.max(0, y0 | 0); x1 = Math.min(W - 1, Math.ceil(x1)); y1 = Math.min(H - 1, Math.ceil(y1));
+    const out = img.map(ch => new Float32Array(ch));
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      let sx = x, sy = y;
+      for (const f of fields) {
+        const u = (x - f.cx) / f.rx, v = (y - f.cy) / f.ry, w = Math.exp(-(u * u + v * v));
+        if (w < 0.004) continue;
+        if (f.scale) { const s = 1 + (f.scale - 1) * w; sx = f.cx + (sx - f.cx) / (f.sx ? 1 + (f.sx - 1) * w : 1); sy = f.cy + (sy - f.cy) / s; }
+        else { sx -= f.dx * w; sy -= f.dy * w; }
+      }
+      if (sx < 0 || sy < 0 || sx >= W - 1 || sy >= H - 1) continue;
+      const ix = sx | 0, iy = sy | 0, fx = sx - ix, fy = sy - iy, i = iy * W + ix, o = y * W + x;
+      for (let c = 0; c < 3; c++) {
+        const ch = img[c];
+        out[c][o] = (ch[i] * (1 - fx) + ch[i + 1] * fx) * (1 - fy) + (ch[i + W] * (1 - fx) + ch[i + W + 1] * fx) * fy;
+      }
+    }
+    return out;
+  }
+
+  // ---------- the plan → effects ----------
+  /* view: SkinEngine view (canvas, pts, regions, lineGroups, W, H)
+     areas: [{ key, level }] — keys as in the injection plan (glabella, forehead, crows, undereye,
+     perioral, lips, nasolabial, marionette, cheeks, temples, chin, jawline, face, meso) */
+  function render(view, areas) {
+    const W = view.W, H = view.H, A = view.pts, Rg = view.regions || {};
+    const g0 = view.canvas.getContext('2d').getImageData(0, 0, W, H).data;
+    let img = [new Float32Array(W * H), new Float32Array(W * H), new Float32Array(W * H)];
+    for (let i = 0; i < W * H; i++) { img[0][i] = g0[i * 4]; img[1][i] = g0[i * 4 + 1]; img[2][i] = g0[i * 4 + 2]; }
+    const faceOutline = A.slice(0, 17).concat([A[26], { x: A[25].x, y: A[24].y - IOD * 0.5 }, { x: A[18].x, y: A[19].y - IOD * 0.5 }, A[17]]);
+    const faceM = weightMap(W, H, g => { polyPath(g, faceOutline); g.fill(); }, 24);
+    const meanL = (im) => { let s = 0, n = 0; for (let i = 0; i < faceM.length; i++) if (faceM[i] > 0.05) { s += faceM[i] * lum(im[0][i], im[1][i], im[2][i]); n += faceM[i]; } return s / Math.max(1, n); };
+    const L0 = meanL(img);
+    const has = Object.fromEntries(areas.map(a => [a.key, a.level === 'high' ? 1 : 0.8]));
+    const lines = view.lineGroups || {};
+    const linePixels = (g, k, wdt) => { for (const c of lines[k] || []) for (const j of c.px) g.fillRect(j % W - wdt / 2, ((j / W) | 0) - wdt / 2, wdt, wdt); };
+    const P = (k) => Rg[k] ? [Rg[k]] : [];
+    const fine = blurRGB(img, W, H, Math.round(IOD * 0.022));     // ≈ fine wrinkles
+    const broad = blurRGB(img, W, H, Math.round(IOD * 0.05));     // ≈ folds and hollows
+
+    const zone = (polys, lineKeys, feather, lineW = 10) => weightMap(W, H, g => {
+      for (const p of polys) { polyPath(g, p); g.fill(); }
+      for (const k of lineKeys || []) linePixels(g, k, lineW);
+    }, feather);
+
+    if (has.forehead) { const m = zone(P('forehead'), ['forehead'], 14); softenLines(img, broad, m, 0.45 * has.forehead); softenLines(img, fine, m, 0.85 * has.forehead); }
+    if (has.glabella) { const m = zone(P('glabella'), ['glabella'], 10, 12); softenLines(img, fine, m, 0.9 * has.glabella); softenLines(img, broad, m, 0.5 * has.glabella); }
+    if (has.crows) { const m = zone([...P('crowsR'), ...P('crowsL')], ['crows'], 12); softenLines(img, broad, m, 0.4 * has.crows); softenLines(img, fine, m, 0.85 * has.crows); }
+    if (has.undereye) {
+      const m = zone([...P('underR'), ...P('underL'), ...P('refR'), ...P('refL')], ['undereye'], 16);
+      softenLines(img, broad, m, 0.75 * has.undereye); glow(img, broad, m, 0.3 * has.undereye, 3);
+    }
+    if (has.nasolabial) { const m = zone([...P('nasoR'), ...P('nasoL')], ['nasolabial'], 18, 16); softenLines(img, broad, m, 0.85 * has.nasolabial); softenLines(img, fine, m, 0.5 * has.nasolabial); }
+    if (has.marionette) { const m = zone([...P('marioR'), ...P('marioL')], ['marionette'], 16, 14); softenLines(img, broad, m, 0.8 * has.marionette); softenLines(img, fine, m, 0.5 * has.marionette); }
+    if (has.perioral) {
+      const m = weightMap(W, H, g => { g.lineWidth = IOD * 0.14; polyPath(g, A.slice(48, 60)); g.stroke(); }, 8);
+      softenLines(img, fine, m, 0.7 * has.perioral);
+    }
+    if (has.temples) {
+      const m = weightMap(W, H, g => { for (const [a, s] of [[0, 1], [16, -1]]) { g.beginPath(); g.ellipse(A[a].x + s * IOD * 0.1, A[19].y - IOD * 0.02, IOD * 0.16, IOD * 0.22, 0, 0, 7); g.fill(); } }, 22);
+      softenLines(img, broad, m, 0.6 * has.temples); glow(img, broad, m, 0.25 * has.temples, 2.5);
+    }
+    if (has.face || has.meso) {
+      const outline = A.slice(0, 17).concat([A[26], { x: A[25].x, y: A[24].y - IOD * 0.5 }, { x: A[18].x, y: A[19].y - IOD * 0.5 }, A[17]]);
+      const m = weightMap(W, H, g => { polyPath(g, outline); g.fill(); g.globalCompositeOperation = 'destination-out'; g.filter = 'blur(4px)';
+        for (const [a, b] of [[36, 42], [42, 48], [48, 60]]) { g.lineWidth = IOD * 0.09; polyPath(g, A.slice(a, b)); g.fill(); g.stroke(); }
+        g.lineWidth = IOD * 0.12; for (const [a, b] of [[17, 22], [22, 27]]) { g.beginPath(); A.slice(a, b).forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.stroke(); } }, 20);
+      glow(img, fine, m, 0.3 * Math.max(has.face || 0, (has.meso || 0) * 0.8), 1.5);
+    }
+    if (has.jawline) {
+      const jaw = A.slice(3, 14);
+      const below = weightMap(W, H, g => { g.lineWidth = IOD * 0.1; g.beginPath(); jaw.forEach((p, i) => i ? g.lineTo(p.x, p.y + IOD * 0.05) : g.moveTo(p.x, p.y + IOD * 0.05)); g.stroke(); }, 14);
+      shade(img, below, 0.1 * has.jawline);
+    }
+
+    // volume: small warps, then soft light on the high points
+    const fields = [];
+    const mouth = { x: (A[48].x + A[54].x) / 2, y: (A[51].y + A[57].y) / 2 }, mw = A[54].x - A[48].x, mh = Math.max(8, A[57].y - A[51].y);
+    if (has.lips) fields.push({ cx: mouth.x, cy: mouth.y, rx: mw * 0.62, ry: mh * 1.05, scale: 1 + 0.13 * has.lips, sx: 1 + 0.03 * has.lips });
+    if (has.cheeks) for (const [e, n, s] of [[36, 31, -1], [45, 35, 1]]) {
+      const cx = (A[e].x + A[n].x) / 2 + s * IOD * 0.06, cy = A[29].y + IOD * 0.06;
+      fields.push({ cx, cy, rx: IOD * 0.22, ry: IOD * 0.2, dx: s * IOD * 0.01 * has.cheeks, dy: -IOD * 0.035 * has.cheeks });
+    }
+    if (has.chin) fields.push({ cx: A[8].x, cy: A[8].y - IOD * 0.06, rx: IOD * 0.2, ry: IOD * 0.14, dx: 0, dy: IOD * 0.03 * has.chin });
+    img = warp(img, W, H, fields);
+    if (has.lips) {
+      const lipM = weightMap(W, H, g => { polyPath(g, A.slice(48, 60)); g.fill(); }, 5);
+      saturate(img, lipM, 0.1 * has.lips);
+      const shine = weightMap(W, H, g => { g.beginPath(); g.ellipse(mouth.x, A[57].y - mh * 0.22, mw * 0.16, mh * 0.1, 0, 0, 7); g.fill(); }, 6);
+      highlight(img, shine, 0.1 * has.lips);
+    }
+    if (has.cheeks) {
+      const m = weightMap(W, H, g => { for (const [e, n, s] of [[36, 31, -1], [45, 35, 1]]) { g.beginPath(); g.ellipse((A[e].x + A[n].x) / 2 + s * IOD * 0.1, A[29].y - IOD * 0.01, IOD * 0.15, IOD * 0.08, s * 0.35, 0, 7); g.fill(); } }, 22);
+      highlight(img, m, 0.07 * has.cheeks);
+      softenLines(img, broad, zone([...P('nasoR'), ...P('nasoL')], [], 18), 0.25 * has.cheeks);
+    }
+    if (has.chin) { const m = weightMap(W, H, g => { g.beginPath(); g.ellipse(A[8].x, A[8].y - IOD * 0.1, IOD * 0.1, IOD * 0.06, 0, 0, 7); g.fill(); }, 14); highlight(img, m, 0.05 * has.chin); }
+
+    // keep the face's overall brightness as in the photo: only texture and shape should change
+    const k = L0 / Math.max(1, meanL(img));
+    if (Math.abs(k - 1) > 0.002) for (let i = 0; i < faceM.length; i++) { const f = 1 + (k - 1) * faceM[i]; img[0][i] *= f; img[1][i] *= f; img[2][i] *= f; }
+    const out = document.createElement('canvas'); out.width = W; out.height = H;
+    const ctx = out.getContext('2d'), id = ctx.createImageData(W, H), d = id.data;
+    for (let i = 0; i < W * H; i++) { d[i * 4] = img[0][i]; d[i * 4 + 1] = img[1][i]; d[i * 4 + 2] = img[2][i]; d[i * 4 + 3] = 255; }
+    ctx.putImageData(id, 0, 0);
+    return out;
+  }
+  return { render };
+})();
+</script>
 <script>/* Recommendation knowledge base — "from depth to surface".
    Layer 1 (depth): an INOVOSENSE filler plan — area, product, technique, depth, approximate volume, sessions.
    Layer 2 (surface): daily skincare by skin type and texture, plus before/after-injection care.
@@ -1905,6 +2135,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const recs = Recs.build(front, self, recsProfile());
     mark('plan', 'done');
     const rec = makeRecord(front, extras, self, recs, keys);
+    try { if (typeof FaceSim !== 'undefined' && simAreas(recs.plan.items).length) { rec.simBefore = jpgOf(front.view.canvas); rec.simAfter = jpgOf(FaceSim.render(front.view, simAreas(recs.plan.items))); } } catch (e) {}
     scans.push(rec); if (scans.length > 10) scans.shift(); saveScans();
     renderReport(rec, front);
     hist.length = 0; go('s-report', { push: false });
@@ -2034,6 +2265,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       ${plan.blocks.map(b => `<div class="notice err">${iWarn}<div>${b}</div></div>`).join('')}
       ${plan.items.length ? `
         <div class="card injmap">${injMapSvg(plan.items)}<div class="legend">${usedProducts.map(p => `<span><i style="background:${P[p].color};color:${P[p].color}"></i>${P[p].name}</span>`).join('')}</div></div>
+        ${simHtml(rec, live)}
         <div class="sec" style="margin-top:22px"><div class="sec-h"><div><span class="en">Injection plan</span><h2>کجا، چه فیلری، چقدر</h2></div></div>
           <div class="plan">${plan.items.map(planCard).join('')}</div></div>
         ${plan.totals.length ? `<div class="card totals" style="margin-top:14px"><h3>جمع تقریبی برای جلسه‌ی اول</h3>${plan.totals.map(t => `<div class="trow"><i style="background:${P[t.product].color};color:${P[t.product].color}"></i><div><b>${P[t.product].name}</b> <span class="faint small">· ${mlText([t.min, t.max])} میلی‌لیتر</span></div><span>${fa(t.syringes[0])}${t.syringes[1] !== t.syringes[0] ? '–' + fa(t.syringes[1]) : ''} سرنگ</span></div>`).join('')}
@@ -2072,6 +2304,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $$('#s-report .tabs button').forEach(b => b.addEventListener('click', () => { $$('#s-report .tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); $('#r-am').hidden = b.dataset.t !== 'am'; $('#r-pm').hidden = b.dataset.t !== 'pm'; }));
     $('#s-report').onclick = onFeedback;
     $('#reqCall').addEventListener('click', requestCall);
+    wireSim(rec, live);
     // the dive ends at the surface: switch the backdrop as the reader scrolls into chapter II
     const zone = $('#s-report .surface-zone');
     if (zone && 'IntersectionObserver' in window) { const io = new IntersectionObserver((es) => { if ($('#s-report').hidden) return; sea(es[0].isIntersecting ? 'surface' : 'deep'); }, { rootMargin: '0px 0px -72% 0px' }); io.observe(zone); }
@@ -2367,12 +2600,16 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const dots = keys.flatMap(k => (k === 'face' ? FACE : (S[k] || [])).map(([x, y]) => `<g><circle cx="${x}" cy="${y}" r="15" fill="${c}" opacity=".2" class="dot"/><circle cx="${x}" cy="${y}" r="5.5" fill="${c}" style="filter:drop-shadow(0 0 7px ${c})"/></g>`)).join('');
     return injMapSvg([]).replace('</svg>', dots + '</svg>');
   }
-  function openProduct(id) {
+  function openProduct(id, dir) {
     const p = P[id], info = PINFO[id]; if (!p || !info) return;
+    curProd = id;
     const last = scans[scans.length - 1], mine = last ? last.recs.plan.items.filter(i => i.product === id) : [];
     const tot = last ? last.recs.plan.totals.find(t => t.product === id) : null;
     const hero = (window.PIMG || {})[id];
     $('#psheetBody').innerHTML = `<div class="ps-hero" style="--pc:${p.color}">${hero ? `<img src="${hero}" alt="جعبه‌ی INOVOSENSE ${p.name}">` : `<span class="ps-meso">M+</span>`}<button type="button" class="ps-x" data-close aria-label="بستن">${I('<path d="M6 6l12 12M18 6 6 18"/>', 2)}</button></div>
+      <div class="ps-nav"><button type="button" class="ps-arrow" data-step="-1" aria-label="محصول قبلی">${I('<path d="m9 6 6 6-6 6"/>', 2)}</button>
+        <div class="ps-dots">${PRODUCT_ORDER.map(k => `<button type="button" class="${k === id ? 'on' : ''}" style="--pc:${P[k].color}" data-goprod="${k}" aria-label="${P[k].name}"></button>`).join('')}</div>
+        <button type="button" class="ps-arrow" data-step="1" aria-label="محصول بعدی">${I('<path d="m15 6-6 6 6 6"/>', 2)}</button></div>
       <div class="ps-in" style="--pc:${p.color}">
         <span class="en">INOVOSENSE</span><h2>${p.name}</h2><p class="ps-tag">${info.tag}</p>
         <div class="ps-depth"><span>سطح پوست</span><div class="bar">${[1, 2, 3, 4, 5].map(d => `<i class="${d <= p.depth ? 'on' : ''}"></i>`).join('')}</div><span>روی استخوان</span></div>
@@ -2393,11 +2630,55 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       </div>`;
     const sh = $('#psheet'); sh.hidden = false; requestAnimationFrame(() => sh.classList.add('open')); document.body.classList.add('noscroll');
     $('.sheet-card', sh).scrollTop = 0; buzz();
+    if (dir && $('#psheetBody').animate) $('#psheetBody').animate([{ transform: `translateX(${dir > 0 ? -48 : 48}px)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.22,.9,.25,1)' });
   }
   function closeProduct() { const sh = $('#psheet'); sh.classList.remove('open'); document.body.classList.remove('noscroll'); setTimeout(() => { sh.hidden = true; }, 320); }
   $('#psheet').addEventListener('click', (e) => { if (e.target.closest('[data-close]')) closeProduct(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#psheet').hidden) closeProduct(); });
   document.addEventListener('click', (e) => { const t = e.target.closest('[data-product]'); if (t) openProduct(t.dataset.product); });
+
+  // ---------- before / after preview of the plan (FaceSim, on the phone) ----------
+  const SIM_KEYS = new Set(['glabella', 'forehead', 'crows', 'undereye', 'perioral', 'lips', 'nasolabial', 'marionette', 'cheeks', 'temples', 'chin', 'jawline', 'face', 'meso']);
+  const simAreas = (items, off) => items.filter(i => SIM_KEYS.has(i.key) && !(off && off.has(i.key))).map(i => ({ key: i.key, level: i.level }));
+  const jpgOf = (cv, w = 384) => { const c = document.createElement('canvas'); c.width = w; c.height = Math.round(w * cv.height / cv.width); c.getContext('2d').drawImage(cv, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.82); };
+  function simHtml(rec, live) {
+    if (!rec.simAfter) return '';
+    const items = rec.recs.plan.items.filter(i => SIM_KEYS.has(i.key));
+    return `<div class="sec" id="simSec"><div class="sec-h"><div><span class="en">Preview</span><h2>بعد از نقشه، تقریباً این‌طوری</h2></div></div>
+      <div class="card pad simcard">
+        <div class="cmp" id="simCmp" style="--x:50%"><img src="${rec.simBefore}" alt="الان"><img class="top" id="simAfter" src="${rec.simAfter}" alt="بعد از تزریق، شبیه‌سازی"><span class="lb l">بعد</span><span class="lb r">الان</span><i class="handle"></i><input type="range" min="0" max="100" value="50" id="simR" aria-label="کشیدن برای دیدن قبل و بعد"><span class="sim-busy" id="simBusy" hidden>در حال ساخت…</span></div>
+        <p class="sim-hint">انگشتت رو روی تصویر به چپ و راست بکش.</p>
+        ${live ? `<p class="group-t">کدوم ناحیه‌ها؟</p><div class="chips" id="simChips">${items.map(i => `<label class="chip"><input type="checkbox" value="${i.key}" checked><span><em class="cdot" style="background:${P[i.product].color}"></em>${esc(i.area)}</span></label>`).join('')}</div>` : ''}
+        <p class="sim-note">این تصویر یک <b>شبیه‌سازی تقریبی</b> روی گوشی توست و نتیجه‌ی واقعی تزریق رو تضمین نمی‌کنه. نتیجه به پوست و بدن تو، مهارت پزشک و مقدار نهایی بستگی داره.</p>
+        <div class="sim-pro"><b>نسخه‌ی پزشک · به‌زودی</b><span>در کلینیک‌های همکار KMT، پزشک می‌تونه با هوش مصنوعی یک تصویر واقعی‌تر از نتیجه برات بسازه.</span></div>
+      </div></div>`;
+  }
+  function wireSim(rec, live) {
+    const r = $('#simR'); if (!r) return;
+    r.oninput = () => $('#simCmp').style.setProperty('--x', r.value + '%');
+    const chips = $('#simChips'); if (!chips || !live) return;
+    let tm = 0;
+    chips.addEventListener('change', () => {
+      clearTimeout(tm); $('#simBusy').hidden = false;
+      tm = setTimeout(() => {
+        const off = new Set($$('input', chips).filter(i => !i.checked).map(i => i.value));
+        try { $('#simAfter').src = jpgOf(FaceSim.render(live.view, simAreas(rec.recs.plan.items, off))); } catch (e) {}
+        $('#simBusy').hidden = true;
+      }, 60);
+    });
+  }
+
+  // ---------- product sheet: swipe to the next / previous product ----------
+  let curProd = null;
+  const stepProduct = (d) => { const i = PRODUCT_ORDER.indexOf(curProd); openProduct(PRODUCT_ORDER[(i + d + PRODUCT_ORDER.length) % PRODUCT_ORDER.length], d); };
+  (() => {
+    const card = $('#psheet .sheet-card'); let sx = 0, sy = 0, t0 = 0;
+    card.addEventListener('touchstart', (e) => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); }, { passive: true });
+    // right-to-left app: dragging the page to the right brings in the next product from the left
+    card.addEventListener('touchend', (e) => { const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy; if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.6 && Date.now() - t0 < 1200) stepProduct(dx > 0 ? 1 : -1); }, { passive: true });
+    $('#psheet').addEventListener('click', (e) => { const b = e.target.closest('[data-goprod]'); if (b) { const i = PRODUCT_ORDER.indexOf(curProd), j = PRODUCT_ORDER.indexOf(b.dataset.goprod); if (i !== j) openProduct(b.dataset.goprod, j > i ? 1 : -1); } const n = e.target.closest('[data-step]'); if (n) stepProduct(Number(n.dataset.step)); });
+    document.addEventListener('keydown', (e) => { if ($('#psheet').hidden) return; if (e.key === 'ArrowLeft') stepProduct(1); if (e.key === 'ArrowRight') stepProduct(-1); });
+  })();
 
   // ---------- boot ----------
   renderZones(); renderShots();
