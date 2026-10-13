@@ -662,6 +662,14 @@ body.noscroll { overflow: hidden; }
 .live-card { max-height: 48vh; overflow-y: auto; }
 .live-legend span { min-width: 40px; }
 
+.cmp img.mask { z-index: 2; pointer-events: none; }
+.sim-seg { display: flex; gap: 6px; justify-content: center; margin: 12px 0 0; flex-wrap: wrap; }
+.sim-seg button { padding: 7px 14px; border-radius: 99px; border: 1px solid var(--hair-2); background: rgba(255,255,255,.04); color: var(--mist); font: inherit; font-size: 13px; }
+.sim-seg button.on { color: #fff; border-color: var(--aqua); background: rgba(127,216,224,.14); box-shadow: 0 0 14px -6px var(--glow); }
+.sim-low { margin: 8px 0 0; padding: 10px 12px; border-radius: 14px; background: rgba(127,216,224,.07); border: 1px solid rgba(127,216,224,.25); font-size: 13px; line-height: 1.8; color: var(--mist); }
+
+.live-report { pointer-events: auto; padding: 9px 18px; border-radius: 99px; border: 1px solid var(--aqua, #7FD8E0); background: rgba(127,216,224,.9); color: #03051A; font: inherit; font-weight: 700; font-size: 14px; box-shadow: 0 0 22px -6px var(--glow, #7FD8E0); }
+
 </style>
 
 <div class="sea" aria-hidden="true"><div class="layer" id="seaHero"><video id="seaVideo" muted loop playsinline preload="auto" aria-hidden="true"></video></div><div class="layer" id="seaDeep"></div><div class="layer" id="seaSurface"></div><div class="rays"></div><div class="veil"></div><div class="motes"></div><div class="motes m2"></div></div>
@@ -837,8 +845,8 @@ body.noscroll { overflow: hidden; }
     <label class="who-opt"><input type="radio" name="who" value="user" checked><span><b>خودم می‌گیرم</b><small>دوربین جلو</small></span></label>
     <label class="who-opt"><input type="radio" name="who" value="environment"><span><b>یکی دیگه می‌گیره</b><small>دوربین اصلی · کیفیت بالاتر</small></span></label>
   </div>
-  <div class="vidbox"><b>خوانش با ویدیو · دقیق‌تر از عکس</b><p>یک ویدیوی ۵ تا ۱۰ ثانیه‌ای بگیر: چند ثانیه صاف روبه‌رو، بعد آروم سر رو کمی به چپ و راست بچرخون. اپ هر فریم رو جدا اندازه می‌گیره و میانه‌ی همه رو حساب می‌کنه، پس یک سایه یا یک حالت صورت نتیجه رو خراب نمی‌کنه.</p>
-    <div class="row2"><button class="btn btn-primary" id="vidCam" type="button">ضبط ویدیو</button><button class="btn btn-ghost" id="vidGal" type="button">ویدیو از گالری</button></div></div>
+  <div class="vidbox"><b>خوانش با ویدیو · دقیق‌تر از عکس</b><p>دوربین زنده باز می‌شه؛ حدود ۲۰ ثانیه صاف و بی‌حالت نگاه کن. اپ ۸ فریم واضح رو جدا اندازه می‌گیره، میانه‌ی همه رو حساب می‌کنه و گزارش رو خودش می‌سازه. یا یک ویدیوی آماده از گالری انتخاب کن.</p>
+    <div class="row2"><button class="btn btn-primary" id="vidCam" type="button">خوانش با دوربین زنده</button><button class="btn btn-ghost" id="vidGal" type="button">ویدیو از گالری</button></div></div>
   <details class="card tips"><summary>راهنمای عکس استاندارد پزشکی</summary><ul>
     <li>پشت سر یک دیوار ساده و روشن؛ رو به پنجره یا نور یکنواخت، بدون فلاش و بدون نور از یک طرف.</li>
     <li>بدون آرایش، عینک و فیلتر؛ موها پشت گوش و پیشانی باز.</li>
@@ -884,7 +892,7 @@ body.noscroll { overflow: hidden; }
   <div class="live-top"><button type="button" id="liveClose" class="lbtn" aria-label="بستن"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="live-t"><b>نقشه‌ی زنده</b><small id="liveMsg">در حال روشن کردن دوربین…</small></div>
     <button type="button" id="liveFlip" class="lbtn" aria-label="چرخش دوربین"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M9 13a3 3 0 0 0 5 2M15 12a3 3 0 0 0-5-2"/></svg></button></div>
-  <div class="live-mid"><div class="live-meter" id="liveMeter" hidden><i></i><span id="liveMeterT">اندازه‌گیری زنده…</span></div><div class="live-legend" id="liveLegend"></div></div>
+  <div class="live-mid"><div class="live-meter" id="liveMeter" hidden><i></i><span id="liveMeterT">اندازه‌گیری زنده…</span></div><div class="live-legend" id="liveLegend"></div><button type="button" class="live-report" id="liveReport" hidden>گزارش کامل</button></div>
   <div class="live-bottom"><div class="live-card" id="liveCard" hidden></div><div class="live-chips" id="liveChips"></div></div>
 </div>
 <div class="cam" id="cam" hidden>
@@ -975,16 +983,14 @@ const SkinEngine = (() => {
   async function detect(canvas, loose) {
     const fa = await init();
     const small = downscale(canvas, 1024);
-    const tries = [{ c: small.canvas, s: small.s, ox: 0, oy: 0 }];
+    const tries = [{ c: small.canvas, s: small.s, ox: 0, oy: 0, sizes: [416, 608, 320] }];
     if (loose) {
-      // the small detector misses a face that fills the whole frame: try again with the frame inside a wide margin
-      const w = small.canvas.width, h = small.canvas.height, m = 0.3, P = document.createElement('canvas');
-      P.width = Math.round(w * (1 + 2 * m)); P.height = Math.round(h * (1 + 2 * m));
-      const g = P.getContext('2d'); g.fillStyle = '#808080'; g.fillRect(0, 0, P.width, P.height); g.drawImage(small.canvas, w * m, h * m);
-      const d = downscale(P, 1024);
-      tries.push({ c: d.canvas, s: small.s * d.s, ox: w * m * d.s, oy: h * m * d.s });
+      // a face that fills the frame: the small detector frames it far better on a small copy (as the live tracker
+      // does); the 68 points are computed on a 112 px face crop either way, so nothing is lost in precision
+      const t = downscale(canvas, 320);
+      tries.unshift({ c: t.canvas, s: t.s, ox: 0, oy: 0, sizes: [224, 160, 320] });
     }
-    for (const T of tries) for (const size of [416, 608, 320]) {
+    for (const T of tries) for (const size of T.sizes) {
       const opts = new fa.TinyFaceDetectorOptions({ inputSize: size, scoreThreshold: 0.35 });
       const res = await fa.detectAllFaces(T.c, opts).withFaceLandmarks();
       if (!res.length) continue;
@@ -995,7 +1001,10 @@ const SkinEngine = (() => {
       const jawInside = pts.slice(0, 17).filter(p => p.y <= canvas.height * 0.995 && p.x >= 0 && p.x <= canvas.width).length;
       if (loose) {
         const H = canvas.height, W = canvas.width, browY = Math.min(pts[19].y, pts[24].y);
-        if (r.detection.score < 0.5 || pts[8].y > H * 1.01 || browY < 0 || pts[30].x < 0 || pts[30].x > W) return null;
+        if (r.detection.score < 0.5 || pts[8].y > H * 1.01 || browY < 0 || pts[30].x < 0 || pts[30].x > W) continue;
+        // anatomy check: eyes level-ish and apart, nose between and below them, mouth below the nose, chin below the mouth
+        const eR = pts[36], eL = pts[45], iod = Math.hypot(eL.x - eR.x, eL.y - eR.y), fw = Math.max(...pts.slice(0, 17).map(p => p.x)) - Math.min(...pts.slice(0, 17).map(p => p.x));
+        if (iod < fw * 0.3 || !(pts[30].x > eR.x && pts[30].x < eL.x) || pts[30].y - (eR.y + eL.y) / 2 < iod * 0.3 || pts[62].y - pts[30].y < iod * 0.12 || pts[8].y - pts[62].y < iod * 0.2) continue;
         return { count: res.length, score: r.detection.score, pts };
       }
       if (inside < 0.95 || jawInside < 15 || r.detection.score < 0.5) return null;   // a partial face → treat as a close-up
@@ -1694,75 +1703,104 @@ const FaceSim = (() => {
     const faceM = weightMap(W, H, g => { polyPath(g, faceOutline); g.fill(); }, 24);
     const meanL = (im) => { let s = 0, n = 0; for (let i = 0; i < faceM.length; i++) if (faceM[i] > 0.05) { s += faceM[i] * lum(im[0][i], im[1][i], im[2][i]); n += faceM[i]; } return s / Math.max(1, n); };
     const L0 = meanL(img);
-    const has = Object.fromEntries(areas.map(a => [a.key, a.level === 'high' ? 1 : 0.8]));
+    // strength per area: the measured need level (0–4) when known, else the plan grade
+    const has = Object.fromEntries(areas.map(a => [a.key, typeof a.level === 'number' ? 0.75 + 0.0625 * Math.min(4, a.level) : a.level === 'high' ? 0.95 : 0.85]));
+    const P = (k) => Rg[k] ? [Rg[k]] : [];
     const lines = view.lineGroups || {};
     const linePixels = (g, k, wdt) => { for (const c of lines[k] || []) for (const j of c.px) g.fillRect(j % W - wdt / 2, ((j / W) | 0) - wdt / 2, wdt, wdt); };
-    const P = (k) => Rg[k] ? [Rg[k]] : [];
-    const fine = blurRGB(img, W, H, Math.round(IOD * 0.022));     // ≈ fine wrinkles
-    const broad = blurRGB(img, W, H, Math.round(IOD * 0.05));     // ≈ folds and hollows
-
-    const zone = (polys, lineKeys, feather, lineW = 10) => weightMap(W, H, g => {
+    const zone = (polys, lineKeys, feather, lineW = 12) => weightMap(W, H, g => {
       for (const p of polys) { polyPath(g, p); g.fill(); }
       for (const k of lineKeys || []) linePixels(g, k, lineW);
     }, feather);
-
-    if (has.forehead) { const m = zone(P('forehead'), ['forehead'], 14); softenLines(img, broad, m, 0.45 * has.forehead); softenLines(img, fine, m, 0.85 * has.forehead); }
-    if (has.glabella) { const m = zone(P('glabella'), ['glabella'], 10, 12); softenLines(img, fine, m, 0.9 * has.glabella); softenLines(img, broad, m, 0.5 * has.glabella); }
-    if (has.crows) { const m = zone([...P('crowsR'), ...P('crowsL')], ['crows'], 12); softenLines(img, broad, m, 0.4 * has.crows); softenLines(img, fine, m, 0.85 * has.crows); }
-    if (has.undereye) {
-      const m = zone([...P('underR'), ...P('underL'), ...P('refR'), ...P('refL')], ['undereye'], 16);
-      softenLines(img, broad, m, 0.75 * has.undereye); glow(img, broad, m, 0.3 * has.undereye, 3);
-    }
-    if (has.nasolabial) { const m = zone([...P('nasoR'), ...P('nasoL')], ['nasolabial'], 18, 16); softenLines(img, broad, m, 0.85 * has.nasolabial); softenLines(img, fine, m, 0.5 * has.nasolabial); }
-    if (has.marionette) { const m = zone([...P('marioR'), ...P('marioL')], ['marionette'], 16, 14); softenLines(img, broad, m, 0.8 * has.marionette); softenLines(img, fine, m, 0.5 * has.marionette); }
-    if (has.perioral) {
-      const m = weightMap(W, H, g => { g.lineWidth = IOD * 0.14; polyPath(g, A.slice(48, 60)); g.stroke(); }, 8);
-      softenLines(img, fine, m, 0.7 * has.perioral);
-    }
-    if (has.temples) {
-      const m = weightMap(W, H, g => { for (const [a, s] of [[0, 1], [16, -1]]) { g.beginPath(); g.ellipse(A[a].x + s * IOD * 0.1, A[19].y - IOD * 0.02, IOD * 0.16, IOD * 0.22, 0, 0, 7); g.fill(); } }, 22);
-      softenLines(img, broad, m, 0.6 * has.temples); glow(img, broad, m, 0.25 * has.temples, 2.5);
-    }
+    const N = W * H, wM = new Float32Array(N), fM = new Float32Array(N);   // wrinkle and fold/hollow strength
+    const put = (dst, m, a) => { for (let i = 0; i < N; i++) { const v = m[i] * a; if (v > dst[i]) dst[i] = v; } };
+    function off(p, dx, dy) { return { x: p.x + dx * IOD, y: p.y + dy * IOD }; }
+    function band(p, q, w) { const dx = q.x - p.x, dy = q.y - p.y, l = Math.hypot(dx, dy) || 1, nx = -dy / l * w * IOD, ny = dx / l * w * IOD; return [{ x: p.x + nx, y: p.y + ny }, { x: q.x + nx, y: q.y + ny }, { x: q.x - nx, y: q.y - ny }, { x: p.x - nx, y: p.y - ny }]; }
+    if (has.forehead) put(wM, zone([[off(A[18], -0.05, -0.75), off(A[25], 0.05, -0.75), off(A[25], 0.05, -0.12), off(A[18], -0.05, -0.12)]], ['forehead'], 22), has.forehead); if (has.forehead) put(fM, zone([[off(A[18], -0.05, -0.75), off(A[25], 0.05, -0.75), off(A[25], 0.05, -0.12), off(A[18], -0.05, -0.12)]], [], 22), has.forehead * 0.7);
+    if (has.glabella) { const m = zone([[off(A[21], -0.04, -0.42), off(A[22], 0.04, -0.42), off(A[22], 0.0, 0.06), off(A[21], 0.0, 0.06)]], ['glabella'], 14); put(wM, m, has.glabella); put(fM, m, has.glabella * 0.6); }
+    if (has.crows) { const m = zone([[off(A[36], -0.03, -0.24), off(A[36], -0.5, -0.3), off(A[36], -0.5, 0.32), off(A[36], -0.03, 0.2)], [off(A[45], 0.03, -0.24), off(A[45], 0.5, -0.3), off(A[45], 0.5, 0.32), off(A[45], 0.03, 0.2)]], ['crows'], 18); put(wM, m, has.crows); put(fM, m, has.crows * 0.6); }
+    if (has.undereye) { const m = zone([...P('underR'), ...P('underL'), ...P('refR'), ...P('refL')], ['undereye'], 18); put(wM, m, has.undereye); put(fM, m, has.undereye * 0.9); }
+    if (has.nasolabial) { const m = zone([band(off(A[31], -0.12, -0.06), off(A[48], -0.16, 0.06), 0.2), band(off(A[35], 0.12, -0.06), off(A[54], 0.16, 0.06), 0.2)], ['nasolabial'], 24, 18); put(fM, m, has.nasolabial); put(wM, m, has.nasolabial * 0.7); }
+    if (has.marionette) { const m = zone([band(off(A[48], -0.04, 0.04), off(A[6], 0.06, -0.08), 0.15), band(off(A[54], 0.04, 0.04), off(A[10], -0.06, -0.08), 0.15)], ['marionette'], 22, 16); put(fM, m, has.marionette); put(wM, m, has.marionette * 0.7); }
+    if (has.perioral) put(wM, weightMap(W, H, g => { g.lineWidth = IOD * 0.16; polyPath(g, A.slice(48, 60)); g.stroke(); }, 10), has.perioral);
+    if (has.temples) put(fM, weightMap(W, H, g => { for (const [a, s] of [[0, 1], [16, -1]]) { g.beginPath(); g.ellipse(A[a].x + s * IOD * 0.1, A[19].y - IOD * 0.02, IOD * 0.16, IOD * 0.22, 0, 0, 7); g.fill(); } }, 24), has.temples * 0.8);
+    if (has.cheeks) put(fM, weightMap(W, H, g => { for (const [e, n, s] of [[36, 31, -1], [45, 35, 1]]) { g.beginPath(); g.ellipse((A[e].x + A[n].x) / 2 + s * IOD * 0.08, A[29].y + IOD * 0.05, IOD * 0.2, IOD * 0.16, 0, 0, 7); g.fill(); } }, 26), has.cheeks * 0.6);
+    const zoneVis = new Float32Array(wM); for (let i = 0; i < N; i++) if (fM[i] > zoneVis[i]) zoneVis[i] = fM[i];
     if (has.face || has.meso) {
-      const outline = A.slice(0, 17).concat([A[26], { x: A[25].x, y: A[24].y - IOD * 0.5 }, { x: A[18].x, y: A[19].y - IOD * 0.5 }, A[17]]);
-      const m = weightMap(W, H, g => { polyPath(g, outline); g.fill(); g.globalCompositeOperation = 'destination-out'; g.filter = 'blur(4px)';
+      // skin quality: a lighter pass over the whole face, eyes, brows and lips left out
+      const m = weightMap(W, H, g => { polyPath(g, faceOutline); g.fill(); g.globalCompositeOperation = 'destination-out';
         for (const [a, b] of [[36, 42], [42, 48], [48, 60]]) { g.lineWidth = IOD * 0.09; polyPath(g, A.slice(a, b)); g.fill(); g.stroke(); }
         g.lineWidth = IOD * 0.12; for (const [a, b] of [[17, 22], [22, 27]]) { g.beginPath(); A.slice(a, b).forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.stroke(); } }, 20);
-      glow(img, fine, m, 0.3 * Math.max(has.face || 0, (has.meso || 0) * 0.8), 1.5);
+      put(wM, m, 0.45 * Math.max(has.face || 0, has.meso || 0));
     }
+    // eyes, brows and lips keep their own detail
+    const keep = weightMap(W, H, g => { g.lineWidth = IOD * 0.03;
+      for (const [a, b] of [[36, 42], [42, 48], [48, 60]]) { polyPath(g, A.slice(a, b)); g.fill(); g.stroke(); }
+      g.lineWidth = IOD * 0.1; for (const [a, b] of [[17, 22], [22, 27]]) { g.beginPath(); A.slice(a, b).forEach((p, i) => i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)); g.stroke(); } }, 6);
+    for (let i = 0; i < N; i++) { const k = 1 - keep[i]; wM[i] *= k; fM[i] *= k; }
+    /* Frequency separation on brightness: micro texture (pores) is kept, the wrinkle band (≈1–8 px) loses most of
+       its dark creases, the fold band (≈8–30 px) loses most of its shadow. Colour is untouched (R, G, B scale together). */
+    const L = new Float32Array(N); for (let i = 0; i < N; i++) L[i] = lum(img[0][i], img[1][i], img[2][i]);
+    const b1 = boxBlur(L, W, H, 1), b2 = boxBlur(L, W, H, Math.round(IOD * 0.03)), b3 = boxBlur(L, W, H, Math.round(IOD * 0.11));
+    for (let i = 0; i < N; i++) {
+      const w = wM[i], f = fM[i]; if (w < 0.01 && f < 0.01) continue;
+      const micro = L[i] - b1[i];
+      let band = b1[i] - b2[i], fold = b2[i] - b3[i];
+      band *= band < 0 ? 1 - 0.97 * w : 1 - 0.7 * w;
+      fold *= fold < 0 ? 1 - 0.92 * f : 1 - 0.3 * f;
+      const nl = b3[i] + fold + band + micro * (1 - 0.3 * w);
+      const k = Math.max(0.6, Math.min(2.2, (nl + 1) / (L[i] + 1)));
+      img[0][i] *= k; img[1][i] *= k; img[2][i] *= k;
+    }
+    const broad = blurRGB(img, W, H, Math.round(IOD * 0.05));
+    if (has.undereye) glow(img, broad, zone([...P('underR'), ...P('underL')], [], 18), 0.3 * has.undereye, 3);
     if (has.jawline) {
       const jaw = A.slice(3, 14);
       const below = weightMap(W, H, g => { g.lineWidth = IOD * 0.1; g.beginPath(); jaw.forEach((p, i) => i ? g.lineTo(p.x, p.y + IOD * 0.05) : g.moveTo(p.x, p.y + IOD * 0.05)); g.stroke(); }, 14);
-      shade(img, below, 0.1 * has.jawline);
+      shade(img, below, 0.14 * has.jawline);
     }
 
     // volume: small warps, then soft light on the high points
     const fields = [];
     const mouth = { x: (A[48].x + A[54].x) / 2, y: (A[51].y + A[57].y) / 2 }, mw = A[54].x - A[48].x, mh = Math.max(8, A[57].y - A[51].y);
-    if (has.lips) fields.push({ cx: mouth.x, cy: mouth.y, rx: mw * 0.62, ry: mh * 1.05, scale: 1 + 0.13 * has.lips, sx: 1 + 0.03 * has.lips });
+    if (has.lips) fields.push({ cx: mouth.x, cy: mouth.y, rx: mw * 0.62, ry: mh * 1.05, scale: 1 + 0.2 * has.lips, sx: 1 + 0.05 * has.lips });
     if (has.cheeks) for (const [e, n, s] of [[36, 31, -1], [45, 35, 1]]) {
       const cx = (A[e].x + A[n].x) / 2 + s * IOD * 0.06, cy = A[29].y + IOD * 0.06;
-      fields.push({ cx, cy, rx: IOD * 0.22, ry: IOD * 0.2, dx: s * IOD * 0.01 * has.cheeks, dy: -IOD * 0.035 * has.cheeks });
+      fields.push({ cx, cy, rx: IOD * 0.22, ry: IOD * 0.2, dx: s * IOD * 0.015 * has.cheeks, dy: -IOD * 0.05 * has.cheeks });
     }
     if (has.chin) fields.push({ cx: A[8].x, cy: A[8].y - IOD * 0.06, rx: IOD * 0.2, ry: IOD * 0.14, dx: 0, dy: IOD * 0.03 * has.chin });
     img = warp(img, W, H, fields);
     if (has.lips) {
       const lipM = weightMap(W, H, g => { polyPath(g, A.slice(48, 60)); g.fill(); }, 5);
-      saturate(img, lipM, 0.1 * has.lips);
+      saturate(img, lipM, 0.16 * has.lips);
       const shine = weightMap(W, H, g => { g.beginPath(); g.ellipse(mouth.x, A[57].y - mh * 0.22, mw * 0.16, mh * 0.1, 0, 0, 7); g.fill(); }, 6);
       highlight(img, shine, 0.1 * has.lips);
     }
     if (has.cheeks) {
       const m = weightMap(W, H, g => { for (const [e, n, s] of [[36, 31, -1], [45, 35, 1]]) { g.beginPath(); g.ellipse((A[e].x + A[n].x) / 2 + s * IOD * 0.1, A[29].y - IOD * 0.01, IOD * 0.15, IOD * 0.08, s * 0.35, 0, 7); g.fill(); } }, 22);
-      highlight(img, m, 0.07 * has.cheeks);
-      softenLines(img, broad, zone([...P('nasoR'), ...P('nasoL')], [], 18), 0.25 * has.cheeks);
+      highlight(img, m, 0.09 * has.cheeks);
     }
     if (has.chin) { const m = weightMap(W, H, g => { g.beginPath(); g.ellipse(A[8].x, A[8].y - IOD * 0.1, IOD * 0.1, IOD * 0.06, 0, 0, 7); g.fill(); }, 14); highlight(img, m, 0.05 * has.chin); }
 
     // keep the face's overall brightness as in the photo: only texture and shape should change
     const k = L0 / Math.max(1, meanL(img));
     if (Math.abs(k - 1) > 0.002) for (let i = 0; i < faceM.length; i++) { const f = 1 + (k - 1) * faceM[i]; img[0][i] *= f; img[1][i] *= f; img[2][i] *= f; }
-    const out = document.createElement('canvas'); out.width = W; out.height = H;
+    // where the plan acts, for the "show treated areas" view: a soft aqua veil, 0..1 per pixel
+    const vol = weightMap(W, H, g => {
+      if (has.lips) { polyPath(g, A.slice(48, 60)); g.fill(); }
+      if (has.cheeks) for (const [e, n, s2] of [[36, 31, -1], [45, 35, 1]]) { g.beginPath(); g.ellipse((A[e].x + A[n].x) / 2 + s2 * IOD * 0.08, A[29].y + IOD * 0.05, IOD * 0.2, IOD * 0.16, 0, 0, 7); g.fill(); }
+      if (has.chin) { g.beginPath(); g.ellipse(A[8].x, A[8].y - IOD * 0.08, IOD * 0.18, IOD * 0.11, 0, 0, 7); g.fill(); }
+    }, 14);
+    const mk = document.createElement('canvas'); mk.width = W; mk.height = H;
+    const mg = mk.getContext('2d'), md = mg.createImageData(W, H), mdd = md.data;
+    const wholeFace = (has.face || has.meso) ? 0.18 : 0;
+    for (let i = 0; i < N; i++) {
+      // the treated zones in strong aqua; a whole-face skin programme only as a faint veil
+      const z = Math.min(1, Math.max(zoneVis[i] * (1 - keep[i]), vol[i] * 0.9)), a = Math.max(z, wholeFace * faceM[i] * (1 - keep[i]));
+      mdd[i * 4] = 40; mdd[i * 4 + 1] = 215 + 30 * z; mdd[i * 4 + 2] = 230; mdd[i * 4 + 3] = Math.min(1, a) * 175;
+    }
+    mg.putImageData(md, 0, 0);
+    const out = document.createElement('canvas'); out.width = W; out.height = H; out.mask = mk;
     const ctx = out.getContext('2d'), id = ctx.createImageData(W, H), d = id.data;
     for (let i = 0; i < W * H; i++) { d[i * 4] = img[0][i]; d[i * 4 + 1] = img[1][i]; d[i * 4 + 2] = img[2][i]; d[i * 4 + 3] = 255; }
     ctx.putImageData(id, 0, 0);
@@ -2508,7 +2546,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const rec = makeRecord(front, extras, self, recs, keys);
     if (video) rec.video = video;
     if (scanFor) rec.person = { name: scanFor.name, birthYear: scanFor.birthYear, gender: scanFor.gender };
-    try { if (typeof FaceSim !== 'undefined' && simAreas(recs.plan.items).length) { rec.simBefore = jpgOf(front.view.canvas); rec.simAfter = jpgOf(FaceSim.render(front.view, simAreas(recs.plan.items))); } } catch (e) {}
+    try { if (typeof FaceSim !== 'undefined' && simAreas(recs.plan.items).length) { rec.simBefore = jpgOf(front.view.canvas); const after = FaceSim.render(front.view, simAreas(recs.plan.items)); rec.simAfter = jpgOf(after); if (after.mask) rec.simMask = pngOf(after.mask); } } catch (e) {}
     scans.push(rec); if (scans.length > 10) scans.shift(); saveScans();
     renderReport(rec, front);
     hist.length = 0; go('s-report', { push: false });
@@ -2538,26 +2576,62 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     let ws = 0, wt = 0; for (const k in m) { if (!W8[k]) continue; const w = W8[k] * (m[k].reliable === false ? 0.4 : 1); ws += m[k].score * w; wt += w; }
     best.overall = Math.round(ws / wt);
   }
+  /* Frames of a phone video, one by one. iPhone Safari loads nothing until playback is requested and may not paint
+     a frame after a bare seek, so playback is started (muted) first, every seek waits for a painted frame, and a
+     blank frame falls back to playing up to the moment. */
   async function seekFrames(file, onFrame, onInfo) {
     const v = document.createElement('video'), url = URL.createObjectURL(file);
-    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.preload = 'auto'; v.src = url;
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.preload = 'auto';
+    v.setAttribute('playsinline', ''); v.setAttribute('muted', ''); v.setAttribute('webkit-playsinline', '');
+    v.style.cssText = 'position:fixed;left:0;top:0;width:4px;height:4px;opacity:.01;pointer-events:none;z-index:-1';
+    document.body.appendChild(v);
+    const once = (ev, ms) => new Promise((res) => { let t = 0; const f = () => { clearTimeout(t); v.removeEventListener(ev, f); res(true); }; v.addEventListener(ev, f); t = setTimeout(() => { v.removeEventListener(ev, f); res(false); }, ms); });
+    const painted = (ms) => new Promise((res) => { let ok = false; const f = () => { if (!ok) { ok = true; res(); } }; if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(f); setTimeout(f, ms); });
     try {
-      await new Promise((res, rej) => { v.onloadeddata = res; v.onerror = () => rej(new Error('video')); setTimeout(() => rej(new Error('video')), 20000); });
-      // some phones only paint a frame after playback has started once
-      try { await v.play(); v.pause(); } catch (e) {}
-      const D = isFinite(v.duration) ? v.duration : 0;
+      const meta = new Promise((res, rej) => { v.addEventListener('loadedmetadata', res, { once: true }); v.addEventListener('error', () => rej(new Error('video')), { once: true }); setTimeout(() => rej(new Error('video')), 30000); });
+      v.src = url;
+      const pp = v.play(); if (pp && pp.catch) pp.catch(() => {});
+      await meta;
+      if (v.readyState < 2) await once('loadeddata', 8000);
+      await painted(400);
+      v.pause();
+      let D = v.duration;
+      if (!isFinite(D) || !D) { v.currentTime = 1e7; await once('seeked', 3000); D = v.currentTime || 0; }
       if (!D || !v.videoWidth) throw new Error('video');
       const n = Math.max(4, Math.min(18, Math.floor(D / 0.4)));
       onInfo && onInfo(n, D);
-      const c = document.createElement('canvas'), k = Math.min(1, 1600 / Math.max(v.videoWidth, v.videoHeight));
+      const c = document.createElement('canvas'), k = Math.min(1, 1440 / Math.max(v.videoWidth, v.videoHeight));
       c.width = Math.round(v.videoWidth * k); c.height = Math.round(v.videoHeight * k);
+      const g = c.getContext('2d', { willReadFrequently: true });
+      const blank = () => { const d = g.getImageData(0, 0, c.width, c.height).data; let s = 0; for (let i = 0; i < d.length; i += 4 * 997) s += d[i] + d[i + 1] + d[i + 2]; return s < 30; };
       for (let i = 0; i < n; i++) {
         const t = Math.min(D - 0.05, (i + 0.5) * D / n);
-        await new Promise((res) => { const done = () => { v.removeEventListener('seeked', done); res(); }; v.addEventListener('seeked', done); v.currentTime = t; setTimeout(done, 4000); });
-        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        v.currentTime = t; await once('seeked', 5000); await painted(250);
+        g.drawImage(v, 0, 0, c.width, c.height);
+        if (blank()) {
+          // no painted frame after the seek: play a moment up to the time and grab it there
+          v.currentTime = Math.max(0, t - 0.15); await once('seeked', 3000);
+          const p2 = v.play(); if (p2 && p2.catch) p2.catch(() => {});
+          const t0 = Date.now(); while (v.currentTime < t && Date.now() - t0 < 2500) await new Promise(r => setTimeout(r, 30));
+          v.pause(); await painted(200); g.drawImage(v, 0, 0, c.width, c.height);
+          if (blank()) continue;
+        }
         if ((await onFrame(c, i, n)) === false) break;
       }
-    } finally { URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); }
+    } finally { try { v.pause(); } catch (e) {} URL.revokeObjectURL(url); v.removeAttribute('src'); v.load(); v.remove(); }
+  }
+  /* The live camera already measured several clear frontal frames: build the full report from them. */
+  async function runFromLive(best, list) {
+    $('#steplist').innerHTML = `<li data-s="combine"><i></i>ترکیب ${fa(list.length)} فریم زنده (میانه‌ی اندازه‌ها)</li><li data-s="plan"><i></i>ساخت نقشه‌ی تزریق و آیین مراقبت</li>`;
+    $('#busyThumbs').innerHTML = ''; $('#busyImg').hidden = true; $('#sweep').hidden = true;
+    $('#meshCv').getContext('2d').clearRect(0, 0, 768, 960);
+    $('#busyT').textContent = 'در حال ساخت گزارش…';
+    go('s-busy');
+    const mark = (k, st) => { const li = $(`#steplist [data-s="${k}"]`); if (li) li.className = st; };
+    mark('combine', 'now'); combine(best, list);
+    if (list.length < 3) { best.issues = (best.issues || []).concat({ k: 'frames', sev: 'mid' }); if (best.quality === 'good') best.quality = 'mid'; }
+    mark('combine', 'done');
+    await finishScan(best, {}, ['front'], mark, { frames: list.length, total: list.length, sides: 0, live: true });
   }
   async function runVideo(file) {
     $('#steplist').innerHTML = `<li data-s="model"><i></i>آماده‌سازی هوش مصنوعی</li><li data-s="frames"><i></i>جدا کردن و اندازه‌گیری فریم‌ها</li><li data-s="combine"><i></i>ترکیب فریم‌ها (میانه‌ی اندازه‌ها)</li><li data-s="plan"><i></i>ساخت نقشه‌ی تزریق و آیین مراقبت</li>`;
@@ -2569,7 +2643,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     closeCam();
     const limit = (pr, ms) => Promise.race([pr, new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), ms))]);
     const fronts = [], sides = {};
-    const weak = []; let best = null, bestQ = -1, weakBest = null, weakQ = -1, total = 0;
+    const weak = []; let best = null, bestQ = -1, weakBest = null, weakQ = -1, total = 0, faced = 0, turned = 0;
     try {
       mark('model', 'now'); await limit(SkinEngine.init(), 60000); mark('model', 'done');
       mark('frames', 'now');
@@ -2580,6 +2654,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         total++;
         let r; try { r = await limit(SkinEngine.analyze(c, { allowPatch: false, loose: true }), 30000); } catch (e) { return Date.now() - t0 < 150000; }
         if (!r.ok) return true;
+        faced++; if (Math.abs(r.raw.yaw) > 0.12) turned++;
         // frames with a serious light or blur problem are kept apart and used only when no clean frame exists
         const yaw = r.raw.yaw, flawed = (r.issues || []).some(q => q.sev === 'high' && q.k !== 'res' && q.k !== 'pose');
         if (Math.abs(yaw) <= 0.12) {
@@ -2598,7 +2673,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     } catch (e) { renderError(e && e.message === 'video' ? 'video' : e && e.message === 'model-missing' ? 'model-missing' : 'error'); return; }
     let used = fronts;
     if (!best && weakBest) { best = weakBest; used = weak; best.quality = 'low'; }
-    if (!best) { renderError('video-no-face'); return; }
+    if (!best) { renderError('video-no-face', `از ${fa(total)} فریم بررسی‌شده، ${fa(faced)} فریم صورت کامل داشت و ${fa(turned)} فریم سر چرخیده بود.`); return; }
     mark('combine', 'now');
     combine(best, used);
     // too few clear frontal frames: the result rests on little evidence, say so in the report
@@ -2607,7 +2682,11 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const keys = ['front'].concat(Object.keys(sides));
     await finishScan(best, sides, keys, mark, { frames: used.length, total, sides: Object.keys(sides).length });
   }
-  $('#vidCam').addEventListener('click', () => { $('#vidCamInput').setAttribute('capture', facing); $('#vidCamInput').click(); });
+  // recording: measure straight from the live camera (no file to decode), the report follows by itself
+  $('#vidCam').addEventListener('click', () => {
+    if (!canLive) { $('#vidCamInput').setAttribute('capture', facing); $('#vidCamInput').click(); return; }
+    liveScan = null; liveAuto = true; openLive();
+  });
   $('#vidGal').addEventListener('click', () => $('#vidGalInput').click());
   for (const id of ['#vidCamInput', '#vidGalInput']) $(id).addEventListener('change', (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) runVideo(f); });
   const EDGES = (() => { const e = []; const ch = (a, b, c) => { for (let i = a; i < b; i++) e.push([i, i + 1]); if (c) e.push([b, a]); };
@@ -2696,9 +2775,9 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   // ---------- report ----------
   const ERR = { 'front-no-face': 'در عکس روبه‌رو صورت کامل پیدا نشد. صورت رو کامل و صاف داخل بیضی بگیر.', 'little-skin': 'پوست کافی در عکس روبه‌رو دیده نشد؛ مو یا عینک رو کنار بزن.', 'model-missing': 'مدل هوش مصنوعی بارگیری نشد؛ اینترنت رو بررسی کن و صفحه رو دوباره باز کن.', error: 'بررسی عکس‌ها انجام نشد؛ با نور بهتر دوباره امتحان کن.', video: 'این ویدیو روی این گوشی باز نشد. با دوربین خود اپ ضبط کن یا ویدیوی دیگه‌ای انتخاب کن.', 'video-no-face': 'در ویدیو فریم روبه‌روی سالمی پیدا نشد. ویدیو رو در نور روز بگیر، کل صورت از پیشانی تا چانه در کادر باشه و چند ثانیه صاف به دوربین نگاه کن.', slow: 'تحلیل روی این گوشی بیش از حد طول کشید. اپ رو کامل ببند و دوباره باز کن و دوباره امتحان کن؛ اگه تکرار شد، فقط با عکس روبه‌رو امتحان کن.' };
   const QTXT = { res: 'صورت در عکس روبه‌رو کوچکه؛ نزدیک‌تر بگیر.', dark: 'نور کمه؛ رو به پنجره بایست.', bright: 'نور خیلی شدیده یا فلاش خورده.', side: 'نور از یک طرف می‌تابه.', pose: 'صورت کمی چرخیده.', blur: 'عکس کمی تاره.', many: 'چند صورت در عکس بود؛ بزرگ‌ترین بررسی شد.', frames: 'در ویدیو فقط چند فریم روبه‌رو و واضح بود (بقیه تار یا ناقص بودن). برای نتیجه‌ی دقیق‌تر گوشی رو ثابت نگه دار، کل صورت در کادر باشه و چند ثانیه آروم و صاف نگاه کن.' };
-  function renderError(reason) {
+  function renderError(reason, extra) {
     $('#s-report').innerHTML = `<div class="steps-top"><button class="back" type="button" id="errBack" aria-label="بازگشت">${I('<path d="m9 6 6 6-6 6"/>', 2)}</button></div>
-      <div class="flow-h"><span class="en">Let's try again</span><h1>یک عکس <b>دیگه</b></h1></div><div class="notice err" role="alert">${iWarn}<div>${ERR[reason] || ERR.error}</div></div>
+      <div class="flow-h"><span class="en">Let's try again</span><h1>یک عکس <b>دیگه</b></h1></div><div class="notice err" role="alert">${iWarn}<div>${ERR[reason] || ERR.error}${extra ? `<br><small>${esc(extra)}</small>` : ''}</div></div>
       <div class="stack" style="margin-top:18px"><button class="btn btn-primary btn-block" type="button" id="reShots">برگشت به عکس‌ها</button></div>`;
     $('#errBack').onclick = $('#reShots').onclick = () => go('s-shots');
     hist.length = 0; go('s-report', { push: false });
@@ -3170,15 +3249,20 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
 
   // ---------- before / after preview of the plan (FaceSim, on the phone) ----------
   const SIM_KEYS = new Set(['glabella', 'forehead', 'crows', 'undereye', 'perioral', 'lips', 'nasolabial', 'marionette', 'cheeks', 'temples', 'chin', 'jawline', 'face', 'meso']);
-  const simAreas = (items, off) => items.filter(i => SIM_KEYS.has(i.key) && !(off && off.has(i.key))).map(i => ({ key: i.key, level: i.level }));
+  // the simulation strength follows the measured need (0–4) when there is one
+  const simAreas = (items, off) => items.filter(i => SIM_KEYS.has(i.key) && !(off && off.has(i.key))).map(i => ({ key: i.key, level: i.need ? i.need.lvl : i.level }));
+  const pngOf = (cv, w = 384) => { const c = document.createElement('canvas'); c.width = w; c.height = Math.round(w * cv.height / cv.width); c.getContext('2d').drawImage(cv, 0, 0, c.width, c.height); return c.toDataURL('image/png'); };
   const jpgOf = (cv, w = 384) => { const c = document.createElement('canvas'); c.width = w; c.height = Math.round(w * cv.height / cv.width); c.getContext('2d').drawImage(cv, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.82); };
   function simHtml(rec, live) {
     if (!rec.simAfter) return '';
     const items = rec.recs.plan.items.filter(i => SIM_KEYS.has(i.key));
+    const low = !items.some(i => i.need && i.need.lvl >= 2);
     return `<div class="sec" id="simSec"><div class="sec-h"><div><span class="en">Preview</span><h2>بعد از نقشه، تقریباً این‌طوری</h2></div></div>
       <div class="card pad simcard">
-        <div class="cmp" id="simCmp" style="--x:50%"><img src="${rec.simBefore}" alt="الان"><img class="top" id="simAfter" src="${rec.simAfter}" alt="بعد از تزریق، شبیه‌سازی"><span class="lb l">بعد</span><span class="lb r">الان</span><i class="handle"></i><input type="range" min="0" max="100" value="50" id="simR" aria-label="کشیدن برای دیدن قبل و بعد"><span class="sim-busy" id="simBusy" hidden>در حال ساخت…</span></div>
-        <p class="sim-hint">انگشتت رو روی تصویر به چپ و راست بکش.</p>
+        <div class="cmp" id="simCmp" style="--x:50%"><img src="${rec.simBefore}" alt="الان"><img class="top" id="simAfter" src="${rec.simAfter}" alt="بعد از تزریق، شبیه‌سازی"><span class="lb l">بعد</span><span class="lb r">الان</span><i class="handle"></i><input type="range" min="0" max="100" value="50" id="simR" aria-label="کشیدن برای دیدن قبل و بعد">${rec.simMask ? `<img class="mask" id="simMask" src="${rec.simMask}" alt="" hidden>` : ''}<span class="sim-busy" id="simBusy" hidden>در حال ساخت…</span></div>
+        <div class="sim-seg" role="group" aria-label="نمایش"><button type="button" data-simx="0">الان</button><button type="button" data-simx="50" class="on">مقایسه</button><button type="button" data-simx="100">بعد</button>${rec.simMask ? '<button type="button" data-simmask>ناحیه‌های درمان</button>' : ''}</div>
+        <p class="sim-hint">انگشتت رو روی تصویر به چپ و راست بکش، یا «الان» و «بعد» رو پشت سر هم بزن.</p>
+        ${low ? '<p class="sim-low">در خوانش تو چین یا گودی عمیقی اندازه‌گیری نشد؛ برای همین تفاوت قبل و بعد کمه و این طبیعیه. با «ناحیه‌های درمان» ببین کجاها تغییر می‌کنه.</p>' : ''}
         ${live ? `<p class="group-t">کدوم ناحیه‌ها؟</p><div class="chips" id="simChips">${items.map(i => `<label class="chip"><input type="checkbox" value="${i.key}" checked><span><em class="cdot" style="background:${P[i.product].color}"></em>${esc(i.area)}</span></label>`).join('')}</div>` : ''}
         <p class="sim-note">این تصویر یک <b>شبیه‌سازی تقریبی</b> روی گوشی توست و نتیجه‌ی واقعی تزریق رو تضمین نمی‌کنه. نتیجه به پوست و بدن تو، مهارت پزشک و مقدار نهایی بستگی داره.</p>
         <div class="sim-pro"><b>نسخه‌ی پزشک · به‌زودی</b><span>در کلینیک‌های همکار KMT، پزشک می‌تونه با هوش مصنوعی یک تصویر واقعی‌تر از نتیجه برات بسازه.</span></div>
@@ -3186,14 +3270,19 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
   function wireSim(rec, live) {
     const r = $('#simR'); if (!r) return;
-    r.oninput = () => $('#simCmp').style.setProperty('--x', r.value + '%');
+    const seg = $$('.sim-seg [data-simx]');
+    const setX = (v) => { r.value = v; $('#simCmp').style.setProperty('--x', v + '%'); seg.forEach(b => b.classList.toggle('on', Number(b.dataset.simx) === Number(v))); };
+    r.oninput = () => setX(r.value);
+    seg.forEach(b => b.onclick = () => setX(b.dataset.simx));
+    const mb = $('.sim-seg [data-simmask]');
+    if (mb) mb.onclick = () => { const m = $('#simMask'); m.hidden = !m.hidden; mb.classList.toggle('on', !m.hidden); };
     const chips = $('#simChips'); if (!chips || !live) return;
     let tm = 0;
     chips.addEventListener('change', () => {
       clearTimeout(tm); $('#simBusy').hidden = false;
       tm = setTimeout(() => {
         const off = new Set($$('input', chips).filter(i => !i.checked).map(i => i.value));
-        try { $('#simAfter').src = jpgOf(FaceSim.render(live.view, simAreas(rec.recs.plan.items, off))); } catch (e) {}
+        try { const after = FaceSim.render(live.view, simAreas(rec.recs.plan.items, off)); $('#simAfter').src = jpgOf(after); if (after.mask && $('#simMask')) $('#simMask').src = pngOf(after.mask); } catch (e) {}
         $('#simBusy').hidden = true;
       }, 60);
     });
@@ -3260,6 +3349,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   let liveScan = null;
   // live measurement: the last readings of each measurable zone (scores 0–100, higher = smoother skin)
   let liveBuf = {}, liveFrames = 0, liveBusy = false, liveTried = 0, liveBuilt = null;
+  // for the full report: every counted frame's measurements and the sharpest frame itself
+  let liveFronts = [], liveBest = null, liveBestQ = -1, liveAuto = false;
   const NEED_KEYS = Object.keys(Recs.NEED.MEASURED);
   const medianOf = (arr) => { const v = arr.slice().sort((x, y) => x - y), n = v.length; return n % 2 ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2; };
   const liveReady = (k) => liveBuf[k] && liveBuf[k].length >= 2;
@@ -3322,7 +3413,8 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   async function openLive() {
     if (!canLive) { toast('دوربین زنده در این مرورگر در دسترس نیست؛ اپ رو در مرورگر اصلی گوشی باز کن'); return; }
     $('#live').hidden = false; $('#liveCard').hidden = true; liveSel = null;
-    liveBuf = {}; liveFrames = 0; liveTried = 0; liveBuilt = null; renderLegend(); renderLiveChips();
+    liveBusy = false; liveBuf = {}; liveFrames = 0; liveTried = 0; liveBuilt = null; liveFronts = []; liveBest = null; liveBestQ = -1; renderLegend(); renderLiveChips();
+    $('#liveReport').hidden = true;
     $('#liveMeter').hidden = true;
     $('#liveMsg').textContent = 'در حال روشن کردن دوربین…';
     try {
@@ -3334,6 +3426,11 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       await SkinEngine.init();
       liveOn = true; livePts = null; liveLost = 0; liveDetect(); liveDraw(); setTimeout(liveMeasure, 1200);
     } catch (e) { closeLive(); toast('دوربین باز نشد؛ اجازه‌ی دوربین رو بررسی کن'); }
+  }
+  function liveToReport() {
+    if (!liveBest) return;
+    const best = liveBest, list = liveFronts.slice();
+    closeLive(); runFromLive(best, list);
   }
   function closeLive() { liveOn = false; if (liveStream) liveStream.getTracks().forEach(t => t.stop()); liveStream = null; $('#live').hidden = true; }
   async function liveDetect() {
@@ -3353,7 +3450,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
           livePts = livePts ? livePts.map((p, i) => ({ x: p.x + (up[i].x - p.x) * a, y: p.y + (up[i].y - p.y) * a })) : up;
           liveRaw = { pts: up, t: performance.now(), still: d < eye * 0.05 ? ((liveRaw && liveRaw.still) || 0) + 1 : 0 };
           liveLost = 0;
-          $('#liveMsg').textContent = liveFrames ? 'روی هر ناحیه بزن تا نیاز و مقدار رو ببینی' : 'صورت رو ثابت نگه دار تا اندازه‌گیری شروع بشه';
+          $('#liveMsg').textContent = liveAuto ? `صاف و بی‌حالت به دوربین نگاه کن · ${fa(Math.min(8, liveFronts.length))} از ۸ فریم` : liveFrames ? 'روی هر ناحیه بزن تا نیاز و مقدار رو ببینی' : 'صورت رو ثابت نگه دار تا اندازه‌گیری شروع بشه';
         } else {
           // never draw on a doubtful face: a wrong map is worse than none
           if (why !== 'none' || ++liveLost > 4) livePts = null;
@@ -3376,7 +3473,9 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         const VW = v.videoWidth, VH = v.videoHeight, k = Math.min(1, 1600 / Math.max(VW, VH));
         liveFull.width = Math.round(VW * k); liveFull.height = Math.round(VH * k);
         liveFull.getContext('2d').drawImage(v, 0, 0, liveFull.width, liveFull.height);
-        const res = await SkinEngine.analyze(liveFull, { allowPatch: false, pts: r.pts.map(p => ({ x: p.x * k, y: p.y * k })) });
+        const trk = r.pts.map(p => ({ x: p.x * k, y: p.y * k }));
+        let res = liveAuto ? await SkinEngine.analyze(liveFull, { allowPatch: false, loose: true }) : null;
+        if (!res || !res.ok) res = await SkinEngine.analyze(liveFull, { allowPatch: false, pts: trk });
         liveTried++;
         // a turned head foreshortens the lines and a dark or blurry frame hides them: such frames are not counted
         const bad = !res.ok || Math.abs(res.raw.yaw) > 0.12 || (res.issues || []).some(q => q.sev === 'high' && q.k !== 'res');
@@ -3384,6 +3483,11 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
           const m = Recs.NEED.measure(res.metrics);
           for (const key of NEED_KEYS) if (m[key]) { const b = liveBuf[key] || (liveBuf[key] = []); b.push(m[key].score); if (b.length > 9) b.shift(); }
           liveFrames++; liveBuilt = liveBuild(); renderLiveChips(); if (liveSel) liveInfo(liveSel);
+          liveFronts.push(JSON.parse(JSON.stringify(res.metrics))); if (liveFronts.length > 12) liveFronts.shift();
+          const q = res.raw.sharp * (1 - Math.abs(res.raw.yaw) * 3) * (res.quality === 'good' ? 1.2 : 1);
+          if (q > liveBestQ) { liveBestQ = q; liveBest = res; }
+          const rb = $('#liveReport'); rb.hidden = liveFronts.length < 3; rb.textContent = `گزارش کامل از ${fa(liveFronts.length)} فریم`;
+          if (liveAuto && liveFronts.length >= 8) { liveToReport(); return; }
         }
         $('#liveMeterT').textContent = bad ? (res.ok && Math.abs(res.raw.yaw) > 0.12 ? 'صاف روبه‌روی دوربین نگاه کن' : 'نور کافی نیست یا تصویر تاره؛ رو به پنجره بایست') : `اندازه‌گیری زنده · ${fa(liveFrames)} فریم`;
         if (liveFrames >= 6) meter.classList.add('done');
@@ -3461,10 +3565,11 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   }
   document.addEventListener('click', (e) => {
     const lv = e.target.closest('[data-live]');
-    if (lv) { liveScan = lv.closest('#s-report') ? curRec : null; openLive(); return; }
+    if (lv) { liveScan = lv.closest('#s-report') ? curRec : null; liveAuto = false; openLive(); return; }
     if (e.target.closest('[data-live-scan]')) { closeLive(); startScan(); return; }
   });
   $('#liveClose').addEventListener('click', closeLive);
+  $('#liveReport').addEventListener('click', liveToReport);
   $('#liveFlip').addEventListener('click', () => { setWho(facing === 'user' ? 'environment' : 'user'); openLive(); });
   $('#live').addEventListener('click', (e) => {
     const z = e.target.closest('[data-lzone]'); if (z) { liveInfo(z.dataset.lzone); return; }
