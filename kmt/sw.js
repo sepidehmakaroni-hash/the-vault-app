@@ -1,6 +1,6 @@
 /* Keeps the app usable offline: the app shell and AI model are cached on first visit,
    fonts are cached as they load. Bump VERSION whenever index.html changes. */
-const VERSION = 'kmt-skinscan-v3';
+const VERSION = 'kmt-skinscan-v4';
 const SHELL = ['./', 'index.html', 'face-api.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith('kmt-skinscan-') && k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
