@@ -551,6 +551,49 @@ body.noscroll { overflow: hidden; }
 .ps-nav { margin: 12px 0 4px; }
 .ps-in { margin-top: 0; padding-top: 8px; }
 
+/* ---------- medical plan: phases, risk, source, physician summary ---------- */
+.phase-h { display: grid; gap: 2px; margin: 26px 4px 12px; font-size: 16px; font-weight: 600; color: var(--pearl); }
+.phase-h small { font-size: 12px; font-weight: 300; color: var(--mist); }
+.pitem .alt { color: var(--faint); font-family: var(--sans, inherit); font-size: 11px; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+.rk, .ev { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 2px 10px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+.rk::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.rk.vhigh { color: #FF6B81; } .rk.high { color: #FF9F7A; } .rk.mid { color: var(--mid); } .rk.low { color: var(--good); }
+.ev { color: var(--aqua); border-color: rgba(191,239,242,.35); }
+.ev.cat { color: var(--mid); border-color: rgba(241,194,125,.45); }
+.advice { padding: 14px 16px; }
+.advice b { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 14.5px; }
+.advice p { margin: 8px 0 0; font-size: 13px; color: var(--mist); line-height: 1.9; font-weight: 300; }
+.docsum { margin-top: 16px; padding: 16px 18px; }
+.docsum summary { list-style: none; cursor: pointer; display: grid; gap: 2px; }
+.docsum summary::-webkit-details-marker { display: none; }
+.docsum summary b { font-size: 15.5px; display: flex; justify-content: space-between; }
+.docsum summary b::after { content: "＋"; color: var(--aqua); font-weight: 300; }
+.docsum[open] summary b::after { content: "－"; }
+.docsum summary small { font-size: 12px; color: var(--mist); font-weight: 300; }
+.glogau { display: grid; gap: 2px; margin: 14px 0 6px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid var(--hair); }
+.glogau small { font-size: 11.5px; color: var(--faint); } .glogau b { font-size: 15px; } .glogau span { font-size: 12.5px; color: var(--mist); }
+.dtable { display: grid; margin-top: 8px; font-size: 12.5px; }
+.dtable > div { display: grid; grid-template-columns: 1.4fr .8fr .9fr; gap: 4px 8px; padding: 9px 0; border-bottom: 1px solid var(--hair); align-items: center; }
+.dtable > div > span:nth-child(4) { grid-column: 1 / 3; color: var(--faint); font-size: 11.5px; }
+.dtable > div > span:nth-child(5) { justify-self: start; }
+.dtable em { color: var(--faint); font-style: normal; font-size: 11px; }
+.ps-areas em.cat { font-style: normal; font-size: 10.5px; color: var(--mid); border: 1px solid rgba(241,194,125,.45); border-radius: 99px; padding: 0 8px; margin-inline-start: 8px; font-weight: 400; }
+.ps-src { font-size: 11.5px; color: var(--faint); margin: 8px 0 0; line-height: 1.8; }
+.surface-zone .notice.err { background: rgba(255,240,242,.85); color: #7A1027; border-color: rgba(192,46,78,.25); }
+/* ---------- who takes the photo + clinical photo tips ---------- */
+.who { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 14px; }
+.who-opt { position: relative; display: block; }
+.who-opt input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.who-opt span { display: grid; gap: 2px; padding: 14px; border-radius: 20px; border: 1px solid var(--hair); background: rgba(3,5,26,.45); text-align: center; transition: all .3s var(--ease); }
+.who-opt b { font-size: 14px; font-weight: 600; } .who-opt small { font-size: 11.5px; color: var(--mist); }
+.who-opt input:checked + span { border-color: var(--glow); background: linear-gradient(180deg, rgba(127,216,224,.2), rgba(127,216,224,.06)); box-shadow: 0 0 24px -10px var(--glow); }
+.who-opt input:focus-visible + span { outline: 2px solid var(--glow); outline-offset: 2px; }
+.tips { margin: 0 0 14px; padding: 12px 16px; }
+.tips summary { cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--aqua); list-style: none; }
+.tips summary::-webkit-details-marker { display: none; }
+.tips ul { margin: 10px 0 2px; padding-inline-start: 18px; font-size: 12.5px; color: var(--mist); line-height: 1.9; font-weight: 300; }
+
 </style>
 
 <div class="sea" aria-hidden="true"><div class="layer" id="seaHero"><video id="seaVideo" muted loop playsinline preload="auto" aria-hidden="true"></video></div><div class="layer" id="seaDeep"></div><div class="layer" id="seaSurface"></div><div class="rays"></div><div class="veil"></div><div class="motes"></div><div class="motes m2"></div></div>
@@ -612,11 +655,17 @@ body.noscroll { overflow: hidden; }
         <label class="chip"><input type="radio" name="pregnancy" id="pg-n" value="no"><span>هیچ‌کدوم</span></label>
       </div></div>
       <div class="field"><span class="lbl">داروها و شرایط خاص</span><div class="chips">
-        <label class="chip"><input type="checkbox" name="meds" id="m-bt" value="anticoagulant"><span>رقیق‌کننده‌ی خون یا آسپرین</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-bt" value="anticoagulant"><span>رقیق‌کننده‌ی خون، آسپرین یا مسکن ضدالتهاب</span></label>
         <label class="chip"><input type="checkbox" name="meds" id="m-iso" value="isotretinoin"><span>راکوتان</span></label>
         <label class="chip"><input type="checkbox" name="meds" id="m-lid" value="lidocaine-allergy"><span>حساسیت به لیدوکائین</span></label>
         <label class="chip"><input type="checkbox" name="meds" id="m-ai" value="autoimmune"><span>بیماری خودایمنی</span></label>
         <label class="chip"><input type="checkbox" name="meds" id="m-cor" value="corticosteroid"><span>کورتون</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-hsv" value="herpes"><span>سابقه‌ی تبخال</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-pf" value="permanent-filler"><span>فیلر دائمی در گذشته</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-las" value="recent-laser"><span>لیزر یا لایه‌برداری در ۲ هفته‌ی اخیر</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-kel" value="keloid"><span>زخم یا اسکار برجسته (کلوئید)</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-fish" value="fish-allergy"><span>حساسیت به ماهی</span></label>
+        <label class="chip"><input type="checkbox" name="meds" id="m-epi" value="epilepsy"><span>صرع یا بیماری قلبی</span></label>
       </div></div>
       <div class="field"><span class="lbl">قبلاً کدوم رو انجام دادی؟</span><div class="chips">
         <label class="chip"><input type="checkbox" name="pastTreatments" id="t-fi" value="filler"><span>فیلر</span></label>
@@ -699,6 +748,17 @@ body.noscroll { overflow: hidden; }
 <section class="screen" id="s-shots" hidden>
   <div class="steps-top"><button class="back" type="button" data-back aria-label="بازگشت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg></button><div class="prog"><i class="on"></i><i class="on"></i><i></i></div></div>
   <div class="flow-h"><span class="en">Six portraits</span><h1>شش عکس، <b>یک نقشه</b></h1><p>نور روز، بدون آرایش و فیلتر. عکس روبه‌رو لازمه؛ بقیه اختیاری‌ان، ولی پنجه‌کلاغی، خط خنده و خطوط ظریف رو خیلی دقیق‌تر نشون می‌دن.</p></div>
+  <div class="who" role="radiogroup" aria-label="کی عکس می‌گیره؟">
+    <label class="who-opt"><input type="radio" name="who" value="user" checked><span><b>خودم می‌گیرم</b><small>دوربین جلو</small></span></label>
+    <label class="who-opt"><input type="radio" name="who" value="environment"><span><b>یکی دیگه می‌گیره</b><small>دوربین اصلی · کیفیت بالاتر</small></span></label>
+  </div>
+  <details class="card tips"><summary>راهنمای عکس استاندارد پزشکی</summary><ul>
+    <li>پشت سر یک دیوار ساده و روشن؛ رو به پنجره یا نور یکنواخت، بدون فلاش و بدون نور از یک طرف.</li>
+    <li>بدون آرایش، عینک و فیلتر؛ موها پشت گوش و پیشانی باز.</li>
+    <li>صورت آروم و بی‌حالت، به‌جز عکس لبخند؛ چانه صاف، نه بالا نه پایین.</li>
+    <li>اگه کس دیگه‌ای عکس می‌گیره: گوشی هم‌سطح صورت، فاصله‌ی حدود نیم متر، بدون زوم.</li>
+    <li>برای مقایسه‌ی قبل و بعد، دفعه‌های بعد هم همین نور و فاصله.</li>
+  </ul></details>
   <div class="shots" id="shots"></div>
   <div class="meter-shots"><span id="shotCount"></span><i><b id="shotBar" style="width:0"></b></i></div>
   <div class="sticky-cta"><button class="btn btn-primary btn-block" id="analyzeBtn" type="button" disabled>شروع خوانش پوست</button></div>
@@ -1591,8 +1651,8 @@ const FaceSim = (() => {
 <script>/* Recommendation knowledge base — "from depth to surface".
    Layer 1 (depth): an INOVOSENSE filler plan — area, product, technique, depth, approximate volume, sessions.
    Layer 2 (surface): daily skincare by skin type and texture, plus before/after-injection care.
-   Product data (HA mg/ml, lidocaine, needle, techniques, indications) comes from inovosense.com.
-   Volumes are typical starting ranges for a first session; the physician decides the real plan. */
+   Product data comes from the official INOVOSENSE Instructions For Use; volumes from expert consensus papers
+   and clinical studies. Volumes are typical starting ranges for a first session; the physician decides the real plan. */
 const Recs = (() => {
   const CONCERNS = {
     acne: { label: 'جوش و التهاب' }, blackheads: { label: 'جوش سرسیاه و منافذ بسته' }, scars: { label: 'جای جوش و اسکار' },
@@ -1610,23 +1670,34 @@ const Recs = (() => {
   const METRIC_KEYS = { acne: 'acne', spots: 'spots', freckles: 'freckles', tone: 'tone', redness: 'redness', shine: 'shine', texture: 'texture', circles: 'circles' };
   const rank = (l) => l === 'high' ? 2 : l === 'mid' ? 1 : 0;
 
-  // ---------- INOVOSENSE line (official data) ----------
+  // ---------- INOVOSENSE line ----------
+  // Composition, depth and indications follow the official Instructions For Use (IFU, inovosense.com, v1403);
+  // "catalog" marks uses listed only in the marketing catalogue/website, not in the IFU.
   const PRODUCTS = {
-    shine:    { id: 'shine', name: 'Shine', color: '#A6CE39', depth: 1, depthLabel: 'سطح پوست · درم سطحی تا میانی', ha: '۱۰ میلی‌گرم در میلی‌لیتر', needle: '30G ½', role: 'آبرسانی عمقی و درخشش', indications: 'صورت، گردن، دکلته و پشت دست' },
-    silk:     { id: 'silk', name: 'Silk', color: '#FC6C0F', depth: 2, depthLabel: 'درم سطحی', ha: '۱۹ میلی‌گرم در میلی‌لیتر', needle: '30G ½', role: 'اصلاح خطوط ظریف و سطحی', indications: 'پنجه‌کلاغی، خط اخم، خطوط پیشانی و دور لب، گودی زیر چشم' },
-    mesocell: { id: 'mesocell', name: 'Mesocell Plus', color: '#E9D9C1', depth: 2, depthLabel: 'درم', ha: '—', needle: '—', role: 'تحریک کلاژن و الاستین، سفتی و روشنی پوست', indications: 'صورت، گردن، دکلته و پشت دست' },
-    smile:    { id: 'smile', name: 'Smile', color: '#D50054', depth: 3, depthLabel: 'درم میانی تا عمقی', ha: '۲۰ میلی‌گرم در میلی‌لیتر', needle: '30G ½ تا 27G ½', role: 'اصلاح چین‌های متوسط و حجم لب', indications: 'خط خنده، خط غم، گوشه‌ی لب، حجم لب' },
-    style:    { id: 'style', name: 'Style', color: '#7C3794', depth: 4, depthLabel: 'درم عمقی', ha: '۲۳ میلی‌گرم در میلی‌لیتر', needle: '27G ½', role: 'چین‌های عمیق و لیفت صورت', indications: 'خط خنده‌ی عمیق، گونه و استخوان گونه، چانه، شقیقه' },
-    shape:    { id: 'shape', name: 'Shape', color: '#25CAD2', depth: 5, depthLabel: 'عمقی · روی استخوان', ha: '۲۵ میلی‌گرم در میلی‌لیتر', needle: '27G ½ تا 25G ½', role: 'بازگرداندن حجم و فرم‌دهی صورت', indications: 'گونه و استخوان گونه، چانه، خط فک، شقیقه' },
+    shine:    { id: 'shine', name: 'Shine', color: '#A6CE39', depth: 1, depthLabel: 'درم سطحی یا محل اتصال درم و اپیدرم', ha: '۱۰ میلی‌گرم در میلی‌لیتر', lido: '۰٫۳٪', needle: '30G ½', pack: '۲ سرنگ ۱ میلی‌لیتری', role: 'آبرسانی و جوان‌سازی پوست، پر کردن اسکار فرورفته‌ی جوش', indications: 'صورت، گردن، دکلته، پشت دست و اسکار آتروفیک صورت' },
+    silk:     { id: 'silk', name: 'Silk', color: '#FC6C0F', depth: 2, depthLabel: 'درم سطحی تا میانی', ha: '۱۹ میلی‌گرم در میلی‌لیتر', lido: '۰٫۳٪', needle: '30G ½', pack: '۲ سرنگ ۱ میلی‌لیتری', role: 'چین‌های متوسط و سطحی، خطوط دور لب و فرم لب', indications: 'خط خنده، خط غم، خطوط دور لب، گوشه‌ی لب و خط دور لب' },
+    mesocell: { id: 'mesocell', name: 'Mesocell Plus', color: '#E9D9C1', depth: 2, depthLabel: 'درم سطحی یا میانی', ha: '—', active: 'PDRN (پلی‌دئوکسی‌ریبونوکلئوتید) ۴۰ میلی‌گرم در ۲ میلی‌لیتر', lido: '۰٫۱۵٪', needle: '31G تا 32G', pack: '۱ سرنگ ۲ میلی‌لیتری', role: 'تحریک کلاژن و الاستین، سفتی، روشنی و ترمیم پوست', indications: 'صورت، گردن، دکلته و پشت دست' },
+    smile:    { id: 'smile', name: 'Smile', color: '#D50054', depth: 3, depthLabel: 'درم عمقی؛ برای لب زیر مخاط', ha: '۲۰ میلی‌گرم در میلی‌لیتر', lido: '۰٫۳٪', needle: '30G ½ تا 27G ½', pack: '۲ سرنگ ۱ میلی‌لیتری', role: 'چین‌های عمیق و حجم لب', indications: 'خط خنده، خط غم و حجم لب' },
+    style:    { id: 'style', name: 'Style', color: '#7C3794', depth: 4, depthLabel: 'زیرجلدی عمقی یا روی استخوان', ha: '۲۳ میلی‌گرم در میلی‌لیتر', lido: '۰٫۳٪', needle: '27G ½', pack: '۲ سرنگ ۱ میلی‌لیتری', role: 'بازگرداندن حجم و لیفت صورت', indications: 'گونه، شقیقه، چانه و خط خنده‌ی شدید' },
+    shape:    { id: 'shape', name: 'Shape', color: '#25CAD2', depth: 5, depthLabel: 'زیرجلدی عمقی یا روی استخوان', ha: '۲۵ میلی‌گرم در میلی‌لیتر', lido: '۰٫۳٪', needle: '27G ½ تا 25G ½ و میکروکانولا', pack: '۲ سرنگ ۱ میلی‌لیتری', role: 'بازگرداندن و افزایش حجم صورت', indications: 'گونه و استخوان گونه، چانه، خط فک و شقیقه' },
   };
   const TECH = {
     serial: 'نقطه‌ای سریالی', linear: 'خطی (Linear threading)', fan: 'بادبزنی (Fanning)', cross: 'هاشور متقاطع (Cross-hatching)', bolus: 'بولوس (توده‌ای عمقی)',
+    multi: 'چندنقطه‌ای در دو ردیف عمود (Multipuncture)', micro: 'میکروپاپول', nappage: 'ناپاژ', submucosal: 'زیر مخاط لب',
   };
+  /* Vascular risk of each area, from the international consensus on preventing filler-related visual loss
+     (Walker et al., PMC7427155): very high / high / moderate / low. */
+  const RISK = {
+    vhigh: { label: 'خطر عروقی بسیار بالا', short: 'بسیار پرخطر' }, high: { label: 'خطر عروقی بالا', short: 'پرخطر' },
+    mid: { label: 'خطر عروقی متوسط', short: 'خطر متوسط' }, low: { label: 'خطر عروقی کم', short: 'کم‌خطر' },
+  };
+  const EVIDENCE = { ifu: 'طبق دفترچه‌ی رسمی محصول', catalog: 'فقط در کاتالوگ Inovosense؛ خارج از دفترچه‌ی رسمی، تصمیم با پزشک' };
   /* Where the plan points sit on the face diagram (viewBox 0 0 300 360). */
   const SPOTS = {
     glabella: [[150, 120]], forehead: [[105, 78], [150, 70], [195, 78]], crows: [[62, 158], [238, 158]], undereye: [[110, 180], [190, 180]],
     nasolabial: [[122, 226], [178, 226]], marionette: [[118, 276], [182, 276]], perioral: [[132, 244], [168, 244]], lips: [[150, 256]],
     cheeks: [[86, 196], [214, 196]], temples: [[52, 112], [248, 112]], chin: [[150, 312]], jawline: [[78, 292], [222, 292]], face: [[150, 200]],
+    scars: [[96, 214], [204, 214]],
   };
 
   function concerns(result, self) {
@@ -1652,55 +1723,104 @@ const Recs = (() => {
   const has = (p, k) => p && (p.meds || []).includes(k);
   const age = (p) => p && p.birthYear ? ((window.SOLAR_YEAR || 1405) - Number(p.birthYear)) : null;
 
+  /* Glogau photo-ageing type, estimated from age and how many line areas read as marked. A rough guide for the
+     physician, not a measurement. */
+  function glogau(cs, p) {
+    const a = age(p) || 0, lineKeys = ['lines_forehead', 'lines_crows', 'lines_undereye', 'nasolabial', 'marionette', 'perioral'];
+    const hi = cs.filter(c => lineKeys.includes(c.key) && c.level === 'high').length, any = cs.filter(c => lineKeys.includes(c.key)).length;
+    let t = 1;
+    if (any || a >= 30) t = 2;
+    if (hi >= 2 || (a >= 45 && any >= 2)) t = 3;
+    if (hi >= 4 && a >= 60) t = 4;
+    return { type: t, label: ['', 'نوع ۱ · بدون چین', 'نوع ۲ · چین در حرکت', 'نوع ۳ · چین در حالت آرام', 'نوع ۴ · چین گسترده'][t],
+      desc: ['', 'پیری نوری خفیف؛ معمولاً ۲۰ تا ۳۰ سالگی.', 'خطوط با حرکت صورت دیده می‌شن؛ معمولاً ۳۰ تا ۴۰ سالگی.', 'خطوط در حالت آرام هم دیده می‌شن؛ معمولاً از ۵۰ سالگی.', 'چین‌های گسترده در بیشتر صورت؛ معمولاً از ۶۰ سالگی.'][t] };
+  }
+
   // ---------- layer 1: the filler plan ----------
+  /* Volumes are typical first-session ranges drawn from expert consensus papers and clinical studies
+     (per side where the area is paired). They are a starting point for the physician, never a prescription. */
   function fillerPlan(cs, p) {
     const lv = (k) => (cs.find(c => c.key === k) || {}).level;
     const src = (k) => (cs.find(c => c.key === k) || {}).source;
-    const items = [];
-    const add = (key, area, product, tech, ml, extra = {}) => items.push({ key, area, product, tech: tech.map(t => TECH[t]), ml, sessions: extra.sessions || 'یک جلسه، ترمیم بعد از ۶ تا ۱۲ ماه', note: extra.note || '', spots: SPOTS[extra.spot || key] || [], level: lv(extra.lvKey || key) || 'mid', source: src(extra.lvKey || key) || 'self' });
+    const items = [], advice = [];
+    const add = (key, area, product, tech, o) => {
+      const sides = o.perSide ? 2 : 1, per = o.perSide || null;
+      const ml = o.ml || (per ? [Math.round(per[0] * 2 * 10) / 10, Math.round(per[1] * 2 * 10) / 10] : null);
+      items.push({ key, area, product, alt: o.alt || null, tech: tech.map(t => TECH[t]), ml, perSide: per, sides,
+        depth: o.depth || PRODUCTS[product].depthLabel, risk: o.risk || 'low', evidence: o.evidence || 'ifu', doctorOnly: !!o.doctorOnly,
+        sessions: o.sessions || 'یک جلسه؛ بررسی نتیجه بعد از ۲ هفته', note: o.note || '', spots: SPOTS[o.spot || key] || [],
+        level: lv(o.lvKey || key) || 'mid', source: src(o.lvKey || key) || 'self', prio: o.prio || 9, program: !!o.program });
+    };
     const sev = (k) => lv(k) === 'high';
 
-    if (lv('lines_glabella')) add('glabella', 'بین ابرو (خط اخم)', 'silk', ['serial', 'linear'], sev('lines_glabella') ? [0.3, 0.5] : [0.1, 0.3], { lvKey: 'lines_glabella', note: 'برای خط اخمی که در حالت آرام هم دیده می‌شه.' });
-    if (lv('lines_forehead')) add('forehead', 'خطوط افقی پیشانی', 'silk', ['serial', 'linear', 'fan'], sev('lines_forehead') ? [0.5, 1.0] : [0.3, 0.6], { lvKey: 'lines_forehead' });
-    if (lv('lines_crows')) add('crows', 'پنجه‌کلاغی (دو طرف)', 'silk', ['serial', 'linear'], sev('lines_crows') ? [0.4, 0.8] : [0.2, 0.4], { lvKey: 'lines_crows' });
-    if (lv('lines_undereye') || lv('hollows') || lv('circles') === 'high') add('undereye', 'زیر چشم (گودی و چین ظریف)', 'silk', ['linear'], (sev('hollows') || sev('lines_undereye')) ? [0.6, 1.0] : [0.3, 0.6], { lvKey: lv('hollows') ? 'hollows' : lv('lines_undereye') ? 'lines_undereye' : 'circles', note: 'ناحیه‌ی ظریف؛ فقط توسط پزشک باتجربه. اگر تیرگی رنگدانه‌ای باشه، فیلر کمکی نمی‌کنه.' });
-    if (lv('perioral')) add('perioral', 'خطوط دور لب', 'silk', ['linear', 'serial'], [0.3, 0.5], {});
-    if (lv('lips')) add('lips', 'حجم و فرم لب', 'smile', ['linear'], [0.5, 1.0], {});
-    if (lv('nasolabial')) {
-      if (sev('nasolabial')) add('nasolabial', 'خط خنده‌ی عمیق (دو طرف)', 'style', ['linear', 'fan'], [1.0, 2.0], { lvKey: 'nasolabial' });
-      else add('nasolabial', 'خط خنده (دو طرف)', 'smile', ['linear', 'fan'], [0.8, 1.5], { lvKey: 'nasolabial' });
-    }
-    if (lv('marionette')) add('marionette', 'خط غم و گوشه‌ی لب', 'smile', ['linear', 'fan', 'cross'], sev('marionette') ? [1.0, 2.0] : [0.6, 1.2], { lvKey: 'marionette' });
+    // structure first (deep products), then folds, lips and fine lines
     const cheekNeed = lv('cheek_volume') || lv('laxity') || (sev('nasolabial') && (age(p) || 0) >= 35);
-    if (cheekNeed) add('cheeks', 'گونه و استخوان گونه', lv('laxity') && !lv('cheek_volume') ? 'style' : 'shape', ['bolus', 'linear', 'fan'], sev('cheek_volume') ? [2.0, 3.0] : [1.0, 2.0], { lvKey: lv('cheek_volume') ? 'cheek_volume' : lv('laxity') ? 'laxity' : 'nasolabial', note: 'حمایت از گونه، خط خنده رو هم نرم‌تر می‌کنه.' });
-    if (lv('temples')) add('temples', 'شقیقه (دو طرف)', 'style', ['linear', 'fan'], [1.0, 2.0], {});
-    if (lv('chin')) add('chin', 'چانه', 'shape', ['bolus', 'linear'], [1.0, 2.0], {});
-    if (lv('jawline') || sev('laxity')) add('jawline', 'خط فک و زاویه‌ی فک', 'shape', ['bolus', 'linear', 'fan'], [2.0, 4.0], { lvKey: lv('jawline') ? 'jawline' : 'laxity' });
-    if (lv('dull') || lv('dryness') || lv('texture') || lv('tone') || lv('neck')) add('face', lv('neck') ? 'کل صورت و گردن (آبرسانی)' : 'کل صورت (آبرسانی و درخشش)', 'shine', ['serial'], [1.0, 2.0], { lvKey: lv('dull') ? 'dull' : lv('dryness') ? 'dryness' : lv('texture') ? 'texture' : lv('tone') ? 'tone' : 'neck', sessions: 'سه جلسه با فاصله‌ی ۴ هفته؛ نگهداری هر ۶ تا ۱۲ ماه' });
-    const a = age(p) || 0;
-    if (lv('laxity') || lv('lines_undereye') || (a >= 35 && (lv('texture') || lv('lines_forehead') || lv('lines_crows')))) items.push({ key: 'meso', area: 'کل صورت و گردن (کیفیت و سفتی پوست)', product: 'mesocell', tech: ['تزریق در درم، طبق ارزیابی پزشک'], ml: null, sessions: 'حداقل سه جلسه با فاصله‌ی ۴ هفته', note: 'تولید کلاژن و الاستین رو بالا می‌بره؛ با فیلرها در عمق‌های متفاوت قابل ترکیبه.', spots: SPOTS.face, level: 'mid', source: 'measured' });
-
-    // safety
-    const blocks = [];
-    if (pregnant(p)) blocks.push('در دوران بارداری و شیردهی تزریق فیلر انجام نمی‌شه؛ این برنامه برای بعد از این دورانه.');
-    if (a && a < 18) blocks.push('تزریق فیلر برای زیر ۱۸ سال توصیه نمی‌شه.');
-    const cautions = [];
-    if (has(p, 'anticoagulant')) cautions.push('مصرف رقیق‌کننده‌ی خون احتمال کبودی رو بالا می‌بره؛ حتماً به پزشک بگو و خودسرانه دارو رو قطع نکن.');
-    if (has(p, 'isotretinoin')) cautions.push('در حین مصرف راکوتان، زمان تزریق رو با پزشک هماهنگ کن.');
-    if (lv('acne') === 'high') cautions.push('روی ناحیه‌ای که جوش فعال و ملتهب داره تزریق نمی‌شه؛ اول جوش‌ها باید کنترل بشن.');
-    if (p && p.lidocaine) cautions.push('به لیدوکائین حساسیت داری؛ همه‌ی فیلرهای Inovosense لیدوکائین ۰٫۳٪ دارن، حتماً به پزشک بگو.');
-    if (p && p.autoimmune) cautions.push('بیماری خودایمنی داری؛ تصمیم درباره‌ی تزریق فقط با نظر پزشک.');
-
-    // per-product totals
-    const totals = {};
-    for (const it of items) {
-      if (!it.ml) continue;
-      const t = totals[it.product] || (totals[it.product] = { product: it.product, min: 0, max: 0 });
-      t.min += it.ml[0]; t.max += it.ml[1];
+    if (cheekNeed) add('cheeks', 'گونه و استخوان گونه', lv('laxity') && !lv('cheek_volume') ? 'style' : 'shape', ['bolus', 'linear', 'fan'],
+      { perSide: sev('cheek_volume') || sev('laxity') ? [1.0, 1.5] : [0.5, 1.0], risk: 'high', prio: 1, lvKey: lv('cheek_volume') ? 'cheek_volume' : lv('laxity') ? 'laxity' : 'nasolabial', alt: 'Style برای لیفت / Shape برای حجم',
+        note: 'گونه‌ی کناری کم‌خطره ولی بخش داخلی گونه جزو نواحی پرخطره. حمایت از گونه خط خنده رو هم نرم‌تر می‌کنه.' });
+    if (lv('temples')) add('temples', 'شقیقه', 'style', ['linear', 'fan'], { perSide: [0.5, 1.0], risk: 'high', prio: 2, alt: 'یا Shape', note: 'ناحیه‌ی پرعروق؛ معمولاً روی استخوان یا با کانولا.' });
+    if (lv('chin')) add('chin', 'چانه', 'style', ['bolus', 'linear'], { ml: sev('chin') ? [1.5, 2.0] : [1.0, 1.5], risk: 'low', prio: 3, alt: 'یا Shape' });
+    if (lv('jawline') || sev('laxity')) add('jawline', 'خط فک و زاویه‌ی فک', 'shape', ['bolus', 'linear', 'fan'], { perSide: sev('jawline') ? [1.5, 2.0] : [1.0, 1.5], risk: 'low', prio: 4, lvKey: lv('jawline') ? 'jawline' : 'laxity', evidence: 'ifu' });
+    if (lv('nasolabial')) {
+      if (sev('nasolabial')) add('nasolabial', 'خط خنده‌ی شدید', 'style', ['linear', 'fan'], { perSide: [0.7, 1.0], risk: 'high', prio: 5, lvKey: 'nasolabial', note: 'بخش بالایی خط خنده، نزدیک بینی، از نواحی پرخطر عروقیه.' });
+      else add('nasolabial', 'خط خنده', 'smile', ['linear', 'fan'], { perSide: [0.5, 0.8], risk: 'high', prio: 5, lvKey: 'nasolabial', alt: 'یا Silk برای چین سطحی', note: 'بخش بالایی خط خنده، نزدیک بینی، از نواحی پرخطر عروقیه.' });
     }
-    for (const t of Object.values(totals)) { t.min = Math.round(t.min * 10) / 10; t.max = Math.round(t.max * 10) / 10; t.syringes = [Math.max(1, Math.ceil(t.min)), Math.max(1, Math.ceil(t.max))]; }
-    items.sort((x, y) => PRODUCTS[y.product].depth - PRODUCTS[x.product].depth || rank(y.level) - rank(x.level));
-    return { items, totals: Object.values(totals).sort((x, y) => PRODUCTS[y.product].depth - PRODUCTS[x.product].depth), blocks, cautions };
+    if (lv('marionette')) add('marionette', 'خط غم و گوشه‌ی لب', 'smile', ['linear', 'fan', 'cross'], { perSide: sev('marionette') ? [0.7, 1.0] : [0.4, 0.7], risk: 'low', prio: 6, alt: 'یا Silk برای چین سطحی' });
+    if (lv('lips')) add('lips', 'حجم لب', 'smile', ['linear', 'submucosal'], { ml: [0.5, 1.0], risk: 'mid', prio: 7, depth: 'زیر مخاط یا زیرجلدی', note: 'طبق نظر متخصصان، برای هر لب حدود ۰٫۲۵ تا ۰٫۵ میلی‌لیتر در جلسه‌ی اول. برای فرم و خط دور لب، Silk.' });
+    if (lv('perioral')) add('perioral', 'خطوط دور لب', 'silk', ['linear', 'serial'], { ml: [0.2, 0.5], risk: 'mid', prio: 8 });
+    if (lv('lines_undereye') || lv('hollows') || lv('circles') === 'high') add('undereye', 'زیر چشم (گودی و چین)', 'silk', ['serial', 'linear'],
+      { perSide: [0.3, 0.5], risk: 'high', prio: 9, evidence: 'catalog', doctorOnly: true, depth: 'روی استخوان، با کانولا یا بولوس‌های بسیار کوچک', lvKey: lv('hollows') ? 'hollows' : lv('lines_undereye') ? 'lines_undereye' : 'circles',
+        note: 'ناحیه‌ی ظریف و پرخطر؛ فقط پزشک باتجربه. اگر تیرگی از رنگدانه یا رگ باشه، فیلر کمکی نمی‌کنه.' });
+    if (lv('lines_crows')) add('crows', 'پنجه‌کلاغی', 'silk', ['serial', 'linear'], { perSide: [0.1, 0.3], risk: 'high', prio: 10, evidence: 'catalog', doctorOnly: true, lvKey: 'lines_crows',
+      note: 'پنجه‌کلاغی بیشتر خط حرکتیه و پزشک معمولاً اول درمان‌های دیگه رو بررسی می‌کنه؛ فیلر سطحی فقط برای خط‌هایی که در حالت آرام هم دیده می‌شن.' });
+
+    // areas where the app does not plan a filler
+    if (lv('lines_glabella')) advice.push({ key: 'glabella', area: 'خط اخم (بین ابرو)', risk: 'vhigh', text: 'طبق دفترچه‌ی رسمی، Silk و Smile نباید در ناحیه‌ی بین ابرو تزریق بشن و این ناحیه از پرخطرترین نقاط صورت برای فیلره. برای خط اخم، پزشک درمان مناسب دیگه‌ای رو بررسی می‌کنه.' });
+    if (lv('lines_forehead')) advice.push({ key: 'forehead', area: 'خطوط پیشانی', risk: 'vhigh', text: 'پیشانی جزو پرخطرترین نواحی برای فیلره و در دفترچه‌ی Silk هم با هشدار ذکر شده. خطوط پیشانی معمولاً حرکتی‌ان و پزشک اول درمان‌های دیگه رو بررسی می‌کنه؛ برای پوست پیشانی، Shine یا Mesocell Plus کمک می‌کنن.' });
+
+    // skin-quality programmes (not counted in the filler session)
+    if (lv('scars')) add('scars', 'اسکار فرورفته‌ی جوش', 'shine', ['serial', 'micro'], { ml: [0.5, 1.0], risk: 'low', prio: 20, program: true, sessions: 'یک جلسه در درم سطحی', note: 'طبق دفترچه‌ی رسمی Shine. جوش فعال باید اول کنترل بشه.' });
+    if (lv('dull') || lv('dryness') || lv('texture') || lv('tone') || lv('neck')) add('face', lv('neck') ? 'کل صورت و گردن (آبرسانی)' : 'کل صورت (آبرسانی و درخشش)', 'shine', ['multi', 'micro'],
+      { ml: [1.0, 2.0], risk: 'low', prio: 21, program: true, lvKey: lv('dull') ? 'dull' : lv('dryness') ? 'dryness' : lv('texture') ? 'texture' : lv('tone') ? 'tone' : 'neck',
+        sessions: '۳ جلسه با فاصله‌ی ۴ هفته؛ نگهداری هر ۶ تا ۱۲ ماه', note: 'میکروپاپول‌ها ممکنه ۲ تا ۳ روز دیده بشن.' });
+    const a = age(p) || 0;
+    if (lv('laxity') || lv('lines_undereye') || lv('lines_forehead') || (a >= 35 && (lv('texture') || lv('lines_crows'))))
+      add('meso', 'کل صورت و گردن (کیفیت و سفتی پوست)', 'mesocell', ['micro', 'nappage'], { ml: [2.0, 2.0], risk: 'low', prio: 22, program: true, spot: 'face', sessions: 'حداقل ۳ جلسه با فاصله‌ی ۴ هفته؛ هر جلسه یک سرنگ ۲ میلی‌لیتری',
+        note: 'با فیلرهای هیالورونیک قابل ترکیبه به شرط تزریق در عمق جدا؛ زمان‌بندی نسبت به فیلر رو پزشک تعیین می‌کنه.' });
+
+    // first session: the three highest-priority filler areas, at most 4 ml; the rest move to a second session
+    let used = 0, n = 0;
+    for (const it of items.filter(i => !i.program).sort((x, y) => x.prio - y.prio)) {
+      const mx = it.ml ? it.ml[1] : 0;
+      if (n < 3 && used + mx <= 4.01) { it.phase = 1; used += mx; n++; } else it.phase = 2;
+    }
+    for (const it of items) if (it.program) it.phase = 0;
+
+    // safety screening from the product IFUs
+    const blocks = [], cautions = [];
+    if (pregnant(p)) blocks.push('در بارداری و شیردهی، طبق دفترچه‌ی همه‌ی محصولات Inovosense، تزریق ممنوعه. این برنامه برای بعد از این دورانه.');
+    if (a && a < 18) blocks.push('طبق دفترچه‌ی رسمی، تزریق برای زیر ۱۸ سال ممنوعه.');
+    if (p && p.lidocaine) blocks.push('همه‌ی محصولات Inovosense لیدوکائین دارن و طبق دفترچه در حساسیت به لیدوکائین یا بی‌حس‌کننده‌های آمیدی منع مصرف دارن.');
+    if (p && p.autoimmune) cautions.push('طبق دفترچه، در بیماری خودایمنی فعال تزریق ممنوعه و Mesocell Plus در هر نوع بیماری خودایمنی منع مصرف داره؛ پزشک باید وضعیت بیماری رو بررسی کنه.');
+    if (has(p, 'anticoagulant')) cautions.push('رقیق‌کننده‌ی خون، آسپرین، مسکن‌های ضدالتهاب و مکمل‌هایی مثل ویتامین E، سیر و جینکو از ۱۰ روز قبل تا ۳ روز بعد احتمال کبودی رو بالا می‌برن. داروی تجویزی رو خودسرانه قطع نکن؛ به پزشک بگو. Mesocell Plus در مصرف این داروها منع مصرف داره.');
+    if (has(p, 'herpes')) cautions.push('سابقه‌ی تبخال: تزریق ممکنه تبخال رو دوباره فعال کنه؛ پزشک ممکنه داروی پیشگیری بده.');
+    if (has(p, 'permanent-filler')) cautions.push('طبق دفترچه، در ناحیه‌ای که قبلاً فیلر دائمی تزریق شده، نباید تزریق کرد. محل فیلر قبلی رو به پزشک بگو.');
+    if (has(p, 'recent-laser')) cautions.push('بعد از لیزر، لایه‌برداری یا درم‌ابریژن باید کامل ترمیم بشی و حداقل ۲ هفته صبر کنی.');
+    if (has(p, 'keloid')) cautions.push('تمایل به اسکار برجسته (کلوئید): طبق دفترچه تزریق توصیه نمی‌شه؛ تصمیم با پزشک.');
+    if (has(p, 'fish-allergy') && items.some(i => i.product === 'mesocell')) cautions.push('Mesocell Plus از DNA ماهی آزاد ساخته شده؛ در حساسیت به ماهی با احتیاط و نظر پزشک.');
+    if (has(p, 'epilepsy')) cautions.push('صرع یا مشکل قلبی: به‌خاطر لیدوکائین حتماً به پزشک بگو؛ Mesocell Plus در صرع توصیه نمی‌شه.');
+    if (has(p, 'isotretinoin')) cautions.push('در حین مصرف راکوتان، زمان تزریق رو با پزشک هماهنگ کن.');
+    if (lv('acne') === 'high') cautions.push('روی پوست ملتهب یا عفونی تزریق ممنوعه؛ اول جوش‌های فعال باید کنترل بشن.');
+
+    // totals over the whole plan, plus the first-session subset
+    const sum = (list) => {
+      const totals = {};
+      for (const it of list) { if (!it.ml) continue; const t = totals[it.product] || (totals[it.product] = { product: it.product, min: 0, max: 0 }); t.min += it.ml[0]; t.max += it.ml[1]; }
+      for (const t of Object.values(totals)) { t.min = Math.round(t.min * 10) / 10; t.max = Math.round(t.max * 10) / 10; const per = t.product === 'mesocell' ? 2 : 1; t.syringes = [Math.max(1, Math.ceil(t.min / per)), Math.max(1, Math.ceil(t.max / per))]; }
+      return Object.values(totals).sort((x, y) => PRODUCTS[y.product].depth - PRODUCTS[x.product].depth);
+    };
+    items.sort((x, y) => (x.phase || 9) - (y.phase || 9) || x.prio - y.prio);
+    return { items, advice, totals: sum(items), first: sum(items.filter(i => i.phase === 1)), blocks, cautions, glogau: glogau(cs, p) };
   }
 
   // ---------- layer 2: daily skincare by skin type ----------
@@ -1743,9 +1863,17 @@ const Recs = (() => {
 
   // before / after injection (Inovosense guidance + standard practice)
   const CARE = {
-    before: ['اگر داروی رقیق‌کننده‌ی خون یا آسپرین مصرف می‌کنی، به پزشک بگو؛ خودسرانه قطع نکن.', 'از ۲۴ ساعت قبل الکل نخور.', 'چند روز قبل از تزریق، رتینول و لایه‌بردارها رو روی ناحیه‌ی تزریق کنار بذار.', 'روز تزریق با صورت تمیز و بدون آرایش برو.'],
-    after: ['کیسه‌ی یخ برای کم کردن تورم و کبودی.', 'تا چند روز روی ناحیه‌ی تزریق فشار نیار، ماساژ نده و روی اون نخواب.', '۲۴ ساعت صورتت رو با آب داغ نشور.', '۱۲ ساعت آرایش نکن.', 'تا دو هفته از آفتاب مستقیم، سولاریوم و سونا دوری کن.', 'تورم، کبودی و قرمزی خفیف معمولاً در چند روز خودش برطرف می‌شه؛ اگر درد شدید یا تغییر رنگ پوست دیدی، فوراً به پزشک خبر بده.'],
+    before: ['اگر داروی رقیق‌کننده‌ی خون، آسپرین یا مسکن ضدالتهاب (مثل ایبوپروفن) مصرف می‌کنی، به پزشک بگو؛ خودسرانه قطع نکن.',
+      'مکمل‌هایی مثل ویتامین E، سیر و جینکو از ۱۰ روز قبل تا ۳ روز بعد احتمال کبودی رو بالا می‌برن؛ با پزشک هماهنگ کن.',
+      'بعد از لیزر، لایه‌برداری یا درم‌ابریژن، تا ترمیم کامل و حداقل ۲ هفته صبر کن.',
+      'اگر سابقه‌ی تبخال، فیلر دائمی یا حساسیت به لیدوکائین داری، حتماً به پزشک بگو.',
+      'از ۲۴ ساعت قبل الکل نخور و روز تزریق با صورت تمیز و بدون آرایش برو.'],
+    after: ['کیسه‌ی یخ برای کم کردن تورم و کبودی.', 'تا چند روز روی ناحیه‌ی تزریق فشار نیار، ماساژ نده و روی اون نخواب.', '۲۴ ساعت صورتت رو با آب داغ نشور و ۱۲ ساعت آرایش نکن.',
+      'تا دو هفته از آفتاب مستقیم، سولاریوم، سونا، بخار و سرمای شدید دوری کن.',
+      'تورم، کبودی، قرمزی یا برآمدگی خفیف معمولاً در چند روز خودش برطرف می‌شه.'],
+    danger: 'اگر در حین یا بعد از تزریق تاری یا کاهش دید، سفید یا کبود شدن پوست، درد شدید و غیرعادی، یا نشانه‌ی سکته (ضعف یا بی‌حسی یک طرف بدن، اختلال گفتار) داشتی، فوراً به پزشک تزریق‌کننده یا اورژانس مراجعه کن.',
   };
+
 
   function doctors(cs, p, self, plan) {
     const lv = (k) => (cs.find(c => c.key === k) || {}).level;
@@ -1767,7 +1895,7 @@ const Recs = (() => {
     if (plan.items.some(i => i.product === 'mesocell')) products.push({ id: 'mesocell', name: 'INOVOSENSE Mesocell Plus', status: plan.blocks.length ? 'not-suitable' : 'doctor', ml: null });
     return { concerns: cs, plan, products, routine: routine(cs, profile), care: CARE, doctors: doctors(cs, profile, self, plan), treatments: plan.items.map(i => ({ id: i.product, name: 'INOVOSENSE ' + PRODUCTS[i.product].name, area: i.area, reason: (i.ml ? `${i.ml[0]} تا ${i.ml[1]} میلی‌لیتر · ` : '') + i.sessions, blocked: plan.blocks[0] || null })) };
   }
-  return { CONCERNS, PRODUCTS, TECH, SPOTS, CARE, build, concerns };
+  return { CONCERNS, PRODUCTS, TECH, SPOTS, CARE, RISK, EVIDENCE, build, concerns };
 })();
 </script>
 <script>
@@ -1833,7 +1961,7 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     const R = s.recs;
     return { createdAt: new Date(s.t).toISOString(), mode: 'face', overall: s.overall, quality: s.quality, metrics: s.metrics, selfReport: s.selfReport,
       concerns: R.concerns.map(c => ({ key: c.key, label: c.label, level: c.level, source: c.source })),
-      recommendations: { products: R.products, plan: R.plan.items.map(i => ({ product: i.product, area: i.area, tech: i.tech, ml: i.ml, sessions: i.sessions })), totals: R.plan.totals, blocks: R.plan.blocks, cautions: R.plan.cautions,
+      recommendations: { products: R.products, plan: R.plan.items.map(i => ({ product: i.product, area: i.area, tech: i.tech, ml: i.ml, perSide: i.perSide || null, depth: i.depth || null, risk: i.risk || null, evidence: i.evidence || null, phase: i.phase == null ? 1 : i.phase, sessions: i.sessions })), advice: R.plan.advice || [], glogau: R.plan.glogau || null, first: R.plan.first || null, totals: R.plan.totals, blocks: R.plan.blocks, cautions: R.plan.cautions,
         doctors: R.doctors.filter(d => !d.conditional), injections: R.treatments, routine: { type: R.routine.type, am: R.routine.am, pm: R.routine.pm } },
       shots: s.shotsTaken, photo: profile.consent.photo ? s.mapJpg : undefined, contactRequested: !!s.contactRequested, feedback: s.feedback || {} };
   }
@@ -2018,7 +2146,11 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
 
   // live camera
   const canLive = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && window.isSecureContext && !window.claude && (!document.featurePolicy || document.featurePolicy.allowsFeature('camera'));
-  let stream = null, loop = 0, facing = 'user', camShot = null;
+  let stream = null, loop = 0, facing = load('kmt.facing.v4', 'user'), camShot = null, imgCap = null;
+  // who takes the photos: the person (front camera) or a helper (rear camera, sharper)
+  const setWho = (v) => { facing = v === 'environment' ? 'environment' : 'user'; save('kmt.facing.v4', facing); $('#camInput').setAttribute('capture', facing); const r = $(`input[name="who"][value="${facing}"]`); if (r) r.checked = true; };
+  setWho(facing);
+  $$('input[name="who"]').forEach(r => r.addEventListener('change', () => setWho(r.value)));
   const video = $('#video');
   // the next angle still missing, in the order of the list (wrapping around), or null when all six are in
   const nextShot = (k) => { const i = SHOT_LIST.findIndex(s => s.k === k); for (let j = 1; j < SHOT_LIST.length; j++) { const s = SHOT_LIST[(i + j) % SHOT_LIST.length]; if (!shots[s.k]) return s; } return null; };
@@ -2038,8 +2170,12 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $('#cam').hidden = false; $('#camTitle').textContent = ''; $('#camMsg').textContent = 'در حال روشن کردن دوربین…'; $('#camMsg').className = ''; $('#camNext').hidden = true;
     try {
       if (stream) stream.getTracks().forEach(t => t.stop());
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing, width: { ideal: 1920 }, height: { ideal: 1920 } }, audio: false });
+      // ask for the sensor's best resolution; the browser picks the closest it can deliver
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 3840 }, height: { ideal: 3840 } }, audio: false });
       video.srcObject = stream; video.classList.toggle('mirror', facing === 'user'); await video.play();
+      const track = stream.getVideoTracks()[0];
+      try { const caps = track.getCapabilities ? track.getCapabilities() : {}; if (caps.focusMode && caps.focusMode.includes('continuous')) await track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) {}
+      imgCap = ('ImageCapture' in window) ? new ImageCapture(track) : null;
       armCam(k);
     } catch (e) { closeCam(); shotTarget = k; $('#camInput').click(); }
   }
@@ -2065,12 +2201,20 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     loop = setTimeout(guide, 280);
   }
   $('#camCancel').addEventListener('click', closeCam);
-  $('#camFlip').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; openCam(camShot.k); });
+  $('#camFlip').addEventListener('click', () => { setWho(facing === 'user' ? 'environment' : 'user'); openCam(camShot.k); });
   $('#shutter').addEventListener('click', () => {
     if (!stream) return;
-    const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0);
     const k = camShot.k;
-    c.toBlob(b => b && setShot(k, new File([b], k + '.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.95);
+    const frame = () => { const c = document.createElement('canvas'); c.width = video.videoWidth; c.height = video.videoHeight; c.getContext('2d').drawImage(video, 0, 0); return c; };
+    const fallback = frame();
+    // a real still (full sensor resolution, autofocus) where the phone supports it; otherwise the video frame
+    const still = imgCap ? Promise.race([imgCap.takePhoto(), new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), 2500))]).catch(() => null) : Promise.resolve(null);
+    still.then(blob => {
+      if (blob && blob.size > 50000) setShot(k, new File([blob], k + '.jpg', { type: blob.type || 'image/jpeg' }));
+      else fallback.toBlob(b => b && setShot(k, new File([b], k + '.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.95);
+    });
+    // quick light check on the frame
+    try { const sm = document.createElement('canvas'); sm.width = 64; sm.height = 64; const g = sm.getContext('2d'); g.drawImage(fallback, 0, 0, 64, 64); const d = g.getImageData(0, 0, 64, 64).data; let L = 0; for (let i = 0; i < d.length; i += 4) L += d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11; L /= 4096; if (L < 55) toast('نور کمه؛ اگه می‌شه رو به پنجره بایست و دوباره بگیر'); else if (L > 215) toast('نور خیلی شدیده؛ از نور مستقیم دور شو'); } catch (e) {}
     const nx = nextShot(k);
     if (!nx) { closeCam(); toast('هر شش عکس گرفته شد'); setTimeout(() => $('#analyzeBtn').scrollIntoView({ behavior: 'smooth', block: 'center' }), 200); return; }
     // flash, then straight on to the next angle without closing the camera
@@ -2261,16 +2405,20 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
       <div class="card savebar reveal d2" id="saveBar"></div>
       ${qual.length ? `<div class="notice warn">${iWarn}<div><b>برای دقت بیشتر دفعه‌ی بعد:</b><ul>${qual.map(x => `<li>${QTXT[x.k]}</li>`).join('')}</ul></div></div>` : ''}
 
-      <div class="chapter"><div class="rule"></div><span class="caps">Chapter I · The depths</span><h2>از <b>عمق</b></h2><p>جایی که حجم و چین‌ها شکل می‌گیرن؛ نقشه‌ی تزریق Inovosense برای صورت تو.</p></div>
+      <div class="chapter"><div class="rule"></div><span class="caps">فصل اول</span><h2>از <b>عمق</b></h2><p>جایی که حجم و چین‌ها شکل می‌گیرن؛ نقشه‌ی تزریق Inovosense برای صورت تو.</p></div>
       ${plan.blocks.map(b => `<div class="notice err">${iWarn}<div>${b}</div></div>`).join('')}
-      ${plan.items.length ? `
-        <div class="card injmap">${injMapSvg(plan.items)}<div class="legend">${usedProducts.map(p => `<span><i style="background:${P[p].color};color:${P[p].color}"></i>${P[p].name}</span>`).join('')}</div></div>
+      ${plan.items.length || (plan.advice || []).length ? `
+        ${plan.items.length ? `<div class="card injmap">${injMapSvg(plan.items)}<div class="legend">${usedProducts.map(p => `<span><i style="background:${P[p].color};color:${P[p].color}"></i>${P[p].name}</span>`).join('')}</div></div>` : ''}
         ${simHtml(rec, live)}
         <div class="sec" style="margin-top:22px"><div class="sec-h"><div><span class="en">Injection plan</span><h2>کجا، چه فیلری، چقدر</h2></div></div>
-          <div class="plan">${plan.items.map(planCard).join('')}</div></div>
-        ${plan.totals.length ? `<div class="card totals" style="margin-top:14px"><h3>جمع تقریبی برای جلسه‌ی اول</h3>${plan.totals.map(t => `<div class="trow"><i style="background:${P[t.product].color};color:${P[t.product].color}"></i><div><b>${P[t.product].name}</b> <span class="faint small">· ${mlText([t.min, t.max])} میلی‌لیتر</span></div><span>${fa(t.syringes[0])}${t.syringes[1] !== t.syringes[0] ? '–' + fa(t.syringes[1]) : ''} سرنگ</span></div>`).join('')}
-          <p class="small faint" style="margin:10px 0 0">هر جعبه‌ی Inovosense دو سرنگ یک میلی‌لیتری داره. همه‌ی فیلرها لیدوکائین ۰٫۳٪ دارن. مقدار نهایی رو پزشک بعد از معاینه تعیین می‌کنه.</p></div>` : ''}
-        ${plan.cautions.map(c => `<div class="notice warn">${iWarn}<div>${c}</div></div>`).join('')}`
+          ${phaseBlock('جلسه‌ی اول', 'مهم‌ترین ناحیه‌ها، حداکثر ۳ ناحیه و ۴ میلی‌لیتر؛ بدون اصلاح بیش از حد.', plan.items.filter(i => (i.phase == null ? 1 : i.phase) === 1))}
+          ${phaseBlock('مرحله‌ی دوم', '۲ تا ۴ هفته بعد، بعد از دیدن نتیجه‌ی جلسه‌ی اول و با نظر پزشک.', plan.items.filter(i => i.phase === 2))}
+          ${phaseBlock('کیفیت پوست', 'برنامه‌ی چندجلسه‌ای، جدا از جلسه‌ی فیلر.', plan.items.filter(i => i.phase === 0))}
+          ${(plan.advice || []).length ? `<h3 class="phase-h">فیلر پیشنهاد نمی‌شه</h3><div class="stack">${plan.advice.map(adviceCard).join('')}</div>` : ''}
+        </div>
+        ${totalsCard(plan)}
+        ${plan.cautions.map(c => `<div class="notice warn">${iWarn}<div>${c}</div></div>`).join('')}
+        ${doctorSummary(rec)}`
       : `<div class="card pad" style="text-align:center"><p class="en" style="margin:0">Nothing to fill</p><h3 style="font-weight:300;margin:4px 0">در این خوانش، نیازی به فیلر دیده نشد</h3><p class="muted small" style="margin:0">اگر ناحیه‌ای مد نظرته، در «از پوستت بگو» انتخابش کن یا عکس‌های نزدیک‌تر بگیر.</p></div>`}
 
       <div class="sec"><div class="sec-h"><div><span class="en">What we saw</span><h2>خطوط و چین‌ها</h2></div><span class="small faint">از ${fa(rec.shotsTaken.length)} عکس</span></div>
@@ -2282,14 +2430,14 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         ${other.length ? `<div class="finds" style="margin-top:12px">${other.map(k => findRow(k, m[k], R.concerns.find(c => c.key === k))).join('')}</div>` : ''}</div>
 
       <div class="surface-zone">
-        <div class="chapter"><div class="rule" style="background:linear-gradient(to bottom, transparent, #1D6F7C)"></div><span class="caps">Chapter II · The surface</span><h2>تا <b>سطح</b></h2><p>آنچه هر روز روی پوستت می‌ذاری؛ آیین مراقبت مخصوص پوست ${esc(R.routine.typeLabel)}${R.routine.sensitive ? ' و حساس' : ''}.</p></div>
+        <div class="chapter"><div class="rule" style="background:linear-gradient(to bottom, transparent, #1D6F7C)"></div><span class="caps">فصل دوم</span><h2>تا <b>سطح</b></h2><p>آنچه هر روز روی پوستت می‌ذاری؛ آیین مراقبت مخصوص پوست ${esc(R.routine.typeLabel)}${R.routine.sensitive ? ' و حساس' : ''}.</p></div>
         <div class="card skin-id"><span class="en" style="font-size:22px">Skin type</span><b>پوست ${esc(R.routine.typeLabel)}${R.routine.sensitive ? ' · حساس' : ''}</b></div>
         <div class="sec" style="margin-top:18px"><div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-t="am" type="button">${I('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>')}صبح</button><button role="tab" aria-selected="false" data-t="pm" type="button">${I('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>')}شب</button></div>
           <div class="card"><ol class="routine" id="r-am">${R.routine.am.map(stepLi).join('')}</ol><ol class="routine" id="r-pm" hidden>${R.routine.pm.map(stepLi).join('')}</ol></div>
           <p class="small" style="margin:10px 4px 0">هفتگی: ${esc(R.routine.weekly)}</p>
           ${R.routine.notes.map(n => `<div class="notice">${iWarn}<div>${n}</div></div>`).join('')}
           ${(BRAND.topicals || []).length ? `<div class="sec"><div class="sec-h"><div><span class="en">KMT care</span><h2>محصولات مراقبتی KMT</h2></div></div><div class="stack">${BRAND.topicals.map(t => `<div class="card care"><h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p></div>`).join('')}</div></div>` : ''}</div>
-        ${plan.items.length ? `<div class="sec"><div class="sec-h"><div><span class="en">Around your treatment</span><h2>قبل و بعد از تزریق</h2></div></div><div class="stack"><div class="card care"><h3>قبل از تزریق</h3><ul>${R.care.before.map(x => `<li>${x}</li>`).join('')}</ul></div><div class="card care"><h3>بعد از تزریق</h3><ul>${R.care.after.map(x => `<li>${x}</li>`).join('')}</ul></div></div></div>` : ''}
+        ${plan.items.length ? `<div class="sec"><div class="sec-h"><div><span class="en">Around your treatment</span><h2>قبل و بعد از تزریق</h2></div></div><div class="stack"><div class="card care"><h3>قبل از تزریق</h3><ul>${R.care.before.map(x => `<li>${x}</li>`).join('')}</ul></div><div class="card care"><h3>بعد از تزریق</h3><ul>${R.care.after.map(x => `<li>${x}</li>`).join('')}</ul></div>${R.care.danger ? `<div class="notice err">${iWarn}<div><b>علائم خطر</b><br>${R.care.danger}</div></div>` : ''}</div></div>` : ''}
         <div class="sec"><div class="sec-h"><div><span class="en">Your specialist</span><h2>پزشک مناسب تو</h2></div></div><div class="docs">${R.doctors.map(d => `<div class="card doc"><b>${esc(d.label)} <span class="pill ${URG[d.urgency][1]}">${d.conditional ? 'اگر این مورد رو داری' : URG[d.urgency][0]}</span></b><p>${esc(d.reason)}</p></div>`).join('')}</div></div>
         <div class="sec"><div class="cta-band"><h3>مشاوره‌ی تزریق با KMT</h3><p>برای تأیید نقشه، معرفی پزشک یا کلینیک همکار و رزرو نوبت.</p><p class="ph ltr">${BRAND.phone}</p><button class="btn btn-primary btn-block" type="button" id="reqCall">${rec.contactRequested ? 'درخواست ثبت شد ✓' : 'درخواست تماس مشاور'}</button><button class="btn btn-ghost btn-block cta-2" type="button" data-book>رزرو نوبت</button></div></div>
         <p class="disclaimer">این ارزیابی با پردازش تصویر روی گوشی انجام شده و تقریبیه. نقشه‌ی تزریق و مقادیر، پیشنهاد اولیه‌ان و جای معاینه‌ی پزشک رو نمی‌گیرن؛ تزریق فقط توسط پزشک انجام می‌شه. مشخصات محصولات از اطلاعات رسمی INOVOSENSE گرفته شده.</p>
@@ -2304,17 +2452,58 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
     $$('#s-report .tabs button').forEach(b => b.addEventListener('click', () => { $$('#s-report .tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); $('#r-am').hidden = b.dataset.t !== 'am'; $('#r-pm').hidden = b.dataset.t !== 'pm'; }));
     $('#s-report').onclick = onFeedback;
     $('#reqCall').addEventListener('click', requestCall);
+    const sd = $('#shareDoc'); if (sd) sd.onclick = async () => { const text = doctorText(rec);
+      try { if (navigator.share) { await navigator.share({ title: 'خلاصه‌ی بالینی', text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+      try { await navigator.clipboard.writeText(text); toast('خلاصه کپی شد؛ در پیام برای پزشک بچسبون'); } catch (e) { toast('اشتراک در این مرورگر ممکن نشد'); } };
     wireSim(rec, live);
     // the dive ends at the surface: switch the backdrop as the reader scrolls into chapter II
     const zone = $('#s-report .surface-zone');
     if (zone && 'IntersectionObserver' in window) { const io = new IntersectionObserver((es) => { if ($('#s-report').hidden) return; sea(es[0].isIntersecting ? 'surface' : 'deep'); }, { rootMargin: '0px 0px -72% 0px' }); io.observe(zone); }
   }
   function planCard(it) {
-    const p = P[it.product];
+    const p = P[it.product], per = it.perSide;
+    const vol = per ? `<b class="num">${mlText(per)}</b><small>میلی‌لیتر هر طرف</small>` : it.ml ? `<b class="num">${mlText(it.ml)}</b><small>میلی‌لیتر</small>` : `<small>جلسه‌ای</small>`;
     return `<article class="card pitem" style="--pc:${p.color}" data-product="${it.product}" role="button" tabindex="0"><header>${it.product === 'mesocell' ? `<span class="jm">M+</span>` : `<img src="${jelly(it.product)}" alt="">`}
-        <h3>${esc(it.area)}<small>INOVOSENSE ${p.name}</small></h3><div class="ml">${it.ml ? `<b class="num">${mlText(it.ml)}</b><small>میلی‌لیتر</small>` : `<small>جلسه‌ای</small>`}</div></header>
-      <div class="kv"><div><small>روش تزریق</small><span>${it.tech.join('، ')}</span></div><div><small>عمق</small><span>${p.depthLabel}</span></div><div><small>جلسات</small><span>${esc(it.sessions)}</span></div><div><small>دلیل</small><span class="why">${SRC[it.source] || ''}</span></div></div>
+        <h3>${esc(it.area)}<small>INOVOSENSE ${p.name}${it.alt ? ` <span class="alt">· ${esc(it.alt)}</span>` : ''}</small></h3><div class="ml">${vol}</div></header>
+      <div class="badges">${it.risk ? `<span class="rk ${it.risk}">${Recs.RISK[it.risk].label}</span>` : ''}${it.evidence === 'catalog' ? `<span class="ev cat">فقط با نظر پزشک · خارج از دفترچه</span>` : it.evidence ? `<span class="ev">طبق دفترچه‌ی رسمی</span>` : ''}</div>
+      <div class="kv"><div><small>روش تزریق</small><span>${it.tech.join('، ')}</span></div><div><small>عمق</small><span>${esc(it.depth || p.depthLabel)}</span></div><div><small>جلسات</small><span>${esc(it.sessions)}</span></div><div><small>${per ? 'جمع دو طرف' : 'دلیل'}</small><span class="why">${per && it.ml ? mlText(it.ml) + ' میلی‌لیتر' : SRC[it.source] || ''}</span></div></div>
       ${it.note ? `<p>${esc(it.note)}</p>` : ''}</article>`;
+  }
+  function phaseBlock(title, sub, items) {
+    if (!items.length) return '';
+    return `<h3 class="phase-h">${title}<small>${sub}</small></h3><div class="plan">${items.map(planCard).join('')}</div>`;
+  }
+  const adviceCard = (a) => `<div class="card advice"><b>${esc(a.area)}<span class="rk ${a.risk}">${Recs.RISK[a.risk].label}</span></b><p>${esc(a.text)}</p></div>`;
+  function totalsCard(plan) {
+    const row = (t) => `<div class="trow"><i style="background:${P[t.product].color};color:${P[t.product].color}"></i><div><b>${P[t.product].name}</b> <span class="faint small">· ${mlText([t.min, t.max])} میلی‌لیتر</span></div><span>${fa(t.syringes[0])}${t.syringes[1] !== t.syringes[0] ? '–' + fa(t.syringes[1]) : ''} ${t.product === 'mesocell' ? 'سرنگ ۲ میلی‌لیتری' : 'سرنگ'}</span></div>`;
+    const first = plan.first || plan.totals, all = plan.totals || [];
+    if (!all.length) return '';
+    const second = plan.items.some(i => i.phase === 2 || i.phase === 0);
+    return `<div class="card totals" style="margin-top:14px"><h3>جمع تقریبی ${second ? 'جلسه‌ی اول' : ''}</h3>${(first.length ? first : all).map(row).join('')}
+      ${second && first.length ? `<h3 style="margin-top:16px">کل نقشه، همه‌ی مراحل</h3>${all.map(row).join('')}` : ''}
+      <p class="small faint" style="margin:10px 0 0">هر جعبه‌ی فیلر Inovosense دو سرنگ یک میلی‌لیتری داره و Mesocell Plus یک سرنگ دو میلی‌لیتری. مقدارها بازه‌ی رایج در مقالات و توافق‌نامه‌های تخصصیه؛ مقدار نهایی رو پزشک بعد از معاینه تعیین می‌کنه.</p></div>`;
+  }
+  // clinical summary for the injecting physician (shareable as plain text)
+  function doctorText(rec) {
+    const R = rec.recs, pl = R.plan, g = pl.glogau, pr = profile || {};
+    const age = pr.birthYear ? SOLAR_YEAR - Number(pr.birthYear) : null;
+    const L = [`خلاصه‌ی بالینی · اپ پوست‌نگار KMT · ${fdate(rec.t)}`, `${pr.name || ''}${age ? ' · ' + fa(age) + ' سال' : ''}${pr.gender === 'female' ? ' · زن' : pr.gender === 'male' ? ' · مرد' : ''}`];
+    if (g) L.push(`پیری نوری (برآورد Glogau): ${g.label}`);
+    L.push('', 'نقشه‌ی پیشنهادی:');
+    for (const it of pl.items) L.push(`- ${it.phase === 2 ? '[مرحله‌ی ۲] ' : it.phase === 0 ? '[کیفیت پوست] ' : ''}${it.area}: INOVOSENSE ${P[it.product].name} · ${it.perSide ? mlText(it.perSide) + ' ml هر طرف' : it.ml ? mlText(it.ml) + ' ml' : ''} · ${it.depth || P[it.product].depthLabel} · ${it.tech.join('، ')}${it.risk ? ' · ' + Recs.RISK[it.risk].short : ''}${it.evidence === 'catalog' ? ' · خارج از IFU' : ''}`);
+    for (const a of pl.advice || []) L.push(`- ${a.area}: فیلر پیشنهاد نشده (${Recs.RISK[a.risk].short})`);
+    if (pl.blocks.length || pl.cautions.length) { L.push('', 'غربالگری:'); for (const x of pl.blocks.concat(pl.cautions)) L.push('- ' + x); }
+    L.push('', 'این خلاصه از پردازش تصویر روی گوشی و پاسخ‌های بیمار ساخته شده و جای معاینه رو نمی‌گیره.');
+    return L.join('\n');
+  }
+  function doctorSummary(rec) {
+    const pl = rec.recs.plan, g = pl.glogau;
+    if (!pl.items.length && !(pl.advice || []).length) return '';
+    return `<details class="card docsum"><summary><b>خلاصه‌ی بالینی برای پزشک</b><small>برای نشون دادن یا فرستادن به پزشک تزریق‌کننده</small></summary>
+      ${g ? `<div class="glogau"><small>پیری نوری · برآورد مقیاس Glogau</small><b>${g.label}</b><span>${g.desc}</span></div>` : ''}
+      <div class="dtable">${pl.items.map(it => `<div><span>${esc(it.area)}${it.phase === 2 ? ' <em>· مرحله‌ی ۲</em>' : it.phase === 0 ? ' <em>· کیفیت پوست</em>' : ''}</span><span style="color:${P[it.product].color}">${P[it.product].name}</span><span class="num">${it.perSide ? mlText(it.perSide) + ' هر طرف' : it.ml ? mlText(it.ml) : '—'}</span><span>${esc(it.depth || P[it.product].depthLabel)}</span><span class="rk ${it.risk || 'low'}">${it.risk ? Recs.RISK[it.risk].short : ''}</span></div>`).join('')}</div>
+      <button class="btn btn-ghost btn-block" type="button" id="shareDoc" style="margin-top:14px">فرستادن برای پزشک</button>
+    </details>`;
   }
   const stepLi = (s) => `<li><div><b>${s.t}<span class="tex">${esc(s.tex || '')}</span></b><span class="d">${s.d}</span></div></li>`;
   function findRow(k, x, c) {
@@ -2569,27 +2758,34 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
   // ---------- INOVOSENSE product sheet (data from inovosense.com) ----------
   const T = Recs.TECH;
   const SIDE_FX = 'ممکنه بعد از تزریق تورم، برآمدگی کوچک، کبودی، قرمزی، حساسیت به لمس، درد خفیف، خارش یا گزگز پیش بیاد؛ این‌ها معمولاً خفیف تا متوسطن و در چند روز خودشون برطرف می‌شن. خونریزی کوتاه در محل سوزن هم معمولاً بلافاصله بند میاد.';
+  // areas: [name, face-map spot, techniques, 'catalog' when listed only in the catalogue, not in the IFU]
   const PINFO = {
-    shine: { tag: 'آبرسانی عمقی پوست', for: 'پوست کم‌آب، بی‌طراوت و کدر؛ بافت ناصاف و خطوط بسیار ظریف ناشی از خشکی.',
-      areas: [['کل صورت', 'face', ['serial']], ['گردن', null, ['serial']], ['دکلته', null, ['serial']], ['پشت دست', null, ['serial']]],
-      depth: 'درم سطحی، یا درم میانی تا عمقی', plan: 'سه جلسه با فاصله‌ی ۴ هفته؛ جلسه‌ی نگهداری هر ۶ تا ۱۲ ماه' },
-    silk: { tag: 'چین‌های ظریف و سطحی', for: 'خطوطی که با حرکت صورت ایجاد شدن و در حالت آرام هم دیده می‌شن؛ پوست نازک دور چشم و دور لب.',
-      areas: [['خطوط پیشانی', 'forehead', ['serial', 'linear', 'fan']], ['خط اخم (بین ابرو)', 'glabella', ['serial', 'linear', 'fan']], ['پنجه‌کلاغی', 'crows', ['serial', 'linear']], ['خطوط عمودی دور لب', 'perioral', ['linear', 'serial']], ['خط دور لب (فرم لب)', 'lips', ['linear']], ['گودی زیر چشم', 'undereye', ['linear']]],
-      depth: 'درم سطحی', plan: 'معمولاً یک جلسه؛ زمان ترمیم رو پزشک تعیین می‌کنه' },
-    smile: { tag: 'چین‌های متوسط و حجم لب', for: 'خط خنده و خط غمی که عمق متوسط دارن، گوشه‌ی افتاده‌ی لب و لب کم‌حجم.',
-      areas: [['خط خنده', 'nasolabial', ['linear', 'fan']], ['خط غم (ماریونت)', 'marionette', ['linear', 'fan', 'cross']], ['چین بالای چانه', 'chin', ['linear', 'fan']], ['گوشه‌ی لب', 'perioral', ['linear']], ['حجم و فرم لب', 'lips', ['linear']]],
-      depth: 'درم میانی تا عمقی', plan: 'معمولاً یک جلسه؛ زمان ترمیم رو پزشک تعیین می‌کنه' },
-    style: { tag: 'چین‌های عمیق و لیفت صورت', for: 'خط خنده‌ی عمیق، افتادگی گونه و نیاز به لیفت؛ فرم‌دهی گونه، چانه و شقیقه.',
-      areas: [['خط خنده‌ی عمیق', 'nasolabial', ['linear', 'fan']], ['گونه و استخوان گونه', 'cheeks', ['bolus', 'linear', 'fan', 'cross']], ['زاویه‌ی فک', 'jawline', ['bolus', 'linear', 'fan']], ['چانه', 'chin', ['bolus', 'linear']], ['گودی شقیقه', 'temples', ['linear', 'fan']]],
-      depth: 'درم عمقی', plan: 'معمولاً یک جلسه؛ زمان ترمیم رو پزشک تعیین می‌کنه' },
-    shape: { tag: 'حجم‌دهی و فرم صورت', for: 'از دست رفتن حجم صورت با بالا رفتن سن؛ گونه‌ی گود، چانه‌ی عقب، خط فک نامشخص و شقیقه‌ی فرورفته.',
-      areas: [['گونه و استخوان گونه', 'cheeks', ['bolus', 'linear', 'fan', 'cross']], ['زاویه‌ی فک', 'jawline', ['bolus', 'linear', 'fan']], ['چانه', 'chin', ['bolus', 'linear']], ['گودی شقیقه', 'temples', ['linear', 'fan']]],
-      depth: 'عمقی، روی استخوان', plan: 'معمولاً یک جلسه؛ زمان ترمیم رو پزشک تعیین می‌کنه' },
-    mesocell: { tag: 'بازسازی و سفتی پوست', for: 'پوستی که سفتی و کشسانی‌اش کم شده، خطوط ریز و تیرگی داره. توانایی فیبروبلاست‌های پوست رو برای ساخت کلاژن و الاستین بالا می‌بره و خاصیت ترمیمی، روشن‌کنندگی و ضدالتهابی داره.',
-      areas: [['کل صورت', 'face', []], ['گردن', null, []], ['دکلته', null, []], ['پشت دست', null, []]],
-      depth: 'درم', plan: 'حداقل سه جلسه با فاصله‌ی ۴ هفته، بسته به نیاز و نظر پزشک',
-      extra: [['ترکیب با درمان‌های دیگه', 'همراه لایه‌برداری، لیزر و درم‌ابریژن قابل استفاده‌ست. با فیلرهای هیالورونیک Inovosense هم قابل ترکیبه، به شرطی که هر محصول در عمق جدا تزریق بشه.'],
-        ['چه کسانی نباید تزریق کنن', 'بارداری و شیردهی، زیر ۱۸ سال؛ سابقه‌ی فیلر غیرقابل جذب یا فیلر اخیر؛ مصرف داروهای ضدالتهاب غیراستروئیدی، ضدپلاکت، ضدانعقاد یا سرکوب‌کننده‌ی ایمنی؛ بیماری خودایمنی، سارکوئیدوز، اندوکاردیت؛ حساسیت به لیدوکائین؛ التهاب یا عفونت فعال در ناحیه؛ صرع یا تومور بدخیم؛ مستعد اسکار برجسته. در حساسیت به فرآورده‌های ماهی با احتیاط.']] },
+    shine: { tag: 'آبرسانی و جوان‌سازی پوست', for: 'پوست کم‌آب، کدر و کم‌کشش؛ و طبق دفترچه‌ی رسمی، پر کردن فرورفتگی اسکارهای آتروفیک جوش. سفتی، کشسانی، رنگ و درخشش پوست صورت، گردن، دکلته و دست رو بهتر می‌کنه.',
+      areas: [['کل صورت', 'face', ['multi', 'micro']], ['اسکار فرورفته‌ی جوش', 'scars', ['serial']], ['گردن', null, ['multi', 'micro']], ['دکلته', null, ['multi', 'micro']], ['پشت دست', null, ['multi', 'micro']]],
+      plan: 'آبرسانی: ۳ جلسه با فاصله‌ی ۴ هفته؛ اسکار: یک جلسه. میکروپاپول‌ها ممکنه ۲ تا ۳ روز دیده بشن.' },
+    silk: { tag: 'چین‌های سطحی و متوسط، دور لب', for: 'خط خنده و خط غم سطحی، خطوط عمودی دور لب، گوشه‌ی افتاده‌ی لب و فرم‌دهی خط دور لب.',
+      areas: [['خط خنده', 'nasolabial', ['linear', 'serial']], ['خط غم', 'marionette', ['linear', 'fan']], ['خطوط دور لب', 'perioral', ['linear', 'serial']], ['گوشه‌ی لب', 'perioral', ['linear']], ['خط دور لب (فرم لب)', 'lips', ['linear']],
+        ['پنجه‌کلاغی', 'crows', ['serial', 'linear'], 'catalog'], ['زیر چشم', 'undereye', ['serial', 'linear'], 'catalog']],
+      plan: 'معمولاً یک جلسه؛ بررسی نتیجه بعد از ۲ هفته. اصلاح بیش از حد نشه.',
+      extra: [['جاهایی که نباید تزریق بشه', 'طبق دفترچه‌ی رسمی، Silk نباید در ناحیه‌ی بین ابرو (خط اخم) و بینی تزریق بشه. تزریق در پیشانی هم با خطر بیشتر عوارض عروقی همراهه.']] },
+    smile: { tag: 'چین‌های عمیق و حجم لب', for: 'خط خنده و خط غم عمیق، و افزایش حجم لب.',
+      areas: [['خط خنده', 'nasolabial', ['linear', 'fan']], ['خط غم', 'marionette', ['linear', 'fan', 'cross']], ['حجم لب', 'lips', ['linear', 'submucosal']], ['گوشه‌ی لب', 'perioral', ['linear'], 'catalog']],
+      plan: 'معمولاً یک جلسه؛ بررسی نتیجه بعد از ۲ هفته. اصلاح بیش از حد نشه.',
+      extra: [['جاهایی که نباید تزریق بشه', 'طبق دفترچه‌ی رسمی، Smile نباید در ناحیه‌ی بین ابرو و بینی تزریق بشه.']] },
+    style: { tag: 'بازگرداندن حجم و لیفت صورت', for: 'حجم‌دهی گونه، شقیقه و چانه، و خط خنده‌ی شدید.',
+      areas: [['گونه و استخوان گونه', 'cheeks', ['bolus', 'linear', 'fan', 'cross']], ['شقیقه', 'temples', ['linear', 'fan']], ['چانه', 'chin', ['bolus', 'linear']], ['خط خنده‌ی شدید', 'nasolabial', ['linear', 'fan']], ['زاویه‌ی فک', 'jawline', ['bolus', 'linear', 'fan'], 'catalog']],
+      plan: 'معمولاً یک جلسه؛ بررسی نتیجه بعد از ۲ هفته.',
+      extra: [['جاهایی که نباید تزریق بشه', 'برای خطوط ظریف و سطحی (درم سطحی) استفاده نمی‌شه.']] },
+    shape: { tag: 'حجم‌دهی و فرم صورت', for: 'بازگرداندن یا افزایش حجم صورت؛ گونه‌ی گود، چانه‌ی عقب، خط فک نامشخص و شقیقه‌ی فرورفته.',
+      areas: [['گونه و استخوان گونه', 'cheeks', ['bolus', 'linear', 'fan', 'cross']], ['چانه', 'chin', ['bolus', 'linear']], ['خط فک و زاویه‌ی فک', 'jawline', ['bolus', 'linear', 'fan']], ['شقیقه', 'temples', ['linear', 'fan']]],
+      plan: 'معمولاً یک جلسه؛ بررسی نتیجه بعد از ۲ هفته. در جعبه، میکروکانولا هم هست.',
+      extra: [['جاهایی که نباید تزریق بشه', 'برای خطوط ظریف و سطحی (درم سطحی) استفاده نمی‌شه.']] },
+    mesocell: { tag: 'بازسازی و سفتی پوست', for: 'پوستی که سفتی و کشسانی‌اش کم شده، خطوط ریز و تیرگی داره. توانایی فیبروبلاست‌های پوست رو برای ساخت کلاژن و الاستین بالا می‌بره و خاصیت ترمیمی، روشن‌کنندگی و ضدالتهابی داره. از قطعات DNA ماهی آزاد ساخته شده.',
+      areas: [['کل صورت', 'face', ['micro', 'nappage']], ['گردن', null, ['micro', 'nappage']], ['دکلته', null, ['micro', 'nappage']], ['پشت دست', null, ['micro', 'nappage']]],
+      plan: 'حداقل سه جلسه با فاصله‌ی ۴ هفته، بسته به نیاز و نظر پزشک.',
+      extra: [['ترکیب با درمان‌های دیگه', 'همراه لایه‌برداری، لیزر و درم‌ابریژن قابل استفاده‌ست. با فیلرهای هیالورونیک هم قابل ترکیبه به شرطی که هر محصول در عمق جدا تزریق بشه.'],
+        ['چه کسانی نباید تزریق کنن', 'بارداری و شیردهی، زیر ۱۸ سال؛ سابقه‌ی فیلر غیرقابل جذب یا فیلر اخیر؛ مصرف داروهای ضدالتهاب غیراستروئیدی، ضدپلاکت، ضدانعقاد یا سرکوب‌کننده‌ی ایمنی؛ بیماری خودایمنی، سارکوئیدوز، اندوکاردیت؛ حساسیت به لیدوکائین؛ التهاب یا عفونت فعال در ناحیه؛ صرع یا تومور بدخیم. در حساسیت به فرآورده‌های ماهی با احتیاط.'],
+        ['بعد از تزریق', 'تا ۱۲ ساعت آرایش نکن؛ دو هفته از آفتاب، اشعه‌ی UV، سرما و گرمای شدید (سونا، بخار) دوری کن. فشار روی محل ممکنه تا یک هفته خارش یا درد بده. سابقه‌ی تبخال ممکنه عود کنه.']] },
   };
   const AREA_SPOTS = () => (Recs.SPOTS || {});
   function productMapSvg(id) {
@@ -2617,16 +2813,16 @@ const BRAND = {"logoWhite": "<img class=\"logo\" src=\"data:image/svg+xml;base64
         ${mine.length ? `<div class="ps-mine"><b>در نقشه‌ی تو</b>${mine.map(i => `<div><span>${esc(i.area)}</span><span class="num">${i.ml ? fa(i.ml[0], 1) + '–' + fa(i.ml[1], 1) + ' میلی‌لیتر' : esc(i.sessions)}</span></div>`).join('')}${tot ? `<div class="sum"><span>جمع تقریبی</span><span class="num">${fa(tot.min, 1)}–${fa(tot.max, 1)} میلی‌لیتر · ${fa(tot.syringes[0])}–${fa(tot.syringes[1])} سرنگ</span></div>` : ''}</div>` : ''}
         <h3>کجا استفاده می‌شه</h3>
         <div class="ps-map">${productMapSvg(id)}</div>
-        <div class="ps-areas">${info.areas.map(([n, , t]) => `<div><b>${n}</b>${t.length ? `<span>${t.map(x => T[x].split(' (')[0]).join('، ')}</span>` : ''}</div>`).join('')}</div>
+        <div class="ps-areas">${info.areas.map(([n, , t, ev]) => `<div><b>${n}${ev === 'catalog' ? '<em class="cat">فقط کاتالوگ</em>' : ''}</b>${t.length ? `<span>${t.map(x => T[x].split(' (')[0]).join('، ')}</span>` : ''}</div>`).join('')}</div>
+        ${info.areas.some(x => x[3] === 'catalog') ? '<p class="ps-src">ناحیه‌های «فقط کاتالوگ» در دفترچه‌ی رسمی محصول نیومدن و تصمیمشون فقط با پزشکه.</p>' : ''}
         <h3>مشخصات</h3>
-        <div class="ps-spec">${id === 'mesocell' ? `<div><small>ماده‌ی مؤثر</small><b>پلی‌دئوکسی‌ریبونوکلئوتید (PDRN)</b></div><div><small>عمق تزریق</small><b>${info.depth}</b></div>` :
-          `<div><small>هیالورونیک اسید</small><b>${p.ha}</b></div><div><small>بی‌حسی</small><b>لیدوکائین ۰٫۳٪</b></div><div><small>سوزن</small><b class="ltr">${p.needle}</b></div><div><small>بسته‌بندی</small><b>۲ سرنگ ۱ میلی‌لیتری</b></div><div class="w"><small>عمق تزریق</small><b>${info.depth}</b></div>`}
+        <div class="ps-spec">${id === 'mesocell' ? `<div class="w"><small>ماده‌ی مؤثر</small><b>${p.active}</b></div>` : `<div><small>هیالورونیک اسید کراس‌لینک‌شده</small><b>${p.ha}</b></div>`}<div><small>لیدوکائین</small><b>${p.lido}</b></div><div><small>سوزن</small><b class="ltr">${p.needle}</b></div><div><small>بسته‌بندی</small><b>${p.pack}</b></div><div class="w"><small>عمق تزریق طبق دفترچه</small><b>${p.depthLabel}</b></div>
           <div class="w"><small>برنامه‌ی درمان</small><b>${info.plan}</b></div></div>
         ${(info.extra || []).map(([h, t]) => `<h3>${h}</h3><p class="ps-p">${t}</p>`).join('')}
         <h3>بعد از تزریق</h3><ul class="ps-care">${Recs.CARE ? Recs.CARE.after.slice(0, 5).map(x => `<li>${x}</li>`).join('') : ''}</ul>
         <h3>عوارض احتمالی</h3><p class="ps-p">${SIDE_FX}</p>
         <div class="row2 ps-cta"><button class="btn btn-ghost" type="button" data-close data-book>رزرو نوبت</button><button class="btn btn-primary" type="button" data-close data-go="s-consult">مشاوره با KMT</button></div>
-        <p class="small faint" style="margin:14px 0 0">تزریق فقط توسط پزشک و بعد از معاینه انجام می‌شه. اطلاعات از وب‌سایت رسمی INOVOSENSE.</p>
+        <p class="small faint" style="margin:14px 0 0">تزریق فقط توسط پزشک و بعد از معاینه انجام می‌شه. اطلاعات از دفترچه‌ی رسمی (IFU) و وب‌سایت INOVOSENSE.</p>
       </div>`;
     const sh = $('#psheet'); sh.hidden = false; requestAnimationFrame(() => sh.classList.add('open')); document.body.classList.add('noscroll');
     $('.sheet-card', sh).scrollTop = 0; buzz();
