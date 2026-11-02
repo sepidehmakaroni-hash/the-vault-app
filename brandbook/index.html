@@ -30,7 +30,8 @@ header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-be
 #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:84px 40px 96px}
 #wrap{position:relative;transition:transform .9s cubic-bezier(.2,.7,.2,1)}
 /* soft contact shadow on the desk */
-#wrap::after{content:"";position:absolute;left:4%;right:4%;bottom:-26px;height:46px;border-radius:50%;
+#wrap.cl::after{left:54%}#wrap.cr::after{right:54%}
+#wrap::after{content:"";position:absolute;left:4%;right:4%;transition:left .9s,right .9s;bottom:-26px;height:46px;border-radius:50%;
   background:radial-gradient(closest-side,rgba(0,0,0,.65),transparent);filter:blur(8px);z-index:-1}
 /* stacked paper edges, thickness follows reading progress */
 .edge{position:absolute;top:3px;bottom:3px;width:0;z-index:0;pointer-events:none;
@@ -149,6 +150,7 @@ function edges() {
   if (land && cur === 0) tx = -r.pageWidth / 2;
   else if (land && cur >= N - 1) tx = r.pageWidth / 2;
   wrap.style.transform = `translateX(${tx}px)`;
+  wrap.classList.toggle("cl", land && cur === 0); wrap.classList.toggle("cr", land && cur >= N - 1);
   if (cur === 0) { edgeL.style.width = "0px"; }
 }
 const LAST = N - 4;   // book pages 1..380 sit at indices 3..382
